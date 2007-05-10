@@ -16,7 +16,7 @@
 
 Name: pidgin
 Version: 2.0.0
-Release: alt8
+Release: alt9
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -29,11 +29,13 @@ Source1: %name-be.po.bz2
 Provides: gaim = %version
 Obsoletes: gaim
 
+Requires: libpurple = %version-%release
+
 BuildRequires: doxygen gcc-c++ GConf gnome-libs-devel graphviz 
 BuildRequires: gstreamer-devel imake libgnutls-devel libgpg-error libgtkspell-devel 
 BuildRequires: libSM-devel libsqlite3-devel 
 BuildRequires: libstartup-notification-devel libXScrnSaver-devel packages-info-i18n-common 
-BuildRequires: python-modules-encodings xorg-cf-files libidn-devel ImageMagick
+BuildRequires: python-modules-encodings xorg-cf-files libidn-devel 
 
 BuildPreReq: desktop-file-utils
 
@@ -271,9 +273,7 @@ fi
 %files -f %name.lang
 %doc AUTHORS  COPYING  COPYRIGHT ChangeLog INSTALL NEWS README README.MTN
 %doc doc/*.txt
-%dir %_datadir/pixmaps/*
-%dir %_datadir/sounds/%name
-%_bindir/*
+%_bindir/%name
 %dir %_libdir/%name
 %_libdir/%name/*
 # %%_datadir/dbus-1/services/*.service
@@ -282,7 +282,9 @@ fi
 
 %_man1dir/%name.*
 %_datadir/applications/%name.desktop
+%dir %_datadir/pixmaps/%name
 %_datadir/pixmaps/%name/*
+%dir %_datadir/sounds/%name
 %_datadir/sounds/%name/*
 %_iconsdir/*
 
@@ -301,7 +303,8 @@ fi
 %_libdir/libpurple.so.* 
 %dir %_libdir/purple-2
 %_libdir/purple-2/*
-%_datadir/pixmaps/purple
+%dir %_datadir/pixmaps/purple
+%_datadir/pixmaps/purple/*
 %exclude %_libdir/purple-2/*.la
 
 %if_enabled tcl
@@ -360,6 +363,7 @@ fi
 %dir %_includedir/libpurple
 %_includedir/libpurple/*
 %_libdir/libpurple.so
+%_libdir/libpurple-client.so
 %_libdir/pkgconfig/purple.pc
 %_datadir/aclocal/purple.m4
 
@@ -379,11 +383,13 @@ fi
 %_includedir/gnt/*
 %_libdir/pkgconfig/gnt.pc
 %_libdir/libgnt.so
-%_libdir/libpurple-client.so
 
 %endif
 
 %changelog
+* Thu May 10 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt9
+- fix spec
+
 * Mon May 07 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt8
 - 2.0.0 release
 - rename gaim -> pidgin
