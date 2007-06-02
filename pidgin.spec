@@ -15,8 +15,8 @@
 %def_enable dbus 1
 
 Name: pidgin
-Version: 2.0.0
-Release: alt9
+Version: 2.0.1
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -387,6 +387,9 @@ fi
 %endif
 
 %changelog
+* Sat Jun 02 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.1-alt1
+- 2.0.1
+
 * Thu May 10 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt9
 - fix spec
 
