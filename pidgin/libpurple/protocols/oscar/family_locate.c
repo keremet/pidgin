@@ -636,13 +636,15 @@ aim_info_extract(OscarData *od, ByteStream *bs, aim_userinfo_t *outinfo)
 	 * Parse out the Type-Length-Value triples as they're found.
 	 */
 	for (curtlv = 0; curtlv < tlvcnt; curtlv++) {
+		guint16 type;
+		guint8 number, length;
 		int endpos;
-		guint16 type, length;
 
 		type = byte_stream_get16(bs);
-		length = byte_stream_get16(bs);
+		number = byte_stream_get8(bs);
+		length = byte_stream_get8(bs);
 
-		endpos = byte_stream_curpos(bs) + length;
+		endpos = byte_stream_curpos(bs) + MIN(length, byte_stream_empty(bs));
 
 		if (type == 0x0001) {
 			/*
@@ -814,27 +816,33 @@ aim_info_extract(OscarData *od, ByteStream *bs, aim_userinfo_t *outinfo)
 			 * contain information about the buddy icon the user
 			 * has stored on the server.
 			 */
-			int type2, number, length2;
+			guint16 type2;
+			guint8 number2, length2;
+			int endpos2;
 
-			while (byte_stream_curpos(bs) < endpos) {
+			/*
+			 * Continue looping as long as we're able to read type2,
+			 * number2, and length2.
+			 */
+			while (byte_stream_curpos(bs) + 4 <= endpos) {
 				type2 = byte_stream_get16(bs);
-				number = byte_stream_get8(bs);
+				number2 = byte_stream_get8(bs);
 				length2 = byte_stream_get8(bs);
+
+				endpos2 = byte_stream_curpos(bs) + MIN(length2, byte_stream_empty(bs));
 
 				switch (type2) {
 					case 0x0000: { /* This is an official buddy icon? */
 						/* This is always 5 bytes of "0x02 01 d2 04 72"? */
-						byte_stream_advance(bs, length2);
 					} break;
 
 					case 0x0001: { /* A buddy icon checksum */
-						if ((length2 > 0) && ((number == 0x00) || (number == 0x01))) {
+						if ((length2 > 0) && ((number2 == 0x00) || (number2 == 0x01))) {
 							g_free(outinfo->iconcsum);
-							outinfo->iconcsumtype = number;
+							outinfo->iconcsumtype = number2;
 							outinfo->iconcsum = byte_stream_getraw(bs, length2);
 							outinfo->iconcsumlen = length2;
-						} else
-							byte_stream_advance(bs, length2);
+						}
 					} break;
 
 					case 0x0002: { /* A status/available message */
@@ -879,11 +887,10 @@ aim_info_extract(OscarData *od, ByteStream *bs, aim_userinfo_t *outinfo)
 							outinfo->itmsurl_encoding = NULL;
 						}
 					} break;
-
-					default: {
-						byte_stream_advance(bs, length2);
-					} break;
 				}
+
+				/* Save ourselves. */
+				byte_stream_setpos(bs, endpos2);
 			}
 
 		} else if (type == 0x001e) {
@@ -930,7 +937,7 @@ aim_info_extract(OscarData *od, ByteStream *bs, aim_userinfo_t *outinfo)
 int
 aim_putuserinfo(ByteStream *bs, aim_userinfo_t *info)
 {
-	aim_tlvlist_t *tlvlist = NULL;
+	GSList *tlvlist = NULL;
 
 	if (!bs || !info)
 		return -EINVAL;
@@ -965,9 +972,9 @@ aim_putuserinfo(ByteStream *bs, aim_userinfo_t *info)
 	if (info->present & AIM_USERINFO_PRESENT_SESSIONLEN)
 		aim_tlvlist_add_32(&tlvlist, (guint16)((info->flags & AIM_FLAG_AOL) ? 0x0010 : 0x000f), info->sessionlen);
 
-	byte_stream_put16(bs, aim_tlvlist_count(&tlvlist));
+	byte_stream_put16(bs, aim_tlvlist_count(tlvlist));
 	aim_tlvlist_write(bs, &tlvlist);
-	aim_tlvlist_free(&tlvlist);
+	aim_tlvlist_free(tlvlist);
 
 	return 0;
 }
@@ -1050,7 +1057,7 @@ aim_locate_reqrights(OscarData *od)
 static int
 rights(OscarData *od, FlapConnection *conn, aim_module_t *mod, FlapFrame *frame, aim_modsnac_t *snac, ByteStream *bs)
 {
-	aim_tlvlist_t *tlvlist;
+	GSList *tlvlist;
 	aim_rxcallback_t userfunc;
 	int ret = 0;
 	guint16 maxsiglen = 0;
@@ -1063,7 +1070,7 @@ rights(OscarData *od, FlapConnection *conn, aim_module_t *mod, FlapFrame *frame,
 	if ((userfunc = aim_callhandler(od, snac->family, snac->subtype)))
 		ret = userfunc(od, conn, frame, maxsiglen);
 
-	aim_tlvlist_free(&tlvlist);
+	aim_tlvlist_free(tlvlist);
 
 	return ret;
 }
@@ -1096,7 +1103,7 @@ aim_locate_setprofile(OscarData *od,
 	FlapConnection *conn;
 	FlapFrame *frame;
 	aim_snacid_t snacid;
-	aim_tlvlist_t *tl = NULL;
+	GSList *tlvlist = NULL;
 	char *encoding;
 	static const char defencoding[] = {"text/aolrtf; charset=\"%s\""};
 
@@ -1115,8 +1122,8 @@ aim_locate_setprofile(OscarData *od,
 		/* no + 1 here because of %s */
 		encoding = g_malloc(strlen(defencoding) + strlen(profile_encoding));
 		snprintf(encoding, strlen(defencoding) + strlen(profile_encoding), defencoding, profile_encoding);
-		aim_tlvlist_add_str(&tl, 0x0001, encoding);
-		aim_tlvlist_add_raw(&tl, 0x0002, profile_len, (const guchar *)profile);
+		aim_tlvlist_add_str(&tlvlist, 0x0001, encoding);
+		aim_tlvlist_add_raw(&tlvlist, 0x0002, profile_len, (const guchar *)profile);
 		g_free(encoding);
 	}
 
@@ -1132,20 +1139,20 @@ aim_locate_setprofile(OscarData *od,
 		if (awaymsg_len) {
 			encoding = g_malloc(strlen(defencoding) + strlen(awaymsg_encoding));
 			snprintf(encoding, strlen(defencoding) + strlen(awaymsg_encoding), defencoding, awaymsg_encoding);
-			aim_tlvlist_add_str(&tl, 0x0003, encoding);
-			aim_tlvlist_add_raw(&tl, 0x0004, awaymsg_len, (const guchar *)awaymsg);
+			aim_tlvlist_add_str(&tlvlist, 0x0003, encoding);
+			aim_tlvlist_add_raw(&tlvlist, 0x0004, awaymsg_len, (const guchar *)awaymsg);
 			g_free(encoding);
 		} else
-			aim_tlvlist_add_noval(&tl, 0x0004);
+			aim_tlvlist_add_noval(&tlvlist, 0x0004);
 	}
 
-	frame = flap_frame_new(od, 0x02, 10 + aim_tlvlist_size(&tl));
+	frame = flap_frame_new(od, 0x02, 10 + aim_tlvlist_size(tlvlist));
 
 	snacid = aim_cachesnac(od, 0x0002, 0x0004, 0x0000, NULL, 0);
 	aim_putsnac(&frame->data, 0x0002, 0x004, 0x0000, snacid);
 
-	aim_tlvlist_write(&frame->data, &tl);
-	aim_tlvlist_free(&tl);
+	aim_tlvlist_write(&frame->data, &tlvlist);
+	aim_tlvlist_free(tlvlist);
 
 	flap_connection_send(conn, frame);
 
@@ -1161,20 +1168,20 @@ aim_locate_setcaps(OscarData *od, guint32 caps)
 	FlapConnection *conn;
 	FlapFrame *frame;
 	aim_snacid_t snacid;
-	aim_tlvlist_t *tl = NULL;
+	GSList *tlvlist = NULL;
 
 	if (!od || !(conn = flap_connection_findbygroup(od, SNAC_FAMILY_LOCATE)))
 		return -EINVAL;
 
-	aim_tlvlist_add_caps(&tl, 0x0005, caps);
+	aim_tlvlist_add_caps(&tlvlist, 0x0005, caps);
 
-	frame = flap_frame_new(od, 0x02, 10 + aim_tlvlist_size(&tl));
+	frame = flap_frame_new(od, 0x02, 10 + aim_tlvlist_size(tlvlist));
 
 	snacid = aim_cachesnac(od, 0x0002, 0x0004, 0x0000, NULL, 0);
 	aim_putsnac(&frame->data, 0x0002, 0x004, 0x0000, snacid);
 
-	aim_tlvlist_write(&frame->data, &tl);
-	aim_tlvlist_free(&tl);
+	aim_tlvlist_write(&frame->data, &tlvlist);
+	aim_tlvlist_free(tlvlist);
 
 	flap_connection_send(conn, frame);
 
@@ -1221,7 +1228,7 @@ userinfo(OscarData *od, FlapConnection *conn, aim_module_t *mod, FlapFrame *fram
 	int ret = 0;
 	aim_rxcallback_t userfunc;
 	aim_userinfo_t *userinfo, *userinfo2;
-	aim_tlvlist_t *tlvlist;
+	GSList *tlvlist;
 	aim_tlv_t *tlv = NULL;
 	int was_explicit;
 
@@ -1252,7 +1259,7 @@ userinfo(OscarData *od, FlapConnection *conn, aim_module_t *mod, FlapFrame *fram
 		userinfo->capabilities = aim_locate_getcaps(od, &cbs, tlv->length);
 		userinfo->present = AIM_USERINFO_PRESENT_CAPABILITIES;
 	}
-	aim_tlvlist_free(&tlvlist);
+	aim_tlvlist_free(tlvlist);
 
 	aim_locate_adduserinfo(od, userinfo);
 	userinfo2 = aim_locate_finduserinfo(od, userinfo->sn);
@@ -1264,10 +1271,13 @@ userinfo(OscarData *od, FlapConnection *conn, aim_module_t *mod, FlapFrame *fram
 	 * this buddy's info explicitly, then notify them that we have info
 	 * for this buddy.
 	 */
-	was_explicit = aim_locate_gotuserinfo(od, conn, userinfo2->sn);
-	if (was_explicit == TRUE)
-		if ((userfunc = aim_callhandler(od, snac->family, snac->subtype)))
-			ret = userfunc(od, conn, frame, userinfo2);
+	if (userinfo2 != NULL)
+	{
+		was_explicit = aim_locate_gotuserinfo(od, conn, userinfo2->sn);
+		if (was_explicit == TRUE)
+			if ((userfunc = aim_callhandler(od, snac->family, snac->subtype)))
+				ret = userfunc(od, conn, frame, userinfo2);
+	}
 
 	return ret;
 }
@@ -1284,42 +1294,42 @@ int aim_locate_setdirinfo(OscarData *od, const char *first, const char *middle, 
 	FlapConnection *conn;
 	FlapFrame *frame;
 	aim_snacid_t snacid;
-	aim_tlvlist_t *tl = NULL;
+	GSList *tlvlist = NULL;
 
 	if (!od || !(conn = flap_connection_findbygroup(od, SNAC_FAMILY_LOCATE)))
 		return -EINVAL;
 
-	aim_tlvlist_add_16(&tl, 0x000a, privacy);
+	aim_tlvlist_add_16(&tlvlist, 0x000a, privacy);
 
 	if (first)
-		aim_tlvlist_add_str(&tl, 0x0001, first);
+		aim_tlvlist_add_str(&tlvlist, 0x0001, first);
 	if (last)
-		aim_tlvlist_add_str(&tl, 0x0002, last);
+		aim_tlvlist_add_str(&tlvlist, 0x0002, last);
 	if (middle)
-		aim_tlvlist_add_str(&tl, 0x0003, middle);
+		aim_tlvlist_add_str(&tlvlist, 0x0003, middle);
 	if (maiden)
-		aim_tlvlist_add_str(&tl, 0x0004, maiden);
+		aim_tlvlist_add_str(&tlvlist, 0x0004, maiden);
 
 	if (state)
-		aim_tlvlist_add_str(&tl, 0x0007, state);
+		aim_tlvlist_add_str(&tlvlist, 0x0007, state);
 	if (city)
-		aim_tlvlist_add_str(&tl, 0x0008, city);
+		aim_tlvlist_add_str(&tlvlist, 0x0008, city);
 
 	if (nickname)
-		aim_tlvlist_add_str(&tl, 0x000c, nickname);
+		aim_tlvlist_add_str(&tlvlist, 0x000c, nickname);
 	if (zip)
-		aim_tlvlist_add_str(&tl, 0x000d, zip);
+		aim_tlvlist_add_str(&tlvlist, 0x000d, zip);
 
 	if (street)
-		aim_tlvlist_add_str(&tl, 0x0021, street);
+		aim_tlvlist_add_str(&tlvlist, 0x0021, street);
 
-	frame = flap_frame_new(od, 0x02, 10+aim_tlvlist_size(&tl));
+	frame = flap_frame_new(od, 0x02, 10+aim_tlvlist_size(tlvlist));
 
 	snacid = aim_cachesnac(od, 0x0002, 0x0009, 0x0000, NULL, 0);
 
 	aim_putsnac(&frame->data, 0x0002, 0x0009, 0x0000, snacid);
-	aim_tlvlist_write(&frame->data, &tl);
-	aim_tlvlist_free(&tl);
+	aim_tlvlist_write(&frame->data, &tlvlist);
+	aim_tlvlist_free(tlvlist);
 
 	flap_connection_send(conn, frame);
 
@@ -1365,32 +1375,32 @@ aim_locate_setinterests(OscarData *od, const char *interest1, const char *intere
 	FlapConnection *conn;
 	FlapFrame *frame;
 	aim_snacid_t snacid;
-	aim_tlvlist_t *tl = NULL;
+	GSList *tlvlist = NULL;
 
 	if (!od || !(conn = flap_connection_findbygroup(od, SNAC_FAMILY_LOCATE)))
 		return -EINVAL;
 
 	/* ?? privacy ?? */
-	aim_tlvlist_add_16(&tl, 0x000a, privacy);
+	aim_tlvlist_add_16(&tlvlist, 0x000a, privacy);
 
 	if (interest1)
-		aim_tlvlist_add_str(&tl, 0x0000b, interest1);
+		aim_tlvlist_add_str(&tlvlist, 0x0000b, interest1);
 	if (interest2)
-		aim_tlvlist_add_str(&tl, 0x0000b, interest2);
+		aim_tlvlist_add_str(&tlvlist, 0x0000b, interest2);
 	if (interest3)
-		aim_tlvlist_add_str(&tl, 0x0000b, interest3);
+		aim_tlvlist_add_str(&tlvlist, 0x0000b, interest3);
 	if (interest4)
-		aim_tlvlist_add_str(&tl, 0x0000b, interest4);
+		aim_tlvlist_add_str(&tlvlist, 0x0000b, interest4);
 	if (interest5)
-		aim_tlvlist_add_str(&tl, 0x0000b, interest5);
+		aim_tlvlist_add_str(&tlvlist, 0x0000b, interest5);
 
-	frame = flap_frame_new(od, 0x02, 10+aim_tlvlist_size(&tl));
+	frame = flap_frame_new(od, 0x02, 10+aim_tlvlist_size(tlvlist));
 
 	snacid = aim_cachesnac(od, 0x0002, 0x000f, 0x0000, NULL, 0);
 
 	aim_putsnac(&frame->data, 0x0002, 0x000f, 0x0000, 0);
-	aim_tlvlist_write(&frame->data, &tl);
-	aim_tlvlist_free(&tl);
+	aim_tlvlist_write(&frame->data, &tlvlist);
+	aim_tlvlist_free(tlvlist);
 
 	flap_connection_send(conn, frame);
 

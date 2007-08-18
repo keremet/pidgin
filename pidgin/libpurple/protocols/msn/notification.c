@@ -591,10 +591,21 @@ adg_cmd(MsnCmdProc *cmdproc, MsnCommand *cmd)
 static void
 qng_cmd(MsnCmdProc *cmdproc, MsnCommand *cmd)
 {
+	MsnSession *session;
 	static int count = 0;
-	MsnSession *session = cmdproc->session;
+	const char *passport;
+	PurpleAccount *account;
+
+	session = cmdproc->session;
+	account = session->account;
 
 	if (session->passport_info.file == NULL)
+		return;
+
+	passport = purple_normalize(account, purple_account_get_username(account));
+
+	if ((strstr(passport, "@hotmail.") != NULL) ||
+		(strstr(passport, "@msn.com") != NULL))
 		return;
 
 	if (count++ < 26)
@@ -694,7 +705,7 @@ nln_cmd(MsnCmdProc *cmdproc, MsnCommand *cmd)
 	user = msn_userlist_find_user(session->userlist, passport);
 
 	old_friendly = msn_user_get_friendly_name(user);
-	if (!old_friendly || (old_friendly && strcmp(old_friendly, friendly)))
+	if (!old_friendly || (old_friendly && (!friendly || strcmp(old_friendly, friendly))))
 	{
 		serv_got_alias(gc, passport, friendly);
 		msn_user_set_friendly_name(user, friendly);
@@ -901,6 +912,7 @@ static void
 syn_cmd(MsnCmdProc *cmdproc, MsnCommand *cmd)
 {
 	MsnSession *session;
+	MsnSync *sync;
 	int total_users;
 
 	session = cmdproc->session;
@@ -919,22 +931,12 @@ syn_cmd(MsnCmdProc *cmdproc, MsnCommand *cmd)
 
 	total_users  = atoi(cmd->params[2]);
 
-	if (total_users == 0)
-	{
-		msn_session_finish_login(session);
-	}
-	else
-	{
-		/* syn_table */
-		MsnSync *sync;
+	sync = msn_sync_new(session);
+	sync->total_users = total_users;
+	sync->old_cbs_table = cmdproc->cbs_table;
 
-		sync = msn_sync_new(session);
-		sync->total_users = total_users;
-		sync->old_cbs_table = cmdproc->cbs_table;
-
-		session->sync = sync;
-		cmdproc->cbs_table = sync->cbs_table;
-	}
+	session->sync = sync;
+	cmdproc->cbs_table = sync->cbs_table;
 }
 
 /**************************************************************************

@@ -1,0 +1,100 @@
+diff -ur pidgin-2.1.0.orig/pidgin/plugins/cap/Makefile.am pidgin-2.1.0/pidgin/plugins/cap/Makefile.am
+--- pidgin-2.1.0.orig/pidgin/plugins/cap/Makefile.am	2007-07-28 04:31:56 +0300
++++ pidgin-2.1.0/pidgin/plugins/cap/Makefile.am	2007-08-18 17:32:28 +0300
+@@ -15,7 +15,7 @@
+ 
+ endif
+ 
+-cap_la_LIBADD = $(GTK_LIBS) $(SQLITE3_LIBS)
++cap_la_LIBADD = $(GTK_LIBS) $(SQLITE3_LIBS) ../../../libpurple/libpurple.la
+ 
+ AM_CPPFLAGS = \
+ 	-DDATADIR=\"$(datadir)\" \
+diff -ur pidgin-2.1.0.orig/pidgin/plugins/gestures/Makefile.am pidgin-2.1.0/pidgin/plugins/gestures/Makefile.am
+--- pidgin-2.1.0.orig/pidgin/plugins/gestures/Makefile.am	2007-05-10 06:02:58 +0300
++++ pidgin-2.1.0/pidgin/plugins/gestures/Makefile.am	2007-08-18 17:34:15 +0300
+@@ -13,7 +13,7 @@
+ 	stroke.c \
+ 	stroke-draw.c
+ 
+-gestures_la_LIBADD = $(GTK_LIBS)
++gestures_la_LIBADD = $(GTK_LIBS) ../../../libpurple/libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.1.0.orig/pidgin/plugins/gevolution/Makefile.am pidgin-2.1.0/pidgin/plugins/gevolution/Makefile.am
+--- pidgin-2.1.0.orig/pidgin/plugins/gevolution/Makefile.am	2007-05-10 06:02:58 +0300
++++ pidgin-2.1.0/pidgin/plugins/gevolution/Makefile.am	2007-08-18 17:35:56 +0300
+@@ -15,7 +15,7 @@
+ 	new_person_dialog.c \
+ 	eds-utils.c
+ 
+-gevolution_la_LIBADD = $(EVOLUTION_ADDRESSBOOK_LIBS) $(GTK_LIBS)
++gevolution_la_LIBADD = $(EVOLUTION_ADDRESSBOOK_LIBS) $(GTK_LIBS) ../../../libpurple/libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.1.0.orig/pidgin/plugins/Makefile.am pidgin-2.1.0/pidgin/plugins/Makefile.am
+--- pidgin-2.1.0.orig/pidgin/plugins/Makefile.am	2007-06-12 09:13:03 +0300
++++ pidgin-2.1.0/pidgin/plugins/Makefile.am	2007-08-18 17:44:14 +0300
+@@ -79,21 +79,21 @@
+ timestamp_format_la_SOURCES = timestamp_format.c
+ xmppconsole_la_SOURCES      = xmppconsole.c
+ 
+-convcolors_la_LIBADD        = $(GTK_LIBS)
+-contact_priority_la_LIBADD  = $(GTK_LIBS)
+-extplacement_la_LIBADD      = $(GTK_LIBS)
+-gtk_signals_test_la_LIBADD  = $(GTK_LIBS)
+-gtkbuddynote_la_LIBADD      = $(GTK_LIBS)
+-history_la_LIBADD           = $(GTK_LIBS)
+-iconaway_la_LIBADD          = $(GTK_LIBS)
+-markerline_la_LIBADD        = $(GTK_LIBS)
+-notify_la_LIBADD            = $(GTK_LIBS)
+-pidginrc_la_LIBADD          = $(GTK_LIBS)
+-relnot_la_LIBADD            = $(GLIB_LIBS)
+-spellchk_la_LIBADD          = $(GTK_LIBS)
+-timestamp_la_LIBADD         = $(GTK_LIBS)
+-timestamp_format_la_LIBADD  = $(GTK_LIBS)
+-xmppconsole_la_LIBADD       = $(GTK_LIBS)
++convcolors_la_LIBADD        = $(GTK_LIBS) ../../libpurple/libpurple.la
++contact_priority_la_LIBADD  = $(GTK_LIBS) ../../libpurple/libpurple.la
++extplacement_la_LIBADD      = $(GTK_LIBS) ../../libpurple/libpurple.la
++gtk_signals_test_la_LIBADD  = $(GTK_LIBS) ../../libpurple/libpurple.la
++gtkbuddynote_la_LIBADD      = $(GTK_LIBS) ../../libpurple/libpurple.la
++history_la_LIBADD           = $(GTK_LIBS) ../../libpurple/libpurple.la
++iconaway_la_LIBADD          = $(GTK_LIBS) ../../libpurple/libpurple.la
++markerline_la_LIBADD        = $(GTK_LIBS) ../../libpurple/libpurple.la
++notify_la_LIBADD            = $(GTK_LIBS) ../../libpurple/libpurple.la
++pidginrc_la_LIBADD          = $(GTK_LIBS) ../../libpurple/libpurple.la
++relnot_la_LIBADD            = $(GLIB_LIBS) ../../libpurple/libpurple.la
++spellchk_la_LIBADD          = $(GTK_LIBS) ../../libpurple/libpurple.la
++timestamp_la_LIBADD         = $(GTK_LIBS) ../../libpurple/libpurple.la
++timestamp_format_la_LIBADD  = $(GTK_LIBS) ../../libpurple/libpurple.la
++xmppconsole_la_LIBADD       = $(GTK_LIBS) ../../libpurple/libpurple.la
+ 
+ endif # PLUGINS
+ 
+diff -ur pidgin-2.1.0.orig/pidgin/plugins/musicmessaging/Makefile.am pidgin-2.1.0/pidgin/plugins/musicmessaging/Makefile.am
+--- pidgin-2.1.0.orig/pidgin/plugins/musicmessaging/Makefile.am	2007-05-10 06:02:58 +0300
++++ pidgin-2.1.0/pidgin/plugins/musicmessaging/Makefile.am	2007-08-18 17:41:39 +0300
+@@ -16,7 +16,7 @@
+ musicmessaging_la_SOURCES = \
+ 	musicmessaging.c
+ 
+-musicmessaging_la_LIBADD = $(GTK_LIBS) $(DBUS_LIBS)
++musicmessaging_la_LIBADD = $(GTK_LIBS) $(DBUS_LIBS) ../../../libpurple/libpurple.la
+ 
+ CLEANFILES              = music-messaging-bindings.c
+ 
+diff -ur pidgin-2.1.0.orig/pidgin/plugins/ticker/Makefile.am pidgin-2.1.0/pidgin/plugins/ticker/Makefile.am
+--- pidgin-2.1.0.orig/pidgin/plugins/ticker/Makefile.am	2007-05-10 06:02:58 +0300
++++ pidgin-2.1.0/pidgin/plugins/ticker/Makefile.am	2007-08-18 17:42:42 +0300
+@@ -14,7 +14,7 @@
+ 	gtkticker.h \
+ 	ticker.c
+ 
+-ticker_la_LIBADD = $(GTK_LIBS)
++ticker_la_LIBADD = $(GTK_LIBS) ../../../libpurple/libpurple.la
+ 
+ endif
+ 

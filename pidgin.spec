@@ -15,16 +15,23 @@
 %def_enable dbus 1
 
 Name: pidgin
-Version: 2.0.1
-Release: alt1
+Version: 2.1.0
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
 Group: Networking/Instant messaging
 Url:  http://pidgin.im/
 
-Source: %name-%version.tar.bz2
+Packager: Alexey Shabalin <shaba@altlinux.ru>
+
+Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
+
+Patch0: pidgin-2.1.0-alt-linking-plugins.patch
+Patch1: pidgin-2.1.0-alt-makefile-order.patch
+Patch2: pidgin-2.1.0-alt-fixing-pidgin-plugins.patch
+Patch3: pidgin-2.1.0-alt-linking-finch-plugins.patch
 
 Provides: gaim = %version
 Obsoletes: gaim
@@ -34,7 +41,8 @@ Requires: libpurple = %version-%release
 BuildRequires: doxygen gcc-c++ GConf gnome-libs-devel graphviz 
 BuildRequires: gstreamer-devel imake libgnutls-devel libgpg-error libgtkspell-devel 
 BuildRequires: libSM-devel libsqlite3-devel 
-BuildRequires: libstartup-notification-devel libXScrnSaver-devel packages-info-i18n-common 
+#BuildRequires: libstartup-notification-devel libXScrnSaver-devel packages-info-i18n-common 
+BuildRequires: libstartup-notification-devel libXScrnSaver-devel
 BuildRequires: python-modules-encodings xorg-cf-files libidn-devel 
 
 BuildPreReq: desktop-file-utils
@@ -192,6 +200,10 @@ and plugins.
 
 %prep
 %setup -q -n %name-%version
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 # belarusian translation
@@ -274,18 +286,15 @@ fi
 %doc AUTHORS  COPYING  COPYRIGHT ChangeLog INSTALL NEWS README README.MTN
 %doc doc/*.txt
 %_bindir/%name
-%dir %_libdir/%name
-%_libdir/%name/*
+%_libdir/%name
 # %%_datadir/dbus-1/services/*.service
 %config %_sysconfdir/gconf/schemas/*
 %exclude %_libdir/%name/*.la
 
 %_man1dir/%name.*
 %_datadir/applications/%name.desktop
-%dir %_datadir/pixmaps/%name
-%_datadir/pixmaps/%name/*
-%dir %_datadir/sounds/%name
-%_datadir/sounds/%name/*
+%_datadir/pixmaps/%name
+%_datadir/sounds/%name
 %_iconsdir/*
 
 %if_enabled gevolution
@@ -301,10 +310,8 @@ fi
 
 %files -n libpurple 
 %_libdir/libpurple.so.* 
-%dir %_libdir/purple-2
-%_libdir/purple-2/*
-%dir %_datadir/pixmaps/purple
-%_datadir/pixmaps/purple/*
+%_libdir/purple-2
+%_datadir/pixmaps/purple
 %exclude %_libdir/purple-2/*.la
 
 %if_enabled tcl
@@ -353,15 +360,13 @@ fi
 %endif
 
 %files devel
-%dir %_includedir/%name
-%_includedir/%name/*
+%_includedir/%name
 %_libdir/pkgconfig/%name.pc
 
 %files -n libpurple-devel
 %doc ChangeLog.API HACKING PLUGIN_HOWTO
 %doc libpurple/purple-notifications-example
-%dir %_includedir/libpurple
-%_includedir/libpurple/*
+%_includedir/libpurple
 %_libdir/libpurple.so
 %_libdir/libpurple-client.so
 %_libdir/pkgconfig/purple.pc
@@ -373,20 +378,33 @@ fi
 %_man1dir/finch.*
 %_bindir/finch
 %_libdir/libgnt.so.*
-%_libdir/finch/*.so
+%_libdir/gnt
+%_libdir/finch
 %exclude %_libdir/finch/*.la
+%exclude %_libdir/gnt/*.la
 
 %files -n finch-devel
-%dir %_includedir/finch
-%_includedir/finch/*
-%dir %_includedir/gnt
-%_includedir/gnt/*
+%_includedir/finch
+%_includedir/gnt
 %_libdir/pkgconfig/gnt.pc
 %_libdir/libgnt.so
 
 %endif
 
 %changelog
+* Sat Aug 18 2007 Igor Zubkov <icesik@altlinux.org> 2.1.0-alt2
+- NMU:
+  + add packager tag
+  + remove packages-info-i18n-common from buildrequires
+  + fix plugins linking
+
+* Mon Aug 13 2007 Alexey Shabalin <shaba@altlinux.ru> 2.1.0-alt1
+- 2.1.0
+- mini fix spec in %%files
+
+* Thu Jun 21 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.2-alt1
+- 2.0.2
+
 * Sat Jun 02 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.1-alt1
 - 2.0.1
 

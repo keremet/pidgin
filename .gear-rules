@@ -1,2 +1,3 @@
+copy: *.patch
 bzip2: *.po
 tar.bz2: pidgin
