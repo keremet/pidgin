@@ -15,8 +15,8 @@
 %def_enable dbus 1
 
 Name: pidgin
-Version: 2.1.0
-Release: alt2
+Version: 2.1.1
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -294,8 +294,8 @@ fi
 %_man1dir/%name.*
 %_datadir/applications/%name.desktop
 %_datadir/pixmaps/%name
-%_datadir/sounds/%name
-%_iconsdir/*
+%_iconsdir/hicolor/??x??/apps/%{name}*.png
+%_iconsdir/hicolor/scalable/apps/%{name}*.svg
 
 %if_enabled gevolution
 %exclude %_libdir/%name/gevolution.so
@@ -312,6 +312,7 @@ fi
 %_libdir/libpurple.so.* 
 %_libdir/purple-2
 %_datadir/pixmaps/purple
+%_datadir/sounds/purple
 %exclude %_libdir/purple-2/*.la
 
 %if_enabled tcl
@@ -392,6 +393,11 @@ fi
 %endif
 
 %changelog
+* Sat Aug 25 2007 Alexey Shabalin <shaba@altlinux.ru> 2.1.1-alt1
+- 2.1.1
+- move sounds from pidgin to purple package
+- more fine use icons in %%files
+
 * Sat Aug 18 2007 Igor Zubkov <icesik@altlinux.org> 2.1.0-alt2
 - NMU:
   + add packager tag
