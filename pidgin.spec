@@ -16,7 +16,7 @@
 
 Name: pidgin
 Version: 2.1.1
-Release: alt1
+Release: alt1.1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -393,6 +393,9 @@ fi
 %endif
 
 %changelog
+* Mon Aug 27 2007 Alexey Shabalin <shaba@altlinux.ru> 2.1.1-alt1.1
+- rebuild with new evolution-data-server-1.10.3.1
+
 * Sat Aug 25 2007 Alexey Shabalin <shaba@altlinux.ru> 2.1.1-alt1
 - 2.1.1
 - move sounds from pidgin to purple package
