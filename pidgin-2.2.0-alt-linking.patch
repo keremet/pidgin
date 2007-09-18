@@ -1,0 +1,371 @@
+diff -ur pidgin-2.2.0.orig/finch/plugins/Makefile.am pidgin-2.2.0/finch/plugins/Makefile.am
+--- pidgin-2.2.0.orig/finch/plugins/Makefile.am	2007-06-19 06:34:24 +0300
++++ pidgin-2.2.0/finch/plugins/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -21,10 +21,10 @@
+ gntclipboard_la_CFLAGS = $(X11_CFLAGS)
+ gntgf_la_CFLAGS = $(X11_CFLAGS)
+ 
+-gntclipboard_la_LIBADD = $(GLIB_LIBS) $(X11_LIBS)
+-gntgf_la_LIBADD       = $(GLIB_LIBS) $(X11_LIBS) $(top_builddir)/finch/libgnt/libgnt.la
+-gnthistory_la_LIBADD  = $(GLIB_LIBS)
+-gntlastlog_la_LIBADD  = $(GLIB_LIBS)
++gntclipboard_la_LIBADD = $(GLIB_LIBS) $(X11_LIBS) ../libgnt/libgnt.la ../../libpurple/libpurple.la
++gntgf_la_LIBADD       = $(GLIB_LIBS) $(X11_LIBS) $(top_builddir)/finch/libgnt/libgnt.la ../../libpurple/libpurple.la
++gnthistory_la_LIBADD  = $(GLIB_LIBS) ../../libpurple/libpurple.la
++gntlastlog_la_LIBADD  = $(GLIB_LIBS) ../../libpurple/libpurple.la ../libgnt/libgnt.la
+ 
+ endif # PLUGINS
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/Makefile.am pidgin-2.2.0/libpurple/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/Makefile.am	2007-08-30 07:36:32 +0300
++++ pidgin-2.2.0/libpurple/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -29,7 +29,7 @@
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = purple.pc
+ 
+-SUBDIRS = $(GCONF_DIR) plugins protocols tests . example
++SUBDIRS = . $(GCONF_DIR) plugins protocols tests example
+ 
+ purple_coresources = \
+ 	account.c \
+diff -ur pidgin-2.2.0.orig/libpurple/plugins/Makefile.am pidgin-2.2.0/libpurple/plugins/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/plugins/Makefile.am	2007-09-14 07:45:39 +0300
++++ pidgin-2.2.0/libpurple/plugins/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -87,28 +87,28 @@
+ simple_la_SOURCES			= simple.c
+ statenotify_la_SOURCES      = statenotify.c
+ 
+-autoaccept_la_LIBADD        = $(GLIB_LIBS)
+-buddynote_la_LIBADD         = $(GLIB_LIBS)
+-ciphertest_la_LIBADD		= $(GLIB_LIBS)
+-codeinline_la_LIBADD		= $(GLIB_LIBS)
+-idle_la_LIBADD              = $(GLIB_LIBS)
+-joinpart_la_LIBADD          = $(GLIB_LIBS)
+-log_reader_la_LIBADD        = $(GLIB_LIBS)
+-newline_la_LIBADD           = $(GLIB_LIBS)
++autoaccept_la_LIBADD        = $(GLIB_LIBS) ../libpurple.la
++buddynote_la_LIBADD         = $(GLIB_LIBS) ../libpurple.la
++ciphertest_la_LIBADD		= $(GLIB_LIBS) ../libpurple.la
++codeinline_la_LIBADD		= $(GLIB_LIBS) ../libpurple.la
++idle_la_LIBADD              = $(GLIB_LIBS) ../libpurple.la
++joinpart_la_LIBADD          = $(GLIB_LIBS) ../libpurple.la
++log_reader_la_LIBADD        = $(GLIB_LIBS) ../libpurple.la
++newline_la_LIBADD           = $(GLIB_LIBS) ../libpurple.la
+ notify_example_la_LIBADD    = $(GLIB_LIBS)
+-offlinemsg_la_LIBADD        = $(GLIB_LIBS)
+-pluginpref_example_la_LIBADD = $(GLIB_LIBS)
+-psychic_la_LIBADD           = $(GLIB_LIBS)
+-signals_test_la_LIBADD		= $(GLIB_LIBS)
+-simple_la_LIBADD			= $(GLIB_LIBS)
+-statenotify_la_LIBADD       = $(GLIB_LIBS)
++offlinemsg_la_LIBADD        = $(GLIB_LIBS) ../libpurple.la
++pluginpref_example_la_LIBADD = $(GLIB_LIBS) ../libpurple.la
++psychic_la_LIBADD           = $(GLIB_LIBS) ../libpurple.la
++signals_test_la_LIBADD		= $(GLIB_LIBS) ../libpurple.la
++simple_la_LIBADD			= $(GLIB_LIBS) ../libpurple.la
++statenotify_la_LIBADD       = $(GLIB_LIBS) ../libpurple.la
+ 
+ if ENABLE_DBUS
+ 
+ CLEANFILES              = dbus-example-bindings.c
+ dbus_example_la_SOURCES = dbus-example.c
+ 
+-dbus_example_la_LIBADD      = $(GLIB_LIBS) $(DBUS_LIBS)
++dbus_example_la_LIBADD      = $(GLIB_LIBS) $(DBUS_LIBS) ../libpurple.la
+ 
+ .PHONY: always
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/plugins/ssl/Makefile.am pidgin-2.2.0/libpurple/plugins/ssl/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/plugins/ssl/Makefile.am	2007-05-03 21:14:10 +0300
++++ pidgin-2.2.0/libpurple/plugins/ssl/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -18,9 +18,9 @@
+ ssl_gnutls_la_SOURCES = ssl-gnutls.c
+ ssl_nss_la_SOURCES    = ssl-nss.c
+ 
+-ssl_la_LIBADD        = $(GLIB_LIBS)
+-ssl_gnutls_la_LIBADD = $(GLIB_LIBS) $(GNUTLS_LIBS)
+-ssl_nss_la_LIBADD    = $(GLIB_LIBS) $(NSS_LIBS)
++ssl_la_LIBADD        = $(GLIB_LIBS) ../../libpurple.la
++ssl_gnutls_la_LIBADD = $(GLIB_LIBS) $(GNUTLS_LIBS) ../../libpurple.la
++ssl_nss_la_LIBADD    = $(GLIB_LIBS) $(NSS_LIBS) ../../libpurple.la
+ 
+ endif # PLUGINS
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/bonjour/Makefile.am pidgin-2.2.0/libpurple/protocols/bonjour/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/bonjour/Makefile.am	2007-08-08 05:17:41 +0300
++++ pidgin-2.2.0/libpurple/protocols/bonjour/Makefile.am	2007-09-17 18:04:55 +0300
+@@ -52,7 +52,7 @@
+ st =
+ pkg_LTLIBRARIES       = libbonjour.la
+ libbonjour_la_SOURCES = $(BONJOURSOURCES)
+-libbonjour_la_LIBADD  = $(GLIB_LIBS) $(LIBXML_LIBS)
++libbonjour_la_LIBADD  = $(GLIB_LIBS) $(LIBXML_LIBS) ../../libpurple.la
+ if MDNS_AVAHI
+   libbonjour_la_LIBADD  += $(AVAHI_LIBS)
+ else
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/gg/Makefile.am pidgin-2.2.0/libpurple/protocols/gg/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/gg/Makefile.am	2007-05-03 21:14:10 +0300
++++ pidgin-2.2.0/libpurple/protocols/gg/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -57,7 +57,7 @@
+ 
+ libgg_a_SOURCES = $(GGSOURCES)
+ libgg_a_CFLAGS  = $(AM_CFLAGS)
+-libgg_a_LIBADD  = $(GADU_LIBS)
++libgg_a_LIBADD  = $(GADU_LIBS) ../../libpurple.la
+ 
+ else
+ 
+@@ -66,7 +66,7 @@
+ noinst_LIBRARIES =
+ 
+ libgg_la_SOURCES = $(GGSOURCES)
+-libgg_la_LIBADD  = $(GLIB_LIBS) $(GADU_LIBS)
++libgg_la_LIBADD  = $(GLIB_LIBS) $(GADU_LIBS) ../../libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/irc/Makefile.am pidgin-2.2.0/libpurple/protocols/irc/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/irc/Makefile.am	2007-05-10 06:02:58 +0300
++++ pidgin-2.2.0/libpurple/protocols/irc/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -24,7 +24,7 @@
+ noinst_LIBRARIES =
+ 
+ libirc_la_SOURCES = $(IRCSOURCES)
+-libirc_la_LIBADD  = $(GLIB_LIBS)
++libirc_la_LIBADD  = $(GLIB_LIBS) ../../libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/jabber/Makefile.am pidgin-2.2.0/libpurple/protocols/jabber/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/jabber/Makefile.am	2007-09-06 07:09:40 +0300
++++ pidgin-2.2.0/libpurple/protocols/jabber/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -70,10 +70,10 @@
+ noinst_LIBRARIES =
+ 
+ libjabber_la_SOURCES = $(JABBERSOURCES)
+-libjabber_la_LIBADD = $(GLIB_LIBS) $(SASL_LIBS) $(LIBXML_LIBS)
++libjabber_la_LIBADD = $(GLIB_LIBS) $(SASL_LIBS) $(LIBXML_LIBS) ../../libpurple.la
+ 
+ libxmpp_la_SOURCES = libxmpp.c
+-libxmpp_la_LIBADD = libjabber.la
++libxmpp_la_LIBADD = libjabber.la ../../libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/msn/Makefile.am pidgin-2.2.0/libpurple/protocols/msn/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/msn/Makefile.am	2007-05-03 21:14:10 +0300
++++ pidgin-2.2.0/libpurple/protocols/msn/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -79,7 +79,7 @@
+ st =
+ pkg_LTLIBRARIES   = libmsn.la
+ libmsn_la_SOURCES = $(MSNSOURCES)
+-libmsn_la_LIBADD  = $(GLIB_LIBS)
++libmsn_la_LIBADD  = $(GLIB_LIBS) ../../libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/myspace/Makefile.am pidgin-2.2.0/libpurple/protocols/myspace/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/myspace/Makefile.am	2007-09-14 07:45:40 +0300
++++ pidgin-2.2.0/libpurple/protocols/myspace/Makefile.am	2007-09-17 18:06:06 +0300
+@@ -32,7 +32,7 @@
+ st =
+ pkg_LTLIBRARIES       = libmyspace.la
+ libmyspace_la_SOURCES = $(SOURCES)
+-libmyspace_la_LIBADD  = $(GLIB_LIBS)
++libmyspace_la_LIBADD  = $(GLIB_LIBS) ../../libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/novell/Makefile.am pidgin-2.2.0/libpurple/protocols/novell/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/novell/Makefile.am	2007-05-03 21:14:10 +0300
++++ pidgin-2.2.0/libpurple/protocols/novell/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -46,7 +46,7 @@
+ noinst_LIBRARIES =
+ 
+ libnovell_la_SOURCES = $(NOVELLSOURCES)
+-libnovell_la_LIBADD  = $(GLIB_LIBS)
++libnovell_la_LIBADD  = $(GLIB_LIBS) ../../libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/oscar/Makefile.am pidgin-2.2.0/libpurple/protocols/oscar/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/oscar/Makefile.am	2007-06-12 09:13:03 +0300
++++ pidgin-2.2.0/libpurple/protocols/oscar/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -62,13 +62,13 @@
+ st =
+ pkg_LTLIBRARIES     = liboscar.la libaim.la libicq.la
+ liboscar_la_SOURCES = $(OSCARSOURCES)
+-liboscar_la_LIBADD  = $(GLIB_LIBS)
++liboscar_la_LIBADD  = $(GLIB_LIBS) ../../libpurple.la
+ 
+ libaim_la_SOURCES = libaim.c
+-libaim_la_LIBADD = liboscar.la
++libaim_la_LIBADD = liboscar.la ../../libpurple.la
+ 
+ libicq_la_SOURCES = libicq.c
+-libicq_la_LIBADD = liboscar.la
++libicq_la_LIBADD = liboscar.la ../../libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/qq/Makefile.am pidgin-2.2.0/libpurple/protocols/qq/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/qq/Makefile.am	2007-06-23 06:06:32 +0300
++++ pidgin-2.2.0/libpurple/protocols/qq/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -85,7 +85,7 @@
+ st =
+ pkg_LTLIBRARIES  = libqq.la
+ libqq_la_SOURCES = $(QQSOURCES)
+-libqq_la_LIBADD  = $(GLIB_LIBS)
++libqq_la_LIBADD  = $(GLIB_LIBS) ../../libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/simple/Makefile.am pidgin-2.2.0/libpurple/protocols/simple/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/simple/Makefile.am	2007-05-03 21:14:10 +0300
++++ pidgin-2.2.0/libpurple/protocols/simple/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -25,7 +25,7 @@
+ st =
+ pkg_LTLIBRARIES   = libsimple.la
+ libsimple_la_SOURCES = $(SIMPLESOURCES)
+-libsimple_la_LIBADD  = $(GLIB_LIBS)
++libsimple_la_LIBADD  = $(GLIB_LIBS) ../../libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/yahoo/Makefile.am pidgin-2.2.0/libpurple/protocols/yahoo/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/yahoo/Makefile.am	2007-08-21 10:33:13 +0300
++++ pidgin-2.2.0/libpurple/protocols/yahoo/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -45,7 +45,7 @@
+ st =
+ pkg_LTLIBRARIES     = libyahoo.la
+ libyahoo_la_SOURCES = $(YAHOOSOURCES)
+-libyahoo_la_LIBADD  = $(GLIB_LIBS)
++libyahoo_la_LIBADD  = $(GLIB_LIBS) ../../libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/libpurple/protocols/zephyr/Makefile.am pidgin-2.2.0/libpurple/protocols/zephyr/Makefile.am
+--- pidgin-2.2.0.orig/libpurple/protocols/zephyr/Makefile.am	2007-05-03 21:14:10 +0300
++++ pidgin-2.2.0/libpurple/protocols/zephyr/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -81,7 +81,7 @@
+ noinst_LIBRARIES = libzephyr.a
+ libzephyr_a_SOURCES = $(ZEPHYRSOURCES)
+ libzephyr_a_CFLAGS  = $(AM_CFLAGS)
+-libzephyr_a_LIBADD  = $(ZEPHYRLIBS)
++libzephyr_a_LIBADD  = $(ZEPHYRLIBS) ../../libpurple.la
+ 
+ else
+ 
+@@ -90,10 +90,10 @@
+ 
+ if EXTERNAL_LIBZEPHYR
+ libzephyr_la_SOURCES = $(ZEPHYRSOURCESEXT)
+-libzephyr_la_LIBADD = $(GLIB_LIBS) $(ZEPHYRLIBSEXT)
++libzephyr_la_LIBADD = $(GLIB_LIBS) $(ZEPHYRLIBSEXT) ../../libpurple.la
+ else
+ libzephyr_la_SOURCES = $(ZEPHYRSOURCES)
+-libzephyr_la_LIBADD  = $(GLIB_LIBS) $(ZEPHYRLIBS)
++libzephyr_la_LIBADD  = $(GLIB_LIBS) $(ZEPHYRLIBS) ../../libpurple.la
+ endif
+ 
+ 
+diff -ur pidgin-2.2.0.orig/pidgin/plugins/cap/Makefile.am pidgin-2.2.0/pidgin/plugins/cap/Makefile.am
+--- pidgin-2.2.0.orig/pidgin/plugins/cap/Makefile.am	2007-07-28 04:31:56 +0300
++++ pidgin-2.2.0/pidgin/plugins/cap/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -15,7 +15,7 @@
+ 
+ endif
+ 
+-cap_la_LIBADD = $(GTK_LIBS) $(SQLITE3_LIBS)
++cap_la_LIBADD = $(GTK_LIBS) $(SQLITE3_LIBS) ../../../libpurple/libpurple.la
+ 
+ AM_CPPFLAGS = \
+ 	-DDATADIR=\"$(datadir)\" \
+diff -ur pidgin-2.2.0.orig/pidgin/plugins/gestures/Makefile.am pidgin-2.2.0/pidgin/plugins/gestures/Makefile.am
+--- pidgin-2.2.0.orig/pidgin/plugins/gestures/Makefile.am	2007-05-10 06:02:58 +0300
++++ pidgin-2.2.0/pidgin/plugins/gestures/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -13,7 +13,7 @@
+ 	stroke.c \
+ 	stroke-draw.c
+ 
+-gestures_la_LIBADD = $(GTK_LIBS)
++gestures_la_LIBADD = $(GTK_LIBS) ../../../libpurple/libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/pidgin/plugins/gevolution/Makefile.am pidgin-2.2.0/pidgin/plugins/gevolution/Makefile.am
+--- pidgin-2.2.0.orig/pidgin/plugins/gevolution/Makefile.am	2007-05-10 06:02:58 +0300
++++ pidgin-2.2.0/pidgin/plugins/gevolution/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -15,7 +15,7 @@
+ 	new_person_dialog.c \
+ 	eds-utils.c
+ 
+-gevolution_la_LIBADD = $(EVOLUTION_ADDRESSBOOK_LIBS) $(GTK_LIBS)
++gevolution_la_LIBADD = $(EVOLUTION_ADDRESSBOOK_LIBS) $(GTK_LIBS) ../../../libpurple/libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.2.0.orig/pidgin/plugins/Makefile.am pidgin-2.2.0/pidgin/plugins/Makefile.am
+--- pidgin-2.2.0.orig/pidgin/plugins/Makefile.am	2007-08-28 05:35:01 +0300
++++ pidgin-2.2.0/pidgin/plugins/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -83,21 +83,21 @@
+ timestamp_format_la_SOURCES = timestamp_format.c
+ xmppconsole_la_SOURCES      = xmppconsole.c
+ 
+-convcolors_la_LIBADD        = $(GTK_LIBS)
+-contact_priority_la_LIBADD  = $(GTK_LIBS)
+-extplacement_la_LIBADD      = $(GTK_LIBS)
+-gtk_signals_test_la_LIBADD  = $(GTK_LIBS)
+-gtkbuddynote_la_LIBADD      = $(GTK_LIBS)
+-history_la_LIBADD           = $(GTK_LIBS)
+-iconaway_la_LIBADD          = $(GTK_LIBS)
+-markerline_la_LIBADD        = $(GTK_LIBS)
+-notify_la_LIBADD            = $(GTK_LIBS)
+-pidginrc_la_LIBADD          = $(GTK_LIBS)
+-relnot_la_LIBADD            = $(GLIB_LIBS)
+-spellchk_la_LIBADD          = $(GTK_LIBS)
+-timestamp_la_LIBADD         = $(GTK_LIBS)
+-timestamp_format_la_LIBADD  = $(GTK_LIBS)
+-xmppconsole_la_LIBADD       = $(GTK_LIBS)
++convcolors_la_LIBADD        = $(GTK_LIBS) ../../libpurple/libpurple.la
++contact_priority_la_LIBADD  = $(GTK_LIBS) ../../libpurple/libpurple.la
++extplacement_la_LIBADD      = $(GTK_LIBS) ../../libpurple/libpurple.la
++gtk_signals_test_la_LIBADD  = $(GTK_LIBS) ../../libpurple/libpurple.la
++gtkbuddynote_la_LIBADD      = $(GTK_LIBS) ../../libpurple/libpurple.la
++history_la_LIBADD           = $(GTK_LIBS) ../../libpurple/libpurple.la
++iconaway_la_LIBADD          = $(GTK_LIBS) ../../libpurple/libpurple.la
++markerline_la_LIBADD        = $(GTK_LIBS) ../../libpurple/libpurple.la
++notify_la_LIBADD            = $(GTK_LIBS) ../../libpurple/libpurple.la
++pidginrc_la_LIBADD          = $(GTK_LIBS) ../../libpurple/libpurple.la
++relnot_la_LIBADD            = $(GLIB_LIBS) ../../libpurple/libpurple.la
++spellchk_la_LIBADD          = $(GTK_LIBS) ../../libpurple/libpurple.la
++timestamp_la_LIBADD         = $(GTK_LIBS) ../../libpurple/libpurple.la
++timestamp_format_la_LIBADD  = $(GTK_LIBS) ../../libpurple/libpurple.la
++xmppconsole_la_LIBADD       = $(GTK_LIBS) ../../libpurple/libpurple.la
+ 
+ endif # PLUGINS
+ 
+diff -ur pidgin-2.2.0.orig/pidgin/plugins/musicmessaging/Makefile.am pidgin-2.2.0/pidgin/plugins/musicmessaging/Makefile.am
+--- pidgin-2.2.0.orig/pidgin/plugins/musicmessaging/Makefile.am	2007-05-10 06:02:58 +0300
++++ pidgin-2.2.0/pidgin/plugins/musicmessaging/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -16,7 +16,7 @@
+ musicmessaging_la_SOURCES = \
+ 	musicmessaging.c
+ 
+-musicmessaging_la_LIBADD = $(GTK_LIBS) $(DBUS_LIBS)
++musicmessaging_la_LIBADD = $(GTK_LIBS) $(DBUS_LIBS) ../../../libpurple/libpurple.la
+ 
+ CLEANFILES              = music-messaging-bindings.c
+ 
+diff -ur pidgin-2.2.0.orig/pidgin/plugins/ticker/Makefile.am pidgin-2.2.0/pidgin/plugins/ticker/Makefile.am
+--- pidgin-2.2.0.orig/pidgin/plugins/ticker/Makefile.am	2007-05-10 06:02:58 +0300
++++ pidgin-2.2.0/pidgin/plugins/ticker/Makefile.am	2007-09-17 17:44:13 +0300
+@@ -14,7 +14,7 @@
+ 	gtkticker.h \
+ 	ticker.c
+ 
+-ticker_la_LIBADD = $(GTK_LIBS)
++ticker_la_LIBADD = $(GTK_LIBS) ../../../libpurple/libpurple.la
+ 
+ endif
+ 

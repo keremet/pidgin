@@ -15,8 +15,8 @@
 %def_enable dbus 1
 
 Name: pidgin
-Version: 2.1.1
-Release: alt1.1
+Version: 2.2.0
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -28,10 +28,7 @@ Packager: Alexey Shabalin <shaba@altlinux.ru>
 Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
 
-Patch0: pidgin-2.1.0-alt-linking-plugins.patch
-Patch1: pidgin-2.1.0-alt-makefile-order.patch
-Patch2: pidgin-2.1.0-alt-fixing-pidgin-plugins.patch
-Patch3: pidgin-2.1.0-alt-linking-finch-plugins.patch
+Patch0: pidgin-2.2.0-alt-linking.patch
 
 Provides: gaim = %version
 Obsoletes: gaim
@@ -201,9 +198,6 @@ and plugins.
 %prep
 %setup -q -n %name-%version
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
 
 %build
 # belarusian translation
@@ -314,6 +308,8 @@ fi
 %_datadir/pixmaps/purple
 %_datadir/sounds/purple
 %exclude %_libdir/purple-2/*.la
+%dir %_datadir/purple
+%_datadir/purple/
 
 %if_enabled tcl
 %exclude %_libdir/purple-2/tcl.so
@@ -393,6 +389,9 @@ fi
 %endif
 
 %changelog
+* Mon Sep 17 2007 Igor Zubkov <icesik@altlinux.org> 2.2.0-alt1
+- 2.1.1 -> 2.2.0
+
 * Mon Aug 27 2007 Alexey Shabalin <shaba@altlinux.ru> 2.1.1-alt1.1
 - rebuild with new evolution-data-server-1.10.3.1
 
