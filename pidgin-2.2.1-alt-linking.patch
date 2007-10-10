@@ -164,18 +164,18 @@ diff -ur pidgin-2.2.0.orig/libpurple/protocols/msn/Makefile.am pidgin-2.2.0/libp
  
  endif
  
-diff -ur pidgin-2.2.0.orig/libpurple/protocols/myspace/Makefile.am pidgin-2.2.0/libpurple/protocols/myspace/Makefile.am
+diff -ur pidgin-2.2.1.orig/libpurple/protocols/myspace/Makefile.am pidgin-2.2.1/libpurple/protocols/myspace/Makefile.am
 --- pidgin-2.2.0.orig/libpurple/protocols/myspace/Makefile.am	2007-09-14 07:45:40 +0300
 +++ pidgin-2.2.0/libpurple/protocols/myspace/Makefile.am	2007-09-17 18:06:06 +0300
 @@ -32,7 +32,7 @@
  st =
  pkg_LTLIBRARIES       = libmyspace.la
- libmyspace_la_SOURCES = $(SOURCES)
+ libmyspace_la_SOURCES = $(MSIMSOURCES)
 -libmyspace_la_LIBADD  = $(GLIB_LIBS)
 +libmyspace_la_LIBADD  = $(GLIB_LIBS) ../../libpurple.la
  
  endif
- 
+      
 diff -ur pidgin-2.2.0.orig/libpurple/protocols/novell/Makefile.am pidgin-2.2.0/libpurple/protocols/novell/Makefile.am
 --- pidgin-2.2.0.orig/libpurple/protocols/novell/Makefile.am	2007-05-03 21:14:10 +0300
 +++ pidgin-2.2.0/libpurple/protocols/novell/Makefile.am	2007-09-17 17:44:13 +0300

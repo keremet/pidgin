@@ -15,7 +15,7 @@
 %def_enable dbus 1
 
 Name: pidgin
-Version: 2.2.0
+Version: 2.2.1
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -28,7 +28,7 @@ Packager: Alexey Shabalin <shaba@altlinux.ru>
 Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
 
-Patch0: pidgin-2.2.0-alt-linking.patch
+Patch0: pidgin-2.2.1-alt-linking.patch
 
 Provides: gaim = %version
 Obsoletes: gaim
@@ -389,6 +389,9 @@ fi
 %endif
 
 %changelog
+* Wed Oct 10 2007 Alexey Shabalin <shaba@altlinux.ru> 2.2.1-alt1
+- 2.2.1
+
 * Mon Sep 17 2007 Igor Zubkov <icesik@altlinux.org> 2.2.0-alt1
 - 2.1.1 -> 2.2.0
 
