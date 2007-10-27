@@ -15,7 +15,7 @@
 %def_enable dbus 1
 
 Name: pidgin
-Version: 2.2.1
+Version: 2.2.2
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -51,9 +51,6 @@ PreReq: GConf
 BuildRequires:	libncurses-devel libncursesw-devel
 %endif
 
-%if_enabled dbus
-BuildRequires: libdbus-devel libdbus-glib-devel
-%endif
 
 %if_enabled nss
 BuildRequires: libnss-devel libnspr-devel
@@ -125,6 +122,7 @@ Provides: gaim-gevolution = %version
 Gevolution plugin for Pidgin.
 %endif
 
+
 %if_enabled mono
 %package -n libpurple-mono
 Summary:    Mono .NET plugin support for Pidgin
@@ -192,7 +190,19 @@ Obsoletes: gaim-text-devel
 The finch-devel package contains the header files, developer
 documentation, and libraries required for development of Finch scripts
 and plugins.
+%endif
 
+%if_enabled dbus
+%package -n libpurple-dbus
+Summary: D-Bus client utiles for Pidgin
+Group: Networking/Instant messaging
+Requires: %name = %version-%release
+BuildRequires: libdbus-devel libdbus-glib-devel
+Obsoletes: gaim-dbus
+Provides: gaim-dbus = %version
+
+%description -n libpurple-dbus
+D-Bus client utiles for Pidgin.
 %endif
 
 %prep
@@ -323,6 +333,7 @@ fi
 %endif
 
 %if_enabled dbus
+%files -n libpurple-dbus
 %_bindir/purple-client-example
 %_bindir/purple-remote
 %_bindir/purple-send
@@ -358,7 +369,7 @@ fi
 
 %files devel
 %_includedir/%name
-%_libdir/pkgconfig/%name.pc
+%_pkgconfigdir/%name.pc
 
 %files -n libpurple-devel
 %doc ChangeLog.API HACKING PLUGIN_HOWTO
@@ -366,7 +377,7 @@ fi
 %_includedir/libpurple
 %_libdir/libpurple.so
 %_libdir/libpurple-client.so
-%_libdir/pkgconfig/purple.pc
+%_pkgconfigdir/purple.pc
 %_datadir/aclocal/purple.m4
 
 %if_enabled consoleui
@@ -383,12 +394,18 @@ fi
 %files -n finch-devel
 %_includedir/finch
 %_includedir/gnt
-%_libdir/pkgconfig/gnt.pc
+%_pkgconfigdir/gnt.pc
+%_pkgconfigdir/finch.pc
 %_libdir/libgnt.so
 
 %endif
 
 %changelog
+* Sat Oct 27 2007 Alexey Shabalin <shaba@altlinux.ru> 2.2.2-alt1
+- 2.2.2
+- move dbus client utiles(exec scripts and lib) from libpurple to libpurple-dbus
+- must fix #13026 with new rpm-build-python find requires
+
 * Wed Oct 10 2007 Alexey Shabalin <shaba@altlinux.ru> 2.2.1-alt1
 - 2.2.1
 
