@@ -68,7 +68,7 @@ typedef struct
 	GtkWidget *filterlevel;
 } DebugWindow;
 
-static char debug_fg_colors[][8] = {
+static const char debug_fg_colors[][8] = {
 	"#000000",    /**< All debug levels. */
 	"#666666",    /**< Misc.             */
 	"#000000",    /**< Information.      */
@@ -985,6 +985,9 @@ pidgin_debug_init(void)
 	REGISTER_G_LOG_HANDLER("GModule");
 	REGISTER_G_LOG_HANDLER("GLib-GObject");
 	REGISTER_G_LOG_HANDLER("GThread");
+#ifdef USE_GSTREAMER
+	REGISTER_G_LOG_HANDLER("GStreamer");
+#endif
 
 #ifdef _WIN32
 	if (!purple_debug_is_enabled())

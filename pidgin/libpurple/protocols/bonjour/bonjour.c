@@ -41,14 +41,7 @@
 #include "mdns_common.h"
 #include "jabber.h"
 #include "buddy.h"
-
-/*
- * TODO: Should implement an add_buddy callback that removes the buddy
- *       from the local list.  Bonjour manages buddies for you, and
- *       adding someone locally by hand is stupid.  Or, maybe even better,
- *       if a PRPL does not have an add_buddy callback then do not allow
- *       users to add buddies.
- */
+#include "bonjour_ft.h"
 
 static char *default_firstname;
 static char *default_lastname;
@@ -85,6 +78,7 @@ bonjour_removeallfromlocal(PurpleConnection *gc)
 				if (buddy->account != account)
 					continue;
 				purple_prpl_got_user_status(account, buddy->name, "offline", NULL);
+				purple_account_remove_buddy(account, buddy, NULL);
 				purple_blist_remove_buddy(buddy);
 			}
 		}
@@ -102,8 +96,8 @@ bonjour_login(PurpleAccount *account)
 
 #ifdef _WIN32
 	if (!dns_sd_available()) {
-		gc->wants_to_die = TRUE;
-		purple_connection_error(gc,
+		purple_connection_error_reason(gc,
+			PURPLE_CONNECTION_ERROR_OTHER_ERROR,
 			_("The Apple Bonjour For Windows toolkit wasn't found, see the FAQ at: "
 			  "http://developer.pidgin.im/wiki/Using%20Pidgin#CanIusePidginforBonjourLink-LocalMessaging"
 			  " for more information."));
@@ -121,7 +115,9 @@ bonjour_login(PurpleAccount *account)
 
 	if (bonjour_jabber_start(bd->jabber_data) == -1) {
 		/* Send a message about the connection error */
-		purple_connection_error(gc, _("Unable to listen for incoming IM connections\n"));
+		purple_connection_error_reason (gc,
+			PURPLE_CONNECTION_ERROR_NETWORK_ERROR,
+			_("Unable to listen for incoming IM connections\n"));
 		return;
 	}
 
@@ -146,7 +142,9 @@ bonjour_login(PurpleAccount *account)
 	bd->dns_sd_data->account = account;
 	if (!bonjour_dns_sd_start(bd->dns_sd_data))
 	{
-		purple_connection_error(gc, _("Unable to establish connection with the local mDNS server.  Is it running?"));
+		purple_connection_error_reason (gc,
+			PURPLE_CONNECTION_ERROR_NETWORK_ERROR,
+			_("Unable to establish connection with the local mDNS server.  Is it running?"));
 		return;
 	}
 
@@ -166,6 +164,9 @@ bonjour_close(PurpleConnection *connection)
 	PurpleGroup *bonjour_group;
 	BonjourData *bd = connection->proto_data;
 
+	/* Remove all the bonjour buddies */
+	bonjour_removeallfromlocal(connection);
+
 	/* Stop looking for buddies in the LAN */
 	if (bd != NULL && bd->dns_sd_data != NULL)
 	{
@@ -180,13 +181,15 @@ bonjour_close(PurpleConnection *connection)
 		g_free(bd->jabber_data);
 	}
 
-	/* Remove all the bonjour buddies */
-	bonjour_removeallfromlocal(connection);
-
 	/* Delete the bonjour group */
 	bonjour_group = purple_find_group(BONJOUR_GROUP_NAME);
 	if (bonjour_group != NULL)
 		purple_blist_remove_group(bonjour_group);
+
+	/* Cancel any file transfers */
+	while (bd != NULL && bd->xfer_lists) {
+		purple_xfer_cancel_local(bd->xfer_lists->data);
+	}
 
 	g_free(bd);
 	connection->proto_data = NULL;
@@ -249,6 +252,25 @@ bonjour_set_status(PurpleAccount *account, PurpleStatus *status)
 	g_free(stripped);
 }
 
+/*
+ * The add_buddy callback removes the buddy from the local list.
+ * Bonjour manages buddies for you, and adding someone locally by
+ * hand is stupid.  Perhaps we should change libpurple not to allow adding
+ * if there is no add_buddy callback.
+ */
+static void
+bonjour_fake_add_buddy(PurpleConnection *pc, PurpleBuddy *buddy, PurpleGroup *group) {
+	purple_debug_error("bonjour", "Buddy '%s' manually added; removing.  "
+				      "Bonjour buddies must be discovered and not manually added.\n",
+			   purple_buddy_get_name(buddy));
+
+	/* I suppose we could alert the user here, but it seems unnecessary. */
+
+	/* If this causes problems, it can be moved to an idle callback */
+	purple_blist_remove_buddy(buddy);
+}
+
+
 static void bonjour_remove_buddy(PurpleConnection *pc, PurpleBuddy *buddy, PurpleGroup *group) {
 	if (buddy->proto_data) {
 		bonjour_buddy_delete(buddy->proto_data);
@@ -292,7 +314,7 @@ bonjour_convo_closed(PurpleConnection *connection, const char *who)
 	PurpleBuddy *buddy = purple_find_buddy(connection->account, who);
 	BonjourBuddy *bb;
 
-	if (buddy == NULL)
+	if (buddy == NULL || buddy->proto_data == NULL)
 	{
 		/*
 		 * This buddy is not in our buddy list, and therefore does not really
@@ -359,6 +381,11 @@ bonjour_tooltip_text(PurpleBuddy *buddy, PurpleNotifyUserInfo *user_info, gboole
 	if (message != NULL)
 		purple_notify_user_info_add_pair(user_info, _("Message"), message);
 
+	if (bb == NULL) {
+		purple_debug_error("bonjour", "Got tooltip request for a buddy without protocol data.\n");
+		return;
+	}
+
 	/* Only show first/last name if there is a nickname set (to avoid duplication) */
 	if (bb->nick != NULL) {
 		if (bb->first != NULL)
@@ -414,7 +441,7 @@ static PurplePluginProtocolInfo prpl_info =
 	bonjour_set_status,                                      /* set_status */
 	NULL,                                                    /* set_idle */
 	NULL,                                                    /* change_passwd */
-	NULL,                                                    /* add_buddy */
+	bonjour_fake_add_buddy,                                  /* add_buddy */
 	NULL,                                                    /* add_buddies */
 	bonjour_remove_buddy,                                    /* remove_buddy */
 	NULL,                                                    /* remove_buddies */
@@ -449,8 +476,8 @@ static PurplePluginProtocolInfo prpl_info =
 	NULL,                                                    /* roomlist_cancel */
 	NULL,                                                    /* roomlist_expand_category */
 	NULL,                                                    /* can_receive_file */
-	NULL,                                                    /* send_file */
-	NULL,                                                    /* new_xfer */
+	bonjour_send_file,                                       /* send_file */
+	bonjour_new_xfer,                                        /* new_xfer */
 	NULL,                                                    /* offline_message */
 	NULL,                                                    /* whiteboard_prpl_ops */
 	NULL,                                                    /* send_raw */
@@ -476,7 +503,7 @@ static PurplePluginInfo info =
 
 	"prpl-bonjour",                                   /**< id             */
 	"Bonjour",                                        /**< name           */
-	VERSION,                                          /**< version        */
+	DISPLAY_VERSION,                                  /**< version        */
 	                                                  /**  summary        */
 	N_("Bonjour Protocol Plugin"),
 	                                                  /**  description    */
@@ -648,7 +675,7 @@ initialize_default_account_values()
 	/* TODO: Avoid 'localhost,' if possible */
 	if (gethostname(hostname, 255) != 0) {
 		purple_debug_warning("bonjour", "Error when getting host name: %s.  Using \"localhost.\"\n",
-				strerror(errno));
+				g_strerror(errno));
 		strcpy(hostname, "localhost");
 	}
 	default_hostname = g_strdup(hostname);

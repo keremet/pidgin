@@ -15,7 +15,7 @@
 %def_enable dbus 1
 
 Name: pidgin
-Version: 2.2.2
+Version: 2.3.1
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -299,7 +299,6 @@ fi
 %_datadir/applications/%name.desktop
 %_datadir/pixmaps/%name
 %_iconsdir/hicolor/??x??/apps/%{name}*.png
-%_iconsdir/hicolor/scalable/apps/%{name}*.svg
 
 %if_enabled gevolution
 %exclude %_libdir/%name/gevolution.so
@@ -401,6 +400,12 @@ fi
 %endif
 
 %changelog
+* Mon Dec 10 2007 Alexey Shabalin <shaba@altlinux.ru> 2.3.1-alt1
+- 2.3.1
+
+* Thu Dec 06 2007 Alexey Shabalin <shaba@altlinux.ru> 2.3.0-alt1
+- 2.3.0
+
 * Sat Oct 27 2007 Alexey Shabalin <shaba@altlinux.ru> 2.2.2-alt1
 - 2.2.2
 - move dbus client utiles(exec scripts and lib) from libpurple to libpurple-dbus
