@@ -3,19 +3,20 @@
 %add_findprov_lib_path %_libdir/finch
 %add_findreq_skiplist %perl_vendor_archlib/*
 
-%def_disable perl 1
-%def_disable tcl 1
-%def_disable tk 1
-%def_disable nss 1
-%def_disable cyrussasl 1
-%def_enable gevolution 1
-%def_enable nas 1
-%def_disable mono 1
-%def_enable consoleui 1
-%def_enable dbus 1
+%def_disable perl
+%def_disable tcl
+%def_disable tk
+%def_disable nss
+%def_disable cyrus_sasl
+%def_enable gnutls
+%def_enable gevolution
+%def_enable nas
+%def_disable mono
+%def_enable consoleui
+%def_enable dbus
 
 Name: pidgin
-Version: 2.3.1
+Version: 2.4.0
 Release: alt1.1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -28,37 +29,39 @@ Packager: Alexey Shabalin <shaba@altlinux.ru>
 Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
 
-Patch0: pidgin-2.2.1-alt-linking.patch
+Patch0: %name-2.4.0-alt-linking.patch
+Patch1: %name-2.4.0-alt-autotools.patch
 
 Provides: gaim = %version
 Obsoletes: gaim
 
 Requires: libpurple = %version-%release
 
-BuildRequires: doxygen gcc-c++ GConf gnome-libs-devel graphviz 
-BuildRequires: gstreamer-devel imake libgnutls-devel libgpg-error libgtkspell-devel 
-BuildRequires: libSM-devel libsqlite3-devel 
-#BuildRequires: libstartup-notification-devel libXScrnSaver-devel packages-info-i18n-common 
-BuildRequires: libstartup-notification-devel libXScrnSaver-devel
-BuildRequires: python-modules-encodings xorg-cf-files libidn-devel 
-
-BuildPreReq: desktop-file-utils
-
 Requires(post,postun): desktop-file-utils
 PreReq: GConf
 
-%if_enabled consoleui
-BuildRequires:	libncurses-devel libncursesw-devel
-%endif
+# From configure.ac
+BuildPreReq: glib2-devel libgtk+2-devel
+BuildPreReq: libpango-devel >= 1.4.0
+BuildPreReq: libSM-devel libXScrnSaver-devel xorg-cf-files imake
+BuildPreReq: libstartup-notification-devel >= 0.5
+BuildPreReq: libgtkspell-devel >= 2.0.2
+%{?_enable_nss:BuildPreReq: libsasl2-devel}
+%{?_enable_cyrus_sasl:BuildPreReq: libnss-devel libnspr-devel}
+%{?_enable_cyrus_gnutls:BuildPreReq: libgnutls-devel}
+%{?_enable_consoleui:BuildPreReq: libncurses-devel libncursesw-devel}
+BuildPreReq: libsqlite3-devel >= 3.3
+BuildPreReq: libxml2-devel >= 2.6.0
+BuildPreReq: GConf
+BuildPreReq: libavahi-devel libavahi-glib-devel
+BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35
+BuildPreReq: doxygen 
 
+BuildRequires: gcc-c++  gstreamer-devel libgpg-error graphviz 
+BuildRequires: python-modules-encodings  libidn-devel 
 
-%if_enabled nss
-BuildRequires: libnss-devel libnspr-devel
-%endif
+BuildPreReq: desktop-file-utils
 
-%if_enabled cyrussasl
-BuildRequires: libsasl2-devel 
-%endif
 
 %description
 Pidgin allows you to talk to anyone using a variety of messaging
@@ -197,7 +200,7 @@ and plugins.
 Summary: D-Bus client utiles for Pidgin
 Group: Networking/Instant messaging
 Requires: %name = %version-%release
-BuildRequires: libdbus-devel libdbus-glib-devel
+BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35
 Obsoletes: gaim-dbus
 Provides: gaim-dbus = %version
 
@@ -206,15 +209,16 @@ D-Bus client utiles for Pidgin.
 %endif
 
 %prep
-%setup -q -n %name-%version
+%setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 # belarusian translation
 bzcat %SOURCE1 > po/be.po
 %__subst 's,\(ALL_LINGUAS=\"\),\1be ,' configure
 
-# %%__autoreconf
+%autoreconf
 
 %__mkdir_p %buildroot/usr/share/dbus-1/services/
 
@@ -228,8 +232,9 @@ bzcat %SOURCE1 > po/be.po
 		%{subst_enable tk} \
 		%{subst_enable tcl} \
 		%{subst_enable nss} \
+		%{subst_enable gnutls} \
 		%{subst_enable consoleui} \
-%if_enabled cyrussasl
+%if_enabled cyrus_sasl
 		--enable-cyrus-sasl \
 %else
 		--disable-cyrus-sasl \
@@ -400,6 +405,14 @@ fi
 %endif
 
 %changelog
+* Sun Mar 16 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.0-alt1.1
+- fix autotools (thanks to Igor Zubkov <icesik at altlinux.org> - patch1)
+- update BuildPreReq 
+
+* Wed Mar 12 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.0-alt1
+- 2.4.0
+- update patch for linking
+
 * Fri Jan 25 2008 Grigory Batalov <bga@altlinux.ru> 2.3.1-alt1.1
 - Rebuilt with python-2.5.
 
