@@ -16,8 +16,8 @@
 %def_enable dbus
 
 Name: pidgin
-Version: 2.4.0
-Release: alt1.1
+Version: 2.4.1
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -322,8 +322,7 @@ fi
 %_datadir/pixmaps/purple
 %_datadir/sounds/purple
 %exclude %_libdir/purple-2/*.la
-%dir %_datadir/purple
-%_datadir/purple/
+%_datadir/purple
 
 %if_enabled tcl
 %exclude %_libdir/purple-2/tcl.so
@@ -405,6 +404,9 @@ fi
 %endif
 
 %changelog
+* Wed Apr 02 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.1-alt1
+- 2.4.1
+
 * Sun Mar 16 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.0-alt1.1
 - fix autotools (thanks to Igor Zubkov <icesik at altlinux.org> - patch1)
 - update BuildPreReq 
