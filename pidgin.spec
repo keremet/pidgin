@@ -17,7 +17,7 @@
 
 Name: pidgin
 Version: 2.4.1
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -57,11 +57,10 @@ BuildPreReq: libavahi-devel libavahi-glib-devel
 BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35
 BuildPreReq: doxygen 
 
-BuildRequires: gcc-c++  gstreamer-devel libgpg-error graphviz 
-BuildRequires: python-modules-encodings  libidn-devel 
+BuildRequires: gcc-c++ gstreamer-devel libgpg-error graphviz 
+BuildRequires: python-modules-encodings libidn-devel 
 
 BuildPreReq: desktop-file-utils
-
 
 %description
 Pidgin allows you to talk to anyone using a variety of messaging
@@ -112,12 +111,20 @@ The libpurple-devel package contains the header files, developer
 documentation, and libraries required for development of libpurple based
 instant messaging clients or plugins for any libpurple based client.
 
+%package -n %name-relnot
+Summary: Release notification plugin for Pidgin
+Group: Networking/Instant messaging
+Requires: %name = %version-%release
+
+%description -n %name-relnot
+Release notification plugin for Pidgin.
+
 %if_enabled gevolution
 %package -n %name-gevolution
 Summary: Gevolution plugin for Pidgin
 Group: Networking/Instant messaging
 Requires: %name = %version-%release
-BuildRequires:	evolution-data-server-devel
+BuildRequires: evolution-data-server-devel
 Obsoletes: gaim-gevolution
 Provides: gaim-gevolution = %version
 
@@ -125,14 +132,13 @@ Provides: gaim-gevolution = %version
 Gevolution plugin for Pidgin.
 %endif
 
-
 %if_enabled mono
 %package -n libpurple-mono
-Summary:    Mono .NET plugin support for Pidgin
+Summary: Mono .NET plugin support for Pidgin
 Group: Networking/Instant messaging
 Requires: libpurple = %version-%release
-BuildRequires:  mono-devel mono-mcs rpm-build-mono mono-nunit 
-BuildRequires:	/proc
+BuildRequires: mono-devel mono-mcs rpm-build-mono mono-nunit 
+BuildRequires: /proc
 Obsoletes: gaim-mono 
 Provides: gaim-mono = %version
 
@@ -146,7 +152,7 @@ Summary: Perl support for Pidgin
 Group: Networking/Instant messaging
 Requires: libpurple = %version-%release
 Requires: perl-base
-BuildRequires:  perl-devel perl-XML-Parser 
+BuildRequires: perl-devel perl-XML-Parser 
 Obsoletes: gaim-perl
 Provides: gaim-perl = %version
 
@@ -169,9 +175,9 @@ Tcl/Tk support for Pidgin.
 
 %if_enabled consoleui
 %package -n finch
-Summary:    A text-based user interface for Pidgin
+Summary: A text-based user interface for Pidgin
 Group: Networking/Instant messaging
-Requires:   libpurple = %version-%release
+Requires: libpurple = %version-%release
 Provides: gaim-text = %version
 Obsoletes: gaim-text
 
@@ -182,7 +188,7 @@ uses ncurses and our homegrown gnt library for drawing windows
 and text.
 
 %package -n finch-devel
-Summary:    Headers etc. for finch stuffs
+Summary: Headers etc. for finch stuffs
 Group: Development/Other
 Requires: finch = %version-%release
 Requires: libpurple-devel = %version-%release
@@ -250,16 +256,14 @@ bzcat %SOURCE1 > po/be.po
 %endif
 		--with-dbus-session-dir=%buildroot/usr/share/dbus-1/services/ 
 
-%make_build 
+%make_build
 
 %install
-
 export GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1
 %make_install install DESTDIR=%buildroot
 unset GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL
 
-%__mkdir_p %buildroot/%_datadir/applications/
-
+mkdir -p %buildroot/%_datadir/applications/
 
 # Menu disabled
 #%__mkdir_p %buildroot%_menudir
@@ -299,6 +303,7 @@ fi
 # %%_datadir/dbus-1/services/*.service
 %config %_sysconfdir/gconf/schemas/*
 %exclude %_libdir/%name/*.la
+%exclude %_libdir/%name/relnot.so
 
 %_man1dir/%name.*
 %_datadir/applications/%name.desktop
@@ -315,6 +320,9 @@ fi
 %perl_vendor_autolib/Pidgin/*
 %perl_vendor_man3dir/Pidgin*
 %endif
+
+%files -n %name-relnot
+%_libdir/%name/relnot.so
 
 %files -n libpurple 
 %_libdir/libpurple.so.* 
@@ -404,6 +412,9 @@ fi
 %endif
 
 %changelog
+* Sun Apr 20 2008 Igor Zubkov <icesik@altlinux.org> 2.4.1-alt2
+- move release notification plugin to separate package (closes #15379)
+
 * Wed Apr 02 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.1-alt1
 - 2.4.1
 
