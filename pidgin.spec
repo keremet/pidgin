@@ -17,7 +17,7 @@
 
 Name: pidgin
 Version: 2.4.1
-Release: alt2
+Release: alt3
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -57,8 +57,10 @@ BuildPreReq: libavahi-devel libavahi-glib-devel
 BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35
 BuildPreReq: doxygen 
 
-BuildRequires: gcc-c++ gstreamer-devel libgpg-error graphviz 
-BuildRequires: python-modules-encodings libidn-devel 
+BuildRequires: gcc-c++ gstreamer-devel libgpg-error graphviz
+BuildRequires: python-modules-encodings libidn-devel
+# for shared gadu plugin
+BuildRequires: libgadu-devel
 
 BuildPreReq: desktop-file-utils
 
@@ -412,6 +414,9 @@ fi
 %endif
 
 %changelog
+* Wed Apr 23 2008 Igor Zubkov <icesik@altlinux.org> 2.4.1-alt3
+- build with external libgadu
+
 * Sun Apr 20 2008 Igor Zubkov <icesik@altlinux.org> 2.4.1-alt2
 - move release notification plugin to separate package (closes #15379)
 
