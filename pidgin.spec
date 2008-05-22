@@ -10,14 +10,17 @@
 %def_disable cyrus_sasl
 %def_enable gnutls
 %def_enable gevolution
-%def_enable nas
+%def_disable meanwhile
+%def_enable cap
+%def_disable nm
 %def_disable mono
 %def_enable consoleui
 %def_enable dbus
 
+
 Name: pidgin
-Version: 2.4.1
-Release: alt3
+Version: 2.4.2
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -29,8 +32,9 @@ Packager: Alexey Shabalin <shaba@altlinux.ru>
 Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
 
-Patch0: %name-2.4.0-alt-linking.patch
+Patch0: %name-2.4.2-alt-linking.patch
 Patch1: %name-2.4.0-alt-autotools.patch
+Patch2: %name-2.4.1-alt-oscar-status-fix.patch
 
 Provides: gaim = %version
 Obsoletes: gaim
@@ -220,6 +224,7 @@ D-Bus client utiles for Pidgin.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 # belarusian translation
@@ -232,8 +237,10 @@ bzcat %SOURCE1 > po/be.po
 
 %configure	--enable-dot \
 		--enable-doxygen \
+		--disable-schemas-install \
 		%{subst_enable mono} \
-		%{subst_enable nas} \
+		%{subst_enable cap} \
+		%{subst_enable nm} \
 		%{subst_enable perl} \
 		%{subst_enable gevolution} \
 		%{subst_enable dbus} \
@@ -242,6 +249,7 @@ bzcat %SOURCE1 > po/be.po
 		%{subst_enable nss} \
 		%{subst_enable gnutls} \
 		%{subst_enable consoleui} \
+		%{subst_enable meanwhile} \
 %if_enabled cyrus_sasl
 		--enable-cyrus-sasl \
 %else
@@ -256,7 +264,8 @@ bzcat %SOURCE1 > po/be.po
 %if_enabled perl
 		--with-perl-lib=vendor \
 %endif
-		--with-dbus-session-dir=%buildroot/usr/share/dbus-1/services/ 
+		--with-dbus-session-dir=%buildroot/usr/share/dbus-1/services/
+
 
 %make_build
 
@@ -414,6 +423,11 @@ fi
 %endif
 
 %changelog
+* Thu May 22 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.2-alt1
+- 2.4.2
+- fix charset in status userinfo (#15384)
+- add more options for configure
+
 * Wed Apr 23 2008 Igor Zubkov <icesik@altlinux.org> 2.4.1-alt3
 - build with external libgadu
 
