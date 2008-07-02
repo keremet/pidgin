@@ -6,9 +6,9 @@
 %def_disable perl
 %def_disable tcl
 %def_disable tk
-%def_disable nss
+%def_enable nss
 %def_disable cyrus_sasl
-%def_enable gnutls
+%def_disable gnutls
 %def_enable gevolution
 %def_disable meanwhile
 %def_enable cap
@@ -19,7 +19,7 @@
 
 
 Name: pidgin
-Version: 2.4.2
+Version: 2.4.3
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -31,10 +31,13 @@ Packager: Alexey Shabalin <shaba@altlinux.ru>
 
 Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
+Source2: purple-altlinux-prefs.xml
 
 Patch0: %name-2.4.2-alt-linking.patch
 Patch1: %name-2.4.0-alt-autotools.patch
 Patch2: %name-2.4.1-alt-oscar-status-fix.patch
+
+Patch10: %name-2.4.2-reread-resolvconf.patch
 
 Provides: gaim = %version
 Obsoletes: gaim
@@ -50,10 +53,11 @@ BuildPreReq: libpango-devel >= 1.4.0
 BuildPreReq: libSM-devel libXScrnSaver-devel xorg-cf-files imake
 BuildPreReq: libstartup-notification-devel >= 0.5
 BuildPreReq: libgtkspell-devel >= 2.0.2
-%{?_enable_nss:BuildPreReq: libsasl2-devel}
-%{?_enable_cyrus_sasl:BuildPreReq: libnss-devel libnspr-devel}
+%{?_enable_nss:BuildPreReq: libnss-devel libnspr-devel}
+%{?_enable_cyrus_sasl:BuildPreReq: libsasl2-devel}
 %{?_enable_cyrus_gnutls:BuildPreReq: libgnutls-devel}
 %{?_enable_consoleui:BuildPreReq: libncurses-devel libncursesw-devel}
+%{?_enable_nm:BuildPreReq: NetworkManager-devel}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
@@ -225,6 +229,9 @@ D-Bus client utiles for Pidgin.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch10 -p1 -b .resolv
+
+cp %SOURCE2 prefs.xml
 
 %build
 # belarusian translation
@@ -246,10 +253,13 @@ bzcat %SOURCE1 > po/be.po
 		%{subst_enable dbus} \
 		%{subst_enable tk} \
 		%{subst_enable tcl} \
-		%{subst_enable nss} \
-		%{subst_enable gnutls} \
 		%{subst_enable consoleui} \
 		%{subst_enable meanwhile} \
+%if_enabled gnutls
+		--enable-gnutls=yes \
+%else
+		--enable-gnutls=no \
+%endif
 %if_enabled cyrus_sasl
 		--enable-cyrus-sasl \
 %else
@@ -260,11 +270,15 @@ bzcat %SOURCE1 > po/be.po
 		--with-nspr-includes=%_includedir/nspr \
 		--with-nspr-libs=%_libdir \
 		--with-nss-libs=%_libdir \
+		--enable-nss=yes \
+%else
+		--enable-nss=no \
 %endif
 %if_enabled perl
 		--with-perl-lib=vendor \
 %endif
-		--with-dbus-session-dir=%buildroot/usr/share/dbus-1/services/
+		--with-dbus-session-dir=%buildroot/usr/share/dbus-1/services \
+		--with-extraversion=%{release}
 
 
 %make_build
@@ -283,6 +297,11 @@ mkdir -p %buildroot/%_datadir/applications/
 #icon="%name.xpm" section="/Networking/Instant messaging" \
 #title="Gaim" longtitle="A multiprotocol Instant Messenger"
 #EOF
+
+# install ALTLinux pidgin default prefs.xml 
+mkdir -p %buildroot%_sysconfdir/purple/
+install -m 644 prefs.xml %buildroot%_sysconfdir/purple/prefs.xml
+
 
 %find_lang --with-gnome %name
 
@@ -338,6 +357,7 @@ fi
 %files -n libpurple 
 %_libdir/libpurple.so.* 
 %_libdir/purple-2
+%config(noreplace) %_sysconfdir/purple
 %_datadir/pixmaps/purple
 %_datadir/sounds/purple
 %exclude %_libdir/purple-2/*.la
@@ -423,6 +443,12 @@ fi
 %endif
 
 %changelog
+* Wed Jul 02 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.3-alt1
+- 2.4.3
+- disable gnutls, enable nss(#15810)
+- add default system prefs.xml
+- Add debian patch to re-read resolv.conf when connecting to a server
+
 * Thu May 22 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.2-alt1
 - 2.4.2
 - fix charset in status userinfo (#15384)
