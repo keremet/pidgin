@@ -19,7 +19,7 @@
 
 
 Name: pidgin
-Version: 2.4.3
+Version: 2.5.0
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -34,7 +34,6 @@ Source1: %name-be.po.bz2
 Source2: purple-altlinux-prefs.xml
 
 Patch0: %name-2.4.2-alt-linking.patch
-Patch1: %name-2.4.0-alt-autotools.patch
 Patch2: %name-2.4.1-alt-oscar-status-fix.patch
 
 Patch10: %name-2.4.2-reread-resolvconf.patch
@@ -102,6 +101,7 @@ and plugins.
 %package -n libpurple
 Summary: libpurple library for IM clients like Pidgin and Finch
 Group: Networking/Instant messaging
+Requires: %_datadir/ca-certificates
 
 %description -n libpurple
 libpurple contains the core IM support for IM clients such as Pidgin
@@ -227,8 +227,7 @@ D-Bus client utiles for Pidgin.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
+#patch2 -p1
 %patch10 -p1 -b .resolv
 
 cp %SOURCE2 prefs.xml
@@ -255,6 +254,7 @@ bzcat %SOURCE1 > po/be.po
 		%{subst_enable tcl} \
 		%{subst_enable consoleui} \
 		%{subst_enable meanwhile} \
+		--with-system-ssl-certs=%_datadir/ca-certificates \
 %if_enabled gnutls
 		--enable-gnutls=yes \
 %else
@@ -361,7 +361,6 @@ fi
 %_datadir/pixmaps/purple
 %_datadir/sounds/purple
 %exclude %_libdir/purple-2/*.la
-%_datadir/purple
 
 %if_enabled tcl
 %exclude %_libdir/purple-2/tcl.so
@@ -443,6 +442,10 @@ fi
 %endif
 
 %changelog
+* Tue Aug 19 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.0-alt1
+- 2.5.0
+- build --with-system-ssl-certs=%_datadir/ca-certificates
+
 * Wed Jul 02 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.3-alt1
 - 2.4.3
 - disable gnutls, enable nss(#15810)
