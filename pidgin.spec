@@ -20,7 +20,7 @@
 
 Name: pidgin
 Version: 2.5.0
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -70,6 +70,7 @@ BuildRequires: python-modules-encodings libidn-devel
 BuildRequires: libgadu-devel
 
 BuildPreReq: desktop-file-utils
+BuildPreReq: ca-certificates
 
 %description
 Pidgin allows you to talk to anyone using a variety of messaging
@@ -101,7 +102,7 @@ and plugins.
 %package -n libpurple
 Summary: libpurple library for IM clients like Pidgin and Finch
 Group: Networking/Instant messaging
-Requires: %_datadir/ca-certificates
+Requires: ca-certificates
 
 %description -n libpurple
 libpurple contains the core IM support for IM clients such as Pidgin
@@ -442,6 +443,9 @@ fi
 %endif
 
 %changelog
+* Fri Aug 22 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.0-alt2
+- change requires /usr/share/ca-certificates to package ca-certificates(16816)
+
 * Tue Aug 19 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.0-alt1
 - 2.5.0
 - build --with-system-ssl-certs=%_datadir/ca-certificates
