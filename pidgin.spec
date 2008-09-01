@@ -19,8 +19,8 @@
 
 
 Name: pidgin
-Version: 2.5.0
-Release: alt2
+Version: 2.5.1
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -359,7 +359,6 @@ fi
 %_libdir/libpurple.so.* 
 %_libdir/purple-2
 %config(noreplace) %_sysconfdir/purple
-%_datadir/pixmaps/purple
 %_datadir/sounds/purple
 %exclude %_libdir/purple-2/*.la
 
@@ -443,6 +442,9 @@ fi
 %endif
 
 %changelog
+* Mon Sep 01 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.1-alt1
+- 2.5.1
+
 * Fri Aug 22 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.0-alt2
 - change requires /usr/share/ca-certificates to package ca-certificates(16816)
 

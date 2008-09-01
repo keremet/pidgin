@@ -9,13 +9,13 @@
 #define beta 7
 
 %if 0%{?beta}
-%define pidginver %(echo "2.5.0"|sed -e 's/dev.*//; s/beta.*//')
+%define pidginver %(echo "2.5.1"|sed -e 's/dev.*//; s/beta.*//')
 %else
-%define pidginver 2.5.0
+%define pidginver 2.5.1
 %endif
 
 # define the minimum API version required, so we can use it for plugin deps
-%define apiver %(echo "2.5.0"|awk -F. '{print $1"."$2}')
+%define apiver %(echo "2.5.1"|awk -F. '{print $1"."$2}')
 
 Summary:    A GTK+ based multiprotocol instant messaging client
 Name:       pidgin
@@ -24,7 +24,7 @@ Release:    0%{?beta:.beta%{beta}}
 License:    GPL
 Group:      Applications/Internet
 URL:        http://pidgin.im/
-Source:     %{name}-2.5.0.tar.bz2
+Source:     %{name}-2.5.1.tar.bz2
 BuildRoot:  %{_tmppath}/%{name}-%{version}-root
 
 # Generic build requirements
@@ -215,7 +215,7 @@ and plugins.
 %endif
 
 %prep
-%setup -q -n %{name}-2.5.0
+%setup -q -n %{name}-2.5.1
 
 %build
 CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix} \
@@ -392,8 +392,6 @@ fi
 %{_datadir}/sounds/purple
 %attr(755, root, root) %{perl_vendorarch}/Purple.pm
 %attr(755, root, root) %{perl_vendorarch}/auto/Purple
-
-%{_datadir}/pixmaps/purple
 
 %if 0%{?_with_dbus:1}
 %{_bindir}/purple-client-example
