@@ -20,7 +20,7 @@
 
 Name: pidgin
 Version: 2.5.1
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -442,6 +442,9 @@ fi
 %endif
 
 %changelog
+* Tue Nov 04 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.1-alt2
+- rebuild with new evolution-data-server
+
 * Mon Sep 01 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.1-alt1
 - 2.5.1
 
