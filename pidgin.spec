@@ -10,7 +10,7 @@
 %def_disable cyrus_sasl
 %def_disable gnutls
 %def_enable gevolution
-%def_disable meanwhile
+%def_enable meanwhile
 %def_enable cap
 %def_disable nm
 %def_disable mono
@@ -19,8 +19,8 @@
 
 
 Name: pidgin
-Version: 2.5.1
-Release: alt2
+Version: 2.5.2
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -49,14 +49,16 @@ PreReq: GConf
 # From configure.ac
 BuildPreReq: glib2-devel libgtk+2-devel
 BuildPreReq: libpango-devel >= 1.4.0
-BuildPreReq: libSM-devel libXScrnSaver-devel xorg-cf-files imake
+BuildPreReq: libXext-devel libSM-devel libXScrnSaver-devel xorg-scrnsaverproto-devel 
+BuildPreReq: libX11-devel xorg-cf-files imake
 BuildPreReq: libstartup-notification-devel >= 0.5
 BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_nss:BuildPreReq: libnss-devel libnspr-devel}
 %{?_enable_cyrus_sasl:BuildPreReq: libsasl2-devel}
-%{?_enable_cyrus_gnutls:BuildPreReq: libgnutls-devel}
+%{?_enable_gnutls:BuildPreReq: libgnutls-devel}
 %{?_enable_consoleui:BuildPreReq: libncurses-devel libncursesw-devel}
 %{?_enable_nm:BuildPreReq: NetworkManager-devel}
+%{?_enable_meanwhile:BuildPreReq: libmeanwhile-devel}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
@@ -308,23 +310,11 @@ install -m 644 prefs.xml %buildroot%_sysconfdir/purple/prefs.xml
 
 %post
 %gconf2_install purple
-%update_menus
-%update_desktopdb
-%post_ldconfig
 
 %preun
 if [ $1 = 0 ]; then
     %gconf2_uninstall purple
 fi
-
-%postun
-%clean_menus
-%clean_desktopdb
-%postun_ldconfig
-
-%post -n libpurple -p %post_ldconfig
-%post -n finch -p %post_ldconfig
-
 
 %files -f %name.lang
 %doc AUTHORS  COPYING  COPYRIGHT ChangeLog INSTALL NEWS README README.MTN
@@ -442,6 +432,12 @@ fi
 %endif
 
 %changelog
+* Mon Dec 01 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.2-alt1
+- 2.5.2
+- removed obsoleted post scripts
+- fix BuildRequires
+- enabled support meanwhile
+
 * Tue Nov 04 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.1-alt2
 - rebuild with new evolution-data-server
 
