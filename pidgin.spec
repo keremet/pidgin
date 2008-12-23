@@ -19,7 +19,7 @@
 
 
 Name: pidgin
-Version: 2.5.2
+Version: 2.5.3
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -33,7 +33,7 @@ Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
 Source2: purple-altlinux-prefs.xml
 
-Patch0: %name-2.4.2-alt-linking.patch
+Patch0: %name-2.5.3-alt-linking.patch
 Patch2: %name-2.4.1-alt-oscar-status-fix.patch
 
 Patch10: %name-2.4.2-reread-resolvconf.patch
@@ -350,6 +350,7 @@ fi
 %_libdir/purple-2
 %config(noreplace) %_sysconfdir/purple
 %_datadir/sounds/purple
+%_datadir/purple
 %exclude %_libdir/purple-2/*.la
 
 %if_enabled tcl
@@ -432,6 +433,9 @@ fi
 %endif
 
 %changelog
+* Mon Dec 22 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.3-alt1
+- 2.5.3
+
 * Mon Dec 01 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.2-alt1
 - 2.5.2
 - removed obsoleted post scripts

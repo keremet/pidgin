@@ -1,6 +1,6 @@
-diff -ur pidgin-2.4.2/finch/plugins/Makefile.am pidgin-2.4.2.new/finch/plugins/Makefile.am
---- pidgin-2.4.2/finch/plugins/Makefile.am	2008-02-02 18:09:14 +0300
-+++ pidgin-2.4.2.new/finch/plugins/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/finch/plugins/Makefile.am pidgin-2.5.3.new/finch/plugins/Makefile.am
+--- pidgin-2.5.3/finch/plugins/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/finch/plugins/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -24,11 +24,11 @@
  gntclipboard_la_CFLAGS = $(X11_CFLAGS)
  gntgf_la_CFLAGS = $(X11_CFLAGS)
@@ -18,9 +18,9 @@ diff -ur pidgin-2.4.2/finch/plugins/Makefile.am pidgin-2.4.2.new/finch/plugins/M
  
  endif # PLUGINS
  
-diff -ur pidgin-2.4.2/libpurple/Makefile.am pidgin-2.4.2.new/libpurple/Makefile.am
---- pidgin-2.4.2/libpurple/Makefile.am	2008-05-12 23:07:44 +0400
-+++ pidgin-2.4.2.new/libpurple/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/libpurple/Makefile.am pidgin-2.5.3.new/libpurple/Makefile.am
+--- pidgin-2.5.3/libpurple/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -30,7 +30,7 @@
  pkgconfigdir = $(libdir)/pkgconfig
  pkgconfig_DATA = purple.pc
@@ -30,9 +30,9 @@ diff -ur pidgin-2.4.2/libpurple/Makefile.am pidgin-2.4.2.new/libpurple/Makefile.
  
  purple_coresources = \
  	account.c \
-diff -ur pidgin-2.4.2/libpurple/plugins/Makefile.am pidgin-2.4.2.new/libpurple/plugins/Makefile.am
---- pidgin-2.4.2/libpurple/plugins/Makefile.am	2007-10-04 01:09:21 +0400
-+++ pidgin-2.4.2.new/libpurple/plugins/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/libpurple/plugins/Makefile.am pidgin-2.5.3.new/libpurple/plugins/Makefile.am
+--- pidgin-2.5.3/libpurple/plugins/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/plugins/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -87,28 +87,28 @@
  simple_la_SOURCES			= simple.c
  statenotify_la_SOURCES      = statenotify.c
@@ -77,10 +77,10 @@ diff -ur pidgin-2.4.2/libpurple/plugins/Makefile.am pidgin-2.4.2.new/libpurple/p
  
  .PHONY: always
  
-diff -ur pidgin-2.4.2/libpurple/plugins/ssl/Makefile.am pidgin-2.4.2.new/libpurple/plugins/ssl/Makefile.am
---- pidgin-2.4.2/libpurple/plugins/ssl/Makefile.am	2007-05-03 19:16:33 +0400
-+++ pidgin-2.4.2.new/libpurple/plugins/ssl/Makefile.am	2008-05-22 16:10:49 +0400
-@@ -18,9 +18,9 @@
+diff -ur pidgin-2.5.3/libpurple/plugins/ssl/Makefile.am pidgin-2.5.3.new/libpurple/plugins/ssl/Makefile.am
+--- pidgin-2.5.3/libpurple/plugins/ssl/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/plugins/ssl/Makefile.am	2008-12-22 20:08:23 +0300
+@@ -39,9 +39,9 @@
  ssl_gnutls_la_SOURCES = ssl-gnutls.c
  ssl_nss_la_SOURCES    = ssl-nss.c
  
@@ -93,9 +93,10 @@ diff -ur pidgin-2.4.2/libpurple/plugins/ssl/Makefile.am pidgin-2.4.2.new/libpurp
  
  endif # PLUGINS
  
-diff -ur pidgin-2.4.2/libpurple/protocols/bonjour/Makefile.am pidgin-2.4.2.new/libpurple/protocols/bonjour/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/bonjour/Makefile.am	2008-05-16 17:53:10 +0400
-+++ pidgin-2.4.2.new/libpurple/protocols/bonjour/Makefile.am	2008-05-22 16:10:49 +0400
+Только в pidgin-2.5.3.new/libpurple/plugins/ssl: Makefile.am.orig
+diff -ur pidgin-2.5.3/libpurple/protocols/bonjour/Makefile.am pidgin-2.5.3.new/libpurple/protocols/bonjour/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/bonjour/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/bonjour/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -40,7 +40,7 @@
  st =
  pkg_LTLIBRARIES       = libbonjour.la
@@ -105,48 +106,39 @@ diff -ur pidgin-2.4.2/libpurple/protocols/bonjour/Makefile.am pidgin-2.4.2.new/l
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/gg/Makefile.am pidgin-2.4.2.new/libpurple/protocols/gg/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/gg/Makefile.am	2007-05-03 19:16:33 +0400
-+++ pidgin-2.4.2.new/libpurple/protocols/gg/Makefile.am	2008-05-22 16:10:49 +0400
-@@ -57,7 +57,7 @@
- 
- libgg_a_SOURCES = $(GGSOURCES)
- libgg_a_CFLAGS  = $(AM_CFLAGS)
--libgg_a_LIBADD  = $(GADU_LIBS)
-+libgg_a_LIBADD  = $(GADU_LIBS) $(top_builddir)/libpurple/libpurple.la
- 
- else
- 
-@@ -66,7 +66,7 @@
- noinst_LIBRARIES =
- 
+diff -ur pidgin-2.5.3/libpurple/protocols/gg/Makefile.am pidgin-2.5.3.new/libpurple/protocols/gg/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/gg/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/gg/Makefile.am	2008-12-22 20:08:23 +0300
+@@ -62,7 +62,7 @@
+ st = $(GADU_CFLAGS)
+ pkg_LTLIBRARIES = libgg.la
  libgg_la_SOURCES = $(GGSOURCES)
 -libgg_la_LIBADD  = $(GLIB_LIBS) $(GADU_LIBS)
 +libgg_la_LIBADD  = $(GLIB_LIBS) $(GADU_LIBS) $(top_builddir)/libpurple/libpurple.la
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/irc/Makefile.am pidgin-2.4.2.new/libpurple/protocols/irc/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/irc/Makefile.am	2007-05-07 17:02:46 +0400
-+++ pidgin-2.4.2.new/libpurple/protocols/irc/Makefile.am	2008-05-22 16:10:49 +0400
-@@ -24,7 +24,7 @@
- noinst_LIBRARIES =
- 
+diff -ur pidgin-2.5.3/libpurple/protocols/irc/Makefile.am pidgin-2.5.3.new/libpurple/protocols/irc/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/irc/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/irc/Makefile.am	2008-12-22 20:08:23 +0300
+@@ -27,7 +27,7 @@
+ st =
+ pkg_LTLIBRARIES   = libirc.la
  libirc_la_SOURCES = $(IRCSOURCES)
 -libirc_la_LIBADD  = $(GLIB_LIBS)
 +libirc_la_LIBADD  = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/jabber/Makefile.am pidgin-2.4.2.new/libpurple/protocols/jabber/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/jabber/Makefile.am	2007-10-04 01:09:22 +0400
-+++ pidgin-2.4.2.new/libpurple/protocols/jabber/Makefile.am	2008-05-22 16:10:49 +0400
-@@ -70,10 +70,10 @@
- noinst_LIBRARIES =
- 
+diff -ur pidgin-2.5.3/libpurple/protocols/jabber/Makefile.am pidgin-2.5.3.new/libpurple/protocols/jabber/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/jabber/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/jabber/Makefile.am	2008-12-22 20:16:29 +0300
+@@ -68,10 +68,10 @@
+ st =
+ pkg_LTLIBRARIES      = libjabber.la libxmpp.la
  libjabber_la_SOURCES = $(JABBERSOURCES)
--libjabber_la_LIBADD = $(GLIB_LIBS) $(SASL_LIBS) $(LIBXML_LIBS)
-+libjabber_la_LIBADD = $(GLIB_LIBS) $(SASL_LIBS) $(LIBXML_LIBS) $(top_builddir)/libpurple/libpurple.la
+-libjabber_la_LIBADD  = $(GLIB_LIBS) $(SASL_LIBS) $(LIBXML_LIBS)
++libjabber_la_LIBADD  = $(GLIB_LIBS) $(SASL_LIBS) $(LIBXML_LIBS) $(top_builddir)/libpurple/libpurple.la
  
  libxmpp_la_SOURCES = libxmpp.c
 -libxmpp_la_LIBADD = libjabber.la
@@ -154,10 +146,10 @@ diff -ur pidgin-2.4.2/libpurple/protocols/jabber/Makefile.am pidgin-2.4.2.new/li
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/msn/Makefile.am pidgin-2.4.2.new/libpurple/protocols/msn/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/msn/Makefile.am	2007-11-05 04:04:49 +0300
-+++ pidgin-2.4.2.new/libpurple/protocols/msn/Makefile.am	2008-05-22 16:10:49 +0400
-@@ -87,7 +87,7 @@
+diff -ur pidgin-2.5.3/libpurple/protocols/msn/Makefile.am pidgin-2.5.3.new/libpurple/protocols/msn/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/msn/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/msn/Makefile.am	2008-12-22 20:08:23 +0300
+@@ -83,7 +83,7 @@
  st =
  pkg_LTLIBRARIES   = libmsn.la
  libmsn_la_SOURCES = $(MSNSOURCES)
@@ -166,9 +158,9 @@ diff -ur pidgin-2.4.2/libpurple/protocols/msn/Makefile.am pidgin-2.4.2.new/libpu
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/msnp9/Makefile.am pidgin-2.4.2.new/libpurple/protocols/msnp9/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/msnp9/Makefile.am	2007-12-01 16:22:39 +0300
-+++ pidgin-2.4.2.new/libpurple/protocols/msnp9/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/libpurple/protocols/msnp9/Makefile.am pidgin-2.5.3.new/libpurple/protocols/msnp9/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/msnp9/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/msnp9/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -79,7 +79,7 @@
  st =
  pkg_LTLIBRARIES   = libmsn.la
@@ -178,10 +170,10 @@ diff -ur pidgin-2.4.2/libpurple/protocols/msnp9/Makefile.am pidgin-2.4.2.new/lib
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/myspace/Makefile.am pidgin-2.4.2.new/libpurple/protocols/myspace/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/myspace/Makefile.am	2007-12-01 16:22:40 +0300
-+++ pidgin-2.4.2.new/libpurple/protocols/myspace/Makefile.am	2008-05-22 16:10:49 +0400
-@@ -32,7 +32,7 @@
+diff -ur pidgin-2.5.3/libpurple/protocols/myspace/Makefile.am pidgin-2.5.3.new/libpurple/protocols/myspace/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/myspace/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/myspace/Makefile.am	2008-12-22 20:08:23 +0300
+@@ -33,7 +33,7 @@
  st =
  pkg_LTLIBRARIES       = libmyspace.la
  libmyspace_la_SOURCES = $(MSIMSOURCES)
@@ -190,42 +182,42 @@ diff -ur pidgin-2.4.2/libpurple/protocols/myspace/Makefile.am pidgin-2.4.2.new/l
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/novell/Makefile.am pidgin-2.4.2.new/libpurple/protocols/novell/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/novell/Makefile.am	2007-05-03 19:16:33 +0400
-+++ pidgin-2.4.2.new/libpurple/protocols/novell/Makefile.am	2008-05-22 16:10:49 +0400
-@@ -46,7 +46,7 @@
- noinst_LIBRARIES =
- 
+diff -ur pidgin-2.5.3/libpurple/protocols/novell/Makefile.am pidgin-2.5.3.new/libpurple/protocols/novell/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/novell/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/novell/Makefile.am	2008-12-22 20:08:23 +0300
+@@ -42,7 +42,7 @@
+ st =
+ pkg_LTLIBRARIES      = libnovell.la
  libnovell_la_SOURCES = $(NOVELLSOURCES)
 -libnovell_la_LIBADD  = $(GLIB_LIBS)
 +libnovell_la_LIBADD  = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/oscar/Makefile.am pidgin-2.4.2.new/libpurple/protocols/oscar/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/oscar/Makefile.am	2007-06-10 06:22:18 +0400
-+++ pidgin-2.4.2.new/libpurple/protocols/oscar/Makefile.am	2008-05-22 16:10:49 +0400
-@@ -62,13 +62,13 @@
+diff -ur pidgin-2.5.3/libpurple/protocols/oscar/Makefile.am pidgin-2.5.3.new/libpurple/protocols/oscar/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/oscar/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/oscar/Makefile.am	2008-12-22 20:17:53 +0300
+@@ -61,13 +61,13 @@
  st =
  pkg_LTLIBRARIES     = liboscar.la libaim.la libicq.la
  liboscar_la_SOURCES = $(OSCARSOURCES)
 -liboscar_la_LIBADD  = $(GLIB_LIBS)
 +liboscar_la_LIBADD  = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
  
- libaim_la_SOURCES = libaim.c
--libaim_la_LIBADD = liboscar.la
-+libaim_la_LIBADD = liboscar.la $(top_builddir)/libpurple/libpurple.la
+ libaim_la_SOURCES   = libaim.c
+-libaim_la_LIBADD    = liboscar.la
++libaim_la_LIBADD    = liboscar.la $(top_builddir)/libpurple/libpurple.la
  
- libicq_la_SOURCES = libicq.c
--libicq_la_LIBADD = liboscar.la
-+libicq_la_LIBADD = liboscar.la $(top_builddir)/libpurple/libpurple.la
+ libicq_la_SOURCES   = libicq.c
+-libicq_la_LIBADD    = liboscar.la
++libicq_la_LIBADD    = liboscar.la $(top_builddir)/libpurple/libpurple.la
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/qq/Makefile.am pidgin-2.4.2.new/libpurple/protocols/qq/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/qq/Makefile.am	2007-06-22 16:20:47 +0400
-+++ pidgin-2.4.2.new/libpurple/protocols/qq/Makefile.am	2008-05-22 16:10:49 +0400
-@@ -85,7 +85,7 @@
+diff -ur pidgin-2.5.3/libpurple/protocols/qq/Makefile.am pidgin-2.5.3.new/libpurple/protocols/qq/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/qq/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/qq/Makefile.am	2008-12-22 20:08:23 +0300
+@@ -65,7 +65,7 @@
  st =
  pkg_LTLIBRARIES  = libqq.la
  libqq_la_SOURCES = $(QQSOURCES)
@@ -234,21 +226,57 @@ diff -ur pidgin-2.4.2/libpurple/protocols/qq/Makefile.am pidgin-2.4.2.new/libpur
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/simple/Makefile.am pidgin-2.4.2.new/libpurple/protocols/simple/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/simple/Makefile.am	2007-05-03 19:16:33 +0400
-+++ pidgin-2.4.2.new/libpurple/protocols/simple/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/libpurple/protocols/sametime/Makefile.am pidgin-2.5.3.new/libpurple/protocols/sametime/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/sametime/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/sametime/Makefile.am	2008-12-22 20:21:45 +0300
+@@ -27,7 +27,7 @@
+ endif
+ 
+ libsametime_la_LDFLAGS = -module -avoid-version
+-libsametime_la_LIBADD = $(GLIB_LIBS) $(MEANWHILE_LIBS)
++libsametime_la_LIBADD = $(GLIB_LIBS) $(MEANWHILE_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ AM_CPPFLAGS = \
+ 	-I$(top_srcdir)/libpurple \
+diff -ur pidgin-2.5.3/libpurple/protocols/silc/Makefile.am pidgin-2.5.3.new/libpurple/protocols/silc/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/silc/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/silc/Makefile.am	2008-12-22 20:22:17 +0300
+@@ -34,7 +34,7 @@
+ st = $(SILC_CFLAGS)
+ pkg_LTLIBRARIES          = libsilcpurple.la
+ libsilcpurple_la_SOURCES = $(SILCSOURCES)
+-libsilcpurple_la_LIBADD  = $(GLIB_LIBS) $(SILC_LIBS)
++libsilcpurple_la_LIBADD  = $(GLIB_LIBS) $(SILC_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.5.3/libpurple/protocols/silc10/Makefile.am pidgin-2.5.3.new/libpurple/protocols/silc10/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/silc10/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/silc10/Makefile.am	2008-12-22 20:22:33 +0300
+@@ -24,7 +24,7 @@
+ st = $(SILC_CFLAGS)
+ pkg_LTLIBRARIES          = libsilcpurple.la
+ libsilcpurple_la_SOURCES = $(SILCSOURCES)
+-libsilcpurple_la_LIBADD  = $(GLIB_LIBS) $(SILC_LIBS)
++libsilcpurple_la_LIBADD  = $(GLIB_LIBS) $(SILC_LIBS) $(top_builddir)/libpurple/libpurple.la
+ 
+ endif
+ 
+diff -ur pidgin-2.5.3/libpurple/protocols/simple/Makefile.am pidgin-2.5.3.new/libpurple/protocols/simple/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/simple/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/simple/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -25,7 +25,7 @@
  st =
- pkg_LTLIBRARIES   = libsimple.la
+ pkg_LTLIBRARIES      = libsimple.la
  libsimple_la_SOURCES = $(SIMPLESOURCES)
 -libsimple_la_LIBADD  = $(GLIB_LIBS)
 +libsimple_la_LIBADD  = $(GLIB_LIBS) $(top_builddir)/libpurple/libpurple.la
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/yahoo/Makefile.am pidgin-2.4.2.new/libpurple/protocols/yahoo/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/yahoo/Makefile.am	2007-10-04 01:09:24 +0400
-+++ pidgin-2.4.2.new/libpurple/protocols/yahoo/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/libpurple/protocols/yahoo/Makefile.am pidgin-2.5.3.new/libpurple/protocols/yahoo/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/yahoo/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/yahoo/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -45,7 +45,7 @@
  st =
  pkg_LTLIBRARIES     = libyahoo.la
@@ -258,24 +286,15 @@ diff -ur pidgin-2.4.2/libpurple/protocols/yahoo/Makefile.am pidgin-2.4.2.new/lib
  
  endif
  
-diff -ur pidgin-2.4.2/libpurple/protocols/zephyr/Makefile.am pidgin-2.4.2.new/libpurple/protocols/zephyr/Makefile.am
---- pidgin-2.4.2/libpurple/protocols/zephyr/Makefile.am	2007-05-03 19:16:33 +0400
-+++ pidgin-2.4.2.new/libpurple/protocols/zephyr/Makefile.am	2008-05-22 16:10:49 +0400
-@@ -81,7 +81,7 @@
- noinst_LIBRARIES = libzephyr.a
- libzephyr_a_SOURCES = $(ZEPHYRSOURCES)
- libzephyr_a_CFLAGS  = $(AM_CFLAGS)
--libzephyr_a_LIBADD  = $(ZEPHYRLIBS)
-+libzephyr_a_LIBADD  = $(ZEPHYRLIBS) $(top_builddir)/libpurple/libpurple.la
- 
- else
- 
-@@ -90,10 +90,10 @@
+diff -ur pidgin-2.5.3/libpurple/protocols/zephyr/Makefile.am pidgin-2.5.3.new/libpurple/protocols/zephyr/Makefile.am
+--- pidgin-2.5.3/libpurple/protocols/zephyr/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/libpurple/protocols/zephyr/Makefile.am	2008-12-22 20:19:47 +0300
+@@ -89,10 +89,10 @@
  
  if EXTERNAL_LIBZEPHYR
  libzephyr_la_SOURCES = $(ZEPHYRSOURCESEXT)
--libzephyr_la_LIBADD = $(GLIB_LIBS) $(ZEPHYRLIBSEXT)
-+libzephyr_la_LIBADD = $(GLIB_LIBS) $(ZEPHYRLIBSEXT) $(top_builddir)/libpurple/libpurple.la
+-libzephyr_la_LIBADD  = $(GLIB_LIBS) $(ZEPHYRLIBSEXT)
++libzephyr_la_LIBADD  = $(GLIB_LIBS) $(ZEPHYRLIBSEXT) $(top_builddir)/libpurple/libpurple.la
  else
  libzephyr_la_SOURCES = $(ZEPHYRSOURCES)
 -libzephyr_la_LIBADD  = $(GLIB_LIBS) $(ZEPHYRLIBS)
@@ -283,9 +302,9 @@ diff -ur pidgin-2.4.2/libpurple/protocols/zephyr/Makefile.am pidgin-2.4.2.new/li
  endif
  
  
-diff -ur pidgin-2.4.2/pidgin/plugins/cap/Makefile.am pidgin-2.4.2.new/pidgin/plugins/cap/Makefile.am
---- pidgin-2.4.2/pidgin/plugins/cap/Makefile.am	2007-10-04 01:09:25 +0400
-+++ pidgin-2.4.2.new/pidgin/plugins/cap/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/pidgin/plugins/cap/Makefile.am pidgin-2.5.3.new/pidgin/plugins/cap/Makefile.am
+--- pidgin-2.5.3/pidgin/plugins/cap/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/pidgin/plugins/cap/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -15,7 +15,7 @@
  
  endif
@@ -295,9 +314,9 @@ diff -ur pidgin-2.4.2/pidgin/plugins/cap/Makefile.am pidgin-2.4.2.new/pidgin/plu
  
  AM_CPPFLAGS = \
  	-DDATADIR=\"$(datadir)\" \
-diff -ur pidgin-2.4.2/pidgin/plugins/gestures/Makefile.am pidgin-2.4.2.new/pidgin/plugins/gestures/Makefile.am
---- pidgin-2.4.2/pidgin/plugins/gestures/Makefile.am	2007-05-07 17:02:47 +0400
-+++ pidgin-2.4.2.new/pidgin/plugins/gestures/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/pidgin/plugins/gestures/Makefile.am pidgin-2.5.3.new/pidgin/plugins/gestures/Makefile.am
+--- pidgin-2.5.3/pidgin/plugins/gestures/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/pidgin/plugins/gestures/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -13,7 +13,7 @@
  	stroke.c \
  	stroke-draw.c
@@ -307,9 +326,9 @@ diff -ur pidgin-2.4.2/pidgin/plugins/gestures/Makefile.am pidgin-2.4.2.new/pidgi
  
  endif
  
-diff -ur pidgin-2.4.2/pidgin/plugins/gevolution/Makefile.am pidgin-2.4.2.new/pidgin/plugins/gevolution/Makefile.am
---- pidgin-2.4.2/pidgin/plugins/gevolution/Makefile.am	2007-10-04 01:09:19 +0400
-+++ pidgin-2.4.2.new/pidgin/plugins/gevolution/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/pidgin/plugins/gevolution/Makefile.am pidgin-2.5.3.new/pidgin/plugins/gevolution/Makefile.am
+--- pidgin-2.5.3/pidgin/plugins/gevolution/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/pidgin/plugins/gevolution/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -15,7 +15,7 @@
  	new_person_dialog.c \
  	eds-utils.c
@@ -319,9 +338,9 @@ diff -ur pidgin-2.4.2/pidgin/plugins/gevolution/Makefile.am pidgin-2.4.2.new/pid
  
  endif
  
-diff -ur pidgin-2.4.2/pidgin/plugins/Makefile.am pidgin-2.4.2.new/pidgin/plugins/Makefile.am
---- pidgin-2.4.2/pidgin/plugins/Makefile.am	2008-04-19 17:09:33 +0400
-+++ pidgin-2.4.2.new/pidgin/plugins/Makefile.am	2008-05-22 16:13:25 +0400
+diff -ur pidgin-2.5.3/pidgin/plugins/Makefile.am pidgin-2.5.3.new/pidgin/plugins/Makefile.am
+--- pidgin-2.5.3/pidgin/plugins/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/pidgin/plugins/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -86,22 +86,22 @@
  timestamp_format_la_SOURCES = timestamp_format.c
  xmppconsole_la_SOURCES      = xmppconsole.c
@@ -361,9 +380,9 @@ diff -ur pidgin-2.4.2/pidgin/plugins/Makefile.am pidgin-2.4.2.new/pidgin/plugins
  
  endif # PLUGINS
  
-diff -ur pidgin-2.4.2/pidgin/plugins/musicmessaging/Makefile.am pidgin-2.4.2.new/pidgin/plugins/musicmessaging/Makefile.am
---- pidgin-2.4.2/pidgin/plugins/musicmessaging/Makefile.am	2007-05-07 17:02:47 +0400
-+++ pidgin-2.4.2.new/pidgin/plugins/musicmessaging/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/pidgin/plugins/musicmessaging/Makefile.am pidgin-2.5.3.new/pidgin/plugins/musicmessaging/Makefile.am
+--- pidgin-2.5.3/pidgin/plugins/musicmessaging/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/pidgin/plugins/musicmessaging/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -16,7 +16,7 @@
  musicmessaging_la_SOURCES = \
  	musicmessaging.c
@@ -373,9 +392,9 @@ diff -ur pidgin-2.4.2/pidgin/plugins/musicmessaging/Makefile.am pidgin-2.4.2.new
  
  CLEANFILES              = music-messaging-bindings.c
  
-diff -ur pidgin-2.4.2/pidgin/plugins/ticker/Makefile.am pidgin-2.4.2.new/pidgin/plugins/ticker/Makefile.am
---- pidgin-2.4.2/pidgin/plugins/ticker/Makefile.am	2007-05-07 17:02:47 +0400
-+++ pidgin-2.4.2.new/pidgin/plugins/ticker/Makefile.am	2008-05-22 16:10:49 +0400
+diff -ur pidgin-2.5.3/pidgin/plugins/ticker/Makefile.am pidgin-2.5.3.new/pidgin/plugins/ticker/Makefile.am
+--- pidgin-2.5.3/pidgin/plugins/ticker/Makefile.am	2008-12-21 03:38:16 +0300
++++ pidgin-2.5.3.new/pidgin/plugins/ticker/Makefile.am	2008-12-22 20:08:23 +0300
 @@ -14,7 +14,7 @@
  	gtkticker.h \
  	ticker.c
