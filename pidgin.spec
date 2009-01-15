@@ -19,7 +19,7 @@
 
 
 Name: pidgin
-Version: 2.5.3
+Version: 2.5.4
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -433,6 +433,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 15 2009 Alexey Shabalin <shaba@altlinux.ru> 2.5.4-alt1
+- 2.5.4
+
 * Mon Dec 22 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.3-alt1
 - 2.5.3
 
