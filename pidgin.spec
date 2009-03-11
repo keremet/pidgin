@@ -17,15 +17,15 @@
 %def_enable consoleui
 %def_enable dbus
 
-
 Name: pidgin
-Version: 2.5.4
+Version: 2.5.5
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
 Group: Networking/Instant messaging
-Url:  http://pidgin.im/
+
+Url: http://pidgin.im
 
 Packager: Alexey Shabalin <shaba@altlinux.ru>
 
@@ -33,10 +33,11 @@ Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
 Source2: purple-altlinux-prefs.xml
 
-Patch0: %name-2.5.3-alt-linking.patch
+Patch0: pidgin-2.5.3-alt-linking.patch
 Patch2: %name-2.4.1-alt-oscar-status-fix.patch
 
 Patch10: %name-2.4.2-reread-resolvconf.patch
+Patch20: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
 
 Provides: gaim = %version
 Obsoletes: gaim
@@ -49,7 +50,7 @@ PreReq: GConf
 # From configure.ac
 BuildPreReq: glib2-devel libgtk+2-devel
 BuildPreReq: libpango-devel >= 1.4.0
-BuildPreReq: libXext-devel libSM-devel libXScrnSaver-devel xorg-scrnsaverproto-devel 
+BuildPreReq: libXext-devel libSM-devel libXScrnSaver-devel xorg-scrnsaverproto-devel
 BuildPreReq: libX11-devel xorg-cf-files imake
 BuildPreReq: libstartup-notification-devel >= 0.5
 BuildPreReq: libgtkspell-devel >= 2.0.2
@@ -64,7 +65,7 @@ BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
 BuildPreReq: libavahi-devel libavahi-glib-devel
 BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35
-BuildPreReq: doxygen 
+BuildPreReq: doxygen
 
 BuildRequires: gcc-c++ gstreamer-devel libgpg-error graphviz
 BuildRequires: python-modules-encodings libidn-devel
@@ -96,7 +97,7 @@ Requires: libpurple-devel = %version-%release
 Provides: gaim-devel = %version
 Obsoletes: gaim-devel
 
-%description devel  
+%description devel
 The pidgin-devel package contains the header files, developer
 documentation, and libraries required for development of Pidgin scripts
 and plugins.
@@ -150,9 +151,9 @@ Gevolution plugin for Pidgin.
 Summary: Mono .NET plugin support for Pidgin
 Group: Networking/Instant messaging
 Requires: libpurple = %version-%release
-BuildRequires: mono-devel mono-mcs rpm-build-mono mono-nunit 
+BuildRequires: mono-devel mono-mcs rpm-build-mono mono-nunit
 BuildRequires: /proc
-Obsoletes: gaim-mono 
+Obsoletes: gaim-mono
 Provides: gaim-mono = %version
 
 %description -n libpurple-mono
@@ -165,11 +166,11 @@ Summary: Perl support for Pidgin
 Group: Networking/Instant messaging
 Requires: libpurple = %version-%release
 Requires: perl-base
-BuildRequires: perl-devel perl-XML-Parser 
+BuildRequires: perl-devel perl-XML-Parser
 Obsoletes: gaim-perl
 Provides: gaim-perl = %version
 
-%description -n libpurple-perl  
+%description -n libpurple-perl
 Perl support for Pidgin.
 %endif
 
@@ -178,11 +179,11 @@ Perl support for Pidgin.
 Summary: Tcl/Tk support for Pidgin
 Group: Networking/Instant messaging
 Requires: libpurple = %version-%release
-BuildRequires:	tcl-devel tk-devel
-Obsoletes: gaim-tcl 
+BuildRequires: tcl-devel tk-devel
+Obsoletes: gaim-tcl
 Provides: gaim-tcl = %version
 
-%description -n libpurple-tcl  
+%description -n libpurple-tcl
 Tcl/Tk support for Pidgin.
 %endif
 
@@ -232,17 +233,18 @@ D-Bus client utiles for Pidgin.
 %patch0 -p1
 #patch2 -p1
 %patch10 -p1 -b .resolv
+%patch20 -p1
 
 cp %SOURCE2 prefs.xml
 
 %build
 # belarusian translation
 bzcat %SOURCE1 > po/be.po
-%__subst 's,\(ALL_LINGUAS=\"\),\1be ,' configure
+sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure
 
 %autoreconf
 
-%__mkdir_p %buildroot/usr/share/dbus-1/services/
+mkdir -p %buildroot%_datadir/dbus-1/services/
 
 %configure	--enable-dot \
 		--enable-doxygen \
@@ -280,31 +282,29 @@ bzcat %SOURCE1 > po/be.po
 %if_enabled perl
 		--with-perl-lib=vendor \
 %endif
-		--with-dbus-session-dir=%buildroot/usr/share/dbus-1/services \
-		--with-extraversion=%{release}
-
+		--with-dbus-session-dir=%buildroot%_datadir/dbus-1/services \
+		--with-extraversion=%release
 
 %make_build
 
 %install
 export GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1
-%make_install install DESTDIR=%buildroot
+%makeinstall_std
 unset GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL
 
-mkdir -p %buildroot/%_datadir/applications/
+mkdir -p %buildroot/%_desktopdir/
 
 # Menu disabled
-#%__mkdir_p %buildroot%_menudir
-#%__cat >%buildroot%_menudir/%name <<EOF
+#mkdir -p %buildroot%_menudir
+#cat >%buildroot%_menudir/%name <<EOF
 #?package(%name): command="%_bindir/%name" needs="X11" \
 #icon="%name.xpm" section="/Networking/Instant messaging" \
 #title="Gaim" longtitle="A multiprotocol Instant Messenger"
 #EOF
 
-# install ALTLinux pidgin default prefs.xml 
+# install ALTLinux pidgin default prefs.xml
 mkdir -p %buildroot%_sysconfdir/purple/
 install -m 644 prefs.xml %buildroot%_sysconfdir/purple/prefs.xml
-
 
 %find_lang --with-gnome %name
 
@@ -327,8 +327,8 @@ fi
 %exclude %_libdir/%name/relnot.so
 
 %_man1dir/%name.*
-%_datadir/applications/%name.desktop
-%_datadir/pixmaps/%name
+%_desktopdir/%name.desktop
+%_pixmapsdir/%name
 %_iconsdir/hicolor/??x??/apps/%{name}*.png
 
 %if_enabled gevolution
@@ -345,8 +345,8 @@ fi
 %files -n %name-relnot
 %_libdir/%name/relnot.so
 
-%files -n libpurple 
-%_libdir/libpurple.so.* 
+%files -n libpurple
+%_libdir/libpurple.so.*
 %_libdir/purple-2
 %config(noreplace) %_sysconfdir/purple
 %_datadir/sounds/purple
@@ -433,17 +433,24 @@ fi
 %endif
 
 %changelog
-* Thu Jan 15 2009 Alexey Shabalin <shaba@altlinux.ru> 2.5.4-alt1
-- 2.5.4
+* Wed Mar 11 2009 Michael Shigorin <mike@altlinux.org> 2.5.5-alt1
+- forward-ported M41 spec to Sisyphus: it was cleaned up
+  but Sisyphus spec got better in the meanwhile too
 
-* Mon Dec 22 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.3-alt1
-- 2.5.3
+* Wed Mar 04 2009 Michael Shigorin <mike@altlinux.org> 2.5.5-alt0.M41.1
+- 2.5.5
 
-* Mon Dec 01 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.2-alt1
-- 2.5.2
-- removed obsoleted post scripts
-- fix BuildRequires
-- enabled support meanwhile
+* Thu Jan 22 2009 Michael Shigorin <mike@altlinux.org> 2.5.4-alt0.M41.2
+- added ICQ-related patch referenced at http://developer.pidgin.im/ticket/8198
+- spec cleanup
+
+* Thu Jan 15 2009 Michael Shigorin <mike@altlinux.org> 2.5.4-alt0.M41.1
+- 2.5.4 built for M41
+- patch0 updated from Sisyphus' 2.5.3-alt1
+
+* Mon Dec 01 2008 Vladimir Scherbaev <vladimir@altlinux.org> 2.5.1-alt2.M41.1
+- Backport to Desktop 4.1
+- 2.5.1
 
 * Tue Nov 04 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.1-alt2
 - rebuild with new evolution-data-server
@@ -452,7 +459,7 @@ fi
 - 2.5.1
 
 * Fri Aug 22 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.0-alt2
-- change requires /usr/share/ca-certificates to package ca-certificates(16816)
+- change requires %_datadir/ca-certificates to package ca-certificates(16816)
 
 * Tue Aug 19 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.0-alt1
 - 2.5.0
@@ -480,7 +487,7 @@ fi
 
 * Sun Mar 16 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.0-alt1.1
 - fix autotools (thanks to Igor Zubkov <icesik at altlinux.org> - patch1)
-- update BuildPreReq 
+- update BuildPreReq
 
 * Wed Mar 12 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.0-alt1
 - 2.4.0
@@ -587,7 +594,7 @@ fi
 
 * Tue Mar 22 2005 Vital Khilko <vk@altlinux.ru> 1.2.0-alt1
 - 1.2.0
-- gevolution plugin moved to separate package 
+- gevolution plugin moved to separate package
 - added Perl support
 
 * Wed Mar 02 2005 Vital Khilko <vk@altlinux.ru> 1.1.4-alt1
@@ -640,7 +647,7 @@ fi
 - new version released
 
 * Sun Apr 04 2004 Vital Khilko <vk@altlinux.ru> 0.76-alt1
-- new version released 
+- new version released
 
 * Tue Mar 16 2004 Vital Khilko <vk@altlinux.ru> 0.75-alt2
 - added security patch
@@ -694,7 +701,7 @@ fi
 
 * Wed Jul 25 2001 Dmitry V. Levin <ldv@altlinux.ru> 0.11.0-alt2
 - Rebuilt with new perl.
- 
+
 * Mon Jun 25 2001 Stanislav Ievlev <inger@altlinux.ru> 0.11.0-alt1
 - 0.11.0 . Rebuilt with perl-5.6.1
 
