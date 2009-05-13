@@ -19,7 +19,7 @@
 
 Name: pidgin
 Version: 2.5.5
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -71,6 +71,8 @@ BuildRequires: gcc-c++ gstreamer-devel libgpg-error graphviz
 BuildRequires: python-modules-encodings libidn-devel
 # for shared gadu plugin
 BuildRequires: libgadu-devel
+# now intltool wants that
+BuildRequires: perl-XML-Parser
 
 BuildPreReq: desktop-file-utils
 BuildPreReq: ca-certificates
@@ -242,7 +244,7 @@ cp %SOURCE2 prefs.xml
 bzcat %SOURCE1 > po/be.po
 sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure
 
-%autoreconf
+#autoreconf
 
 mkdir -p %buildroot%_datadir/dbus-1/services/
 
@@ -433,6 +435,9 @@ fi
 %endif
 
 %changelog
+* Wed May 13 2009 Michael Shigorin <mike@altlinux.org> 2.5.5-alt2
+- fixed FTBFS
+
 * Wed Mar 11 2009 Michael Shigorin <mike@altlinux.org> 2.5.5-alt1
 - forward-ported M41 spec to Sisyphus: it was cleaned up
   but Sisyphus spec got better in the meanwhile too
