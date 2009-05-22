@@ -18,8 +18,8 @@
 %def_enable dbus
 
 Name: pidgin
-Version: 2.5.5
-Release: alt2
+Version: 2.5.6
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -435,6 +435,15 @@ fi
 %endif
 
 %changelog
+* Fri May 22 2009 Michael Shigorin <mike@altlinux.org> 2.5.6-alt1
+- 2.5.6:
+  + CVE-2009-1373: XMPP SOCKS5 stream server buffer overflow
+  + CVE-2009-1374: remote DoS with a special QQ packet
+  + CVE-2009-1375: PurpleCircBuffer (XMPP/Sametime) BoF
+  + CVE-2009-1376: buffer overflow via specially crafted SLP
+    message due to incomplete fix for CVE-2008-2927
+- thanks crux@ for notification (fixes: #20141)
+
 * Wed May 13 2009 Michael Shigorin <mike@altlinux.org> 2.5.5-alt2
 - fixed FTBFS
 
