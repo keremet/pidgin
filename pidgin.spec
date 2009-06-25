@@ -18,7 +18,7 @@
 %def_enable dbus
 
 Name: pidgin
-Version: 2.5.6
+Version: 2.5.7
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -26,24 +26,19 @@ License: GPL
 Group: Networking/Instant messaging
 
 Url: http://pidgin.im
-
-Packager: Alexey Shabalin <shaba@altlinux.ru>
-
 Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
 Source2: purple-altlinux-prefs.xml
-
 Patch0: pidgin-2.5.3-alt-linking.patch
 Patch2: %name-2.4.1-alt-oscar-status-fix.patch
-
 Patch10: %name-2.4.2-reread-resolvconf.patch
 Patch20: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
+Packager: Alexey Shabalin <shaba@altlinux.ru>
 
 Provides: gaim = %version
 Obsoletes: gaim
 
 Requires: libpurple = %version-%release
-
 Requires(post,postun): desktop-file-utils
 PreReq: GConf
 
@@ -71,6 +66,7 @@ BuildRequires: gcc-c++ gstreamer-devel libgpg-error graphviz
 BuildRequires: python-modules-encodings libidn-devel
 # for shared gadu plugin
 BuildRequires: libgadu-devel
+BuildRequires: intltool
 # now intltool wants that
 BuildRequires: perl-XML-Parser
 
@@ -239,15 +235,13 @@ D-Bus client utiles for Pidgin.
 
 cp %SOURCE2 prefs.xml
 
-%build
 # belarusian translation
 bzcat %SOURCE1 > po/be.po
 sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure
 
+%build
 #autoreconf
-
 mkdir -p %buildroot%_datadir/dbus-1/services/
-
 %configure	--enable-dot \
 		--enable-doxygen \
 		--disable-schemas-install \
@@ -294,15 +288,7 @@ export GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1
 %makeinstall_std
 unset GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL
 
-mkdir -p %buildroot/%_desktopdir/
-
-# Menu disabled
-#mkdir -p %buildroot%_menudir
-#cat >%buildroot%_menudir/%name <<EOF
-#?package(%name): command="%_bindir/%name" needs="X11" \
-#icon="%name.xpm" section="/Networking/Instant messaging" \
-#title="Gaim" longtitle="A multiprotocol Instant Messenger"
-#EOF
+mkdir -p %buildroot%_desktopdir/
 
 # install ALTLinux pidgin default prefs.xml
 mkdir -p %buildroot%_sysconfdir/purple/
@@ -435,6 +421,15 @@ fi
 %endif
 
 %changelog
+* Thu Jun 25 2009 Michael Shigorin <mike@altlinux.org> 2.5.7-alt1
+- 2.5.7 rebuilt for Sisyphus
+  + solves Yahoo Messenger problems (protocol 16 support)
+- restored Packager: to shaba@
+- minor spec cleanup
+
+* Wed Jun 24 2009 Alex Negulescu <a@wdu.ro> 2.5.7-alt0
+- initial build of 2.5.7, which permits connecting to all messenger servers
+
 * Fri May 22 2009 Michael Shigorin <mike@altlinux.org> 2.5.6-alt1
 - 2.5.6:
   + CVE-2009-1373: XMPP SOCKS5 stream server buffer overflow
