@@ -18,7 +18,7 @@
 %def_enable dbus
 
 Name: pidgin
-Version: 2.5.7
+Version: 2.5.8
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -149,7 +149,7 @@ Gevolution plugin for Pidgin.
 Summary: Mono .NET plugin support for Pidgin
 Group: Networking/Instant messaging
 Requires: libpurple = %version-%release
-BuildRequires: mono-devel mono-mcs rpm-build-mono mono-nunit
+BuildRequires: mono-devel mono-mcs rpm-build-mono mono-nunit-devel
 BuildRequires: /proc
 Obsoletes: gaim-mono
 Provides: gaim-mono = %version
@@ -421,6 +421,10 @@ fi
 %endif
 
 %changelog
+* Fri Jul 10 2009 Alexey Shabalin <shaba@altlinux.ru> 2.5.8-alt1
+- 2.5.8
+- fixed CVE-2009-1889
+
 * Thu Jun 25 2009 Michael Shigorin <mike@altlinux.org> 2.5.7-alt1
 - 2.5.7 rebuilt for Sisyphus
   + solves Yahoo Messenger problems (protocol 16 support)
