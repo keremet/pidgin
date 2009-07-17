@@ -12,14 +12,14 @@
 %def_enable gevolution
 %def_enable meanwhile
 %def_enable cap
-%def_disable nm
+%def_enable nm
 %def_disable mono
 %def_enable consoleui
 %def_enable dbus
 
 Name: pidgin
 Version: 2.5.8
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -421,6 +421,9 @@ fi
 %endif
 
 %changelog
+* Fri Jul 17 2009 Michael Shigorin <mike@altlinux.org> 2.5.8-alt2
+- built with NM support enabled by default (shrek@'s request)
+
 * Fri Jul 10 2009 Alexey Shabalin <shaba@altlinux.ru> 2.5.8-alt1
 - 2.5.8
 - fixed CVE-2009-1889
