@@ -18,21 +18,13 @@
 %def_enable dbus
 
 Name: pidgin
-Version: 2.5.8
-Release: alt2
+Version: 2.6.1
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
 Group: Networking/Instant messaging
-
 Url: http://pidgin.im
-Source0: %name-%version.tar.bz2
-Source1: %name-be.po.bz2
-Source2: purple-altlinux-prefs.xml
-Patch0: pidgin-2.5.3-alt-linking.patch
-Patch2: %name-2.4.1-alt-oscar-status-fix.patch
-Patch10: %name-2.4.2-reread-resolvconf.patch
-Patch20: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
 Packager: Alexey Shabalin <shaba@altlinux.ru>
 
 Provides: gaim = %version
@@ -42,11 +34,18 @@ Requires: libpurple = %version-%release
 Requires(post,postun): desktop-file-utils
 PreReq: GConf
 
+Source0: %name-%version.tar.bz2
+Source1: %name-be.po.bz2
+Source2: purple-altlinux-prefs.xml
+Patch10: %name-2.6.1-reread-resolvconf.patch
+Patch20: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
+Patch21: pidgin-2.6.1-alt-confdir.patch
+
 # From configure.ac
 BuildPreReq: glib2-devel libgtk+2-devel
 BuildPreReq: libpango-devel >= 1.4.0
 BuildPreReq: libXext-devel libSM-devel libXScrnSaver-devel xorg-scrnsaverproto-devel
-BuildPreReq: libX11-devel xorg-cf-files imake
+BuildPreReq: libX11-devel
 BuildPreReq: libstartup-notification-devel >= 0.5
 BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_nss:BuildPreReq: libnss-devel libnspr-devel}
@@ -72,6 +71,9 @@ BuildRequires: perl-XML-Parser
 
 BuildPreReq: desktop-file-utils
 BuildPreReq: ca-certificates
+
+# audio/video
+BuildRequires: gst-plugins-devel farsight2-devel
 
 %description
 Pidgin allows you to talk to anyone using a variety of messaging
@@ -131,7 +133,6 @@ Requires: %name = %version-%release
 %description -n %name-relnot
 Release notification plugin for Pidgin.
 
-%if_enabled gevolution
 %package -n %name-gevolution
 Summary: Gevolution plugin for Pidgin
 Group: Networking/Instant messaging
@@ -142,9 +143,7 @@ Provides: gaim-gevolution = %version
 
 %description -n %name-gevolution
 Gevolution plugin for Pidgin.
-%endif
 
-%if_enabled mono
 %package -n libpurple-mono
 Summary: Mono .NET plugin support for Pidgin
 Group: Networking/Instant messaging
@@ -156,9 +155,7 @@ Provides: gaim-mono = %version
 
 %description -n libpurple-mono
 Mono support for Pidgin.
-%endif
 
-%if_enabled perl
 %package -n libpurple-perl
 Summary: Perl support for Pidgin
 Group: Networking/Instant messaging
@@ -170,9 +167,7 @@ Provides: gaim-perl = %version
 
 %description -n libpurple-perl
 Perl support for Pidgin.
-%endif
 
-%if_enabled tcl
 %package -n libpurple-tcl
 Summary: Tcl/Tk support for Pidgin
 Group: Networking/Instant messaging
@@ -183,9 +178,7 @@ Provides: gaim-tcl = %version
 
 %description -n libpurple-tcl
 Tcl/Tk support for Pidgin.
-%endif
 
-%if_enabled consoleui
 %package -n finch
 Summary: A text-based user interface for Pidgin
 Group: Networking/Instant messaging
@@ -211,9 +204,7 @@ Obsoletes: gaim-text-devel
 The finch-devel package contains the header files, developer
 documentation, and libraries required for development of Finch scripts
 and plugins.
-%endif
 
-%if_enabled dbus
 %package -n libpurple-dbus
 Summary: D-Bus client utiles for Pidgin
 Group: Networking/Instant messaging
@@ -224,14 +215,12 @@ Provides: gaim-dbus = %version
 
 %description -n libpurple-dbus
 D-Bus client utiles for Pidgin.
-%endif
 
 %prep
 %setup -q
-%patch0 -p1
-#patch2 -p1
 %patch10 -p1 -b .resolv
 %patch20 -p1
+%patch21 -p1 -b .confdir
 
 cp %SOURCE2 prefs.xml
 
@@ -241,58 +230,55 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure
 
 %build
 #autoreconf
-mkdir -p %buildroot%_datadir/dbus-1/services/
-%configure	--enable-dot \
-		--enable-doxygen \
-		--disable-schemas-install \
-		%{subst_enable mono} \
-		%{subst_enable cap} \
-		%{subst_enable nm} \
-		%{subst_enable perl} \
-		%{subst_enable gevolution} \
-		%{subst_enable dbus} \
-		%{subst_enable tk} \
-		%{subst_enable tcl} \
-		%{subst_enable consoleui} \
-		%{subst_enable meanwhile} \
-		--with-system-ssl-certs=%_datadir/ca-certificates \
+%configure \
+	--enable-dot \
+	--enable-doxygen \
+	--disable-schemas-install \
+	%{subst_enable mono} \
+	%{subst_enable cap} \
+	%{subst_enable nm} \
+	%{subst_enable perl} \
+	%{subst_enable gevolution} \
+	%{subst_enable dbus} \
+	%{subst_enable tk} \
+	%{subst_enable tcl} \
+	%{subst_enable consoleui} \
+	%{subst_enable meanwhile} \
+	--with-system-ssl-certs=%_datadir/ca-certificates \
 %if_enabled gnutls
-		--enable-gnutls=yes \
+	--enable-gnutls=yes \
 %else
-		--enable-gnutls=no \
+	--enable-gnutls=no \
 %endif
 %if_enabled cyrus_sasl
-		--enable-cyrus-sasl \
+	--enable-cyrus-sasl \
 %else
-		--disable-cyrus-sasl \
+	--disable-cyrus-sasl \
 %endif
 %if_enabled nss
-		--with-nss-includes=%_includedir/nss \
-		--with-nspr-includes=%_includedir/nspr \
-		--with-nspr-libs=%_libdir \
-		--with-nss-libs=%_libdir \
-		--enable-nss=yes \
+	--with-nss-includes=%_includedir/nss \
+	--with-nspr-includes=%_includedir/nspr \
+	--with-nspr-libs=%_libdir \
+	--with-nss-libs=%_libdir \
+	--enable-nss=yes \
 %else
-		--enable-nss=no \
+	--enable-nss=no \
 %endif
 %if_enabled perl
-		--with-perl-lib=vendor \
+	--with-perl-lib=vendor \
 %endif
-		--with-dbus-session-dir=%buildroot%_datadir/dbus-1/services \
-		--with-extraversion=%release
+	--with-extraversion=%release
 
 %make_build
 
 %install
-export GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1
-%makeinstall_std
-unset GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL
-
-mkdir -p %buildroot%_desktopdir/
+%make DESTDIR=%buildroot install
 
 # install ALTLinux pidgin default prefs.xml
-mkdir -p %buildroot%_sysconfdir/purple/
+mkdir -p %buildroot%_sysconfdir/purple
 install -m 644 prefs.xml %buildroot%_sysconfdir/purple/prefs.xml
+
+find %buildroot%_libdir -name \*.la -delete
 
 %find_lang --with-gnome %name
 
@@ -305,42 +291,34 @@ if [ $1 = 0 ]; then
 fi
 
 %files -f %name.lang
-%doc AUTHORS  COPYING  COPYRIGHT ChangeLog INSTALL NEWS README README.MTN
-%doc doc/*.txt
+%doc AUTHORS COPYRIGHT INSTALL NEWS README README.MTN doc/*.txt
+%config %_sysconfdir/gconf/schemas/*
 %_bindir/%name
 %_libdir/%name
-# %%_datadir/dbus-1/services/*.service
-%config %_sysconfdir/gconf/schemas/*
-%exclude %_libdir/%name/*.la
-%exclude %_libdir/%name/relnot.so
-
-%_man1dir/%name.*
 %_desktopdir/%name.desktop
 %_pixmapsdir/%name
-%_iconsdir/hicolor/??x??/apps/%{name}*.png
-
-%if_enabled gevolution
-%exclude %_libdir/%name/gevolution.so
-%endif
-
+%_iconsdir/hicolor/*/apps/*
+%_man1dir/%name.*
 %if_enabled perl
 %perl_vendor_archlib/Pidgin.pm
 %dir %perl_vendor_autolib/Pidgin
 %perl_vendor_autolib/Pidgin/*
 %perl_vendor_man3dir/Pidgin*
 %endif
+%if_enabled gevolution
+%exclude %_libdir/%name/gevolution.so
+%endif
+%exclude %_libdir/%name/relnot.so
 
 %files -n %name-relnot
 %_libdir/%name/relnot.so
 
 %files -n libpurple
+%config(noreplace) %_sysconfdir/purple
 %_libdir/libpurple.so.*
 %_libdir/purple-2
-%config(noreplace) %_sysconfdir/purple
 %_datadir/sounds/purple
 %_datadir/purple
-%exclude %_libdir/purple-2/*.la
-
 %if_enabled tcl
 %exclude %_libdir/purple-2/tcl.so
 %endif
@@ -392,8 +370,7 @@ fi
 %_pkgconfigdir/%name.pc
 
 %files -n libpurple-devel
-%doc ChangeLog.API HACKING PLUGIN_HOWTO
-%doc libpurple/purple-notifications-example
+%doc ChangeLog.API HACKING PLUGIN_HOWTO libpurple/purple-notifications-example
 %_includedir/libpurple
 %_libdir/libpurple.so
 %_libdir/libpurple-client.so
@@ -401,15 +378,12 @@ fi
 %_datadir/aclocal/purple.m4
 
 %if_enabled consoleui
-
 %files -n finch
 %_man1dir/finch.*
 %_bindir/finch
 %_libdir/libgnt.so.*
 %_libdir/gnt
 %_libdir/finch
-%exclude %_libdir/finch/*.la
-%exclude %_libdir/gnt/*.la
 
 %files -n finch-devel
 %_includedir/finch
@@ -417,10 +391,13 @@ fi
 %_pkgconfigdir/gnt.pc
 %_pkgconfigdir/finch.pc
 %_libdir/libgnt.so
-
 %endif
 
 %changelog
+* Wed Aug 19 2009 Valery Inozemtsev <shrek@altlinux.ru> 2.6.1-alt1
+- 2.6.1
+- fixed CVE-2009-2694
+
 * Fri Jul 17 2009 Michael Shigorin <mike@altlinux.org> 2.5.8-alt2
 - built with NM support enabled by default (shrek@'s request)
 
