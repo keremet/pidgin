@@ -19,7 +19,7 @@
 
 Name: pidgin
 Version: 2.6.1
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -37,9 +37,10 @@ PreReq: GConf
 Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
 Source2: purple-altlinux-prefs.xml
-Patch10: %name-2.6.1-reread-resolvconf.patch
-Patch20: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
-Patch21: pidgin-2.6.1-alt-confdir.patch
+Patch0: %name-2.6.1-reread-resolvconf.patch
+Patch1: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
+Patch2: pidgin-2.6.1-alt-confdir.patch
+Patch3: pidgin-2.6.1-alt-gnome-proxy.patch
 
 # From configure.ac
 BuildPreReq: glib2-devel libgtk+2-devel
@@ -218,9 +219,10 @@ D-Bus client utiles for Pidgin.
 
 %prep
 %setup -q
-%patch10 -p1 -b .resolv
-%patch20 -p1
-%patch21 -p1 -b .confdir
+%patch0 -p1 -b .resolv
+%patch1 -p1
+%patch2 -p1 -b .confdir
+%patch3 -p1 -b .proxy
 
 cp %SOURCE2 prefs.xml
 
@@ -394,6 +396,9 @@ fi
 %endif
 
 %changelog
+* Tue Aug 25 2009 Valery Inozemtsev <shrek@altlinux.ru> 2.6.1-alt2
+- fixed using GNOME proxy settings properly
+
 * Wed Aug 19 2009 Valery Inozemtsev <shrek@altlinux.ru> 2.6.1-alt1
 - 2.6.1
 - fixed CVE-2009-2694
