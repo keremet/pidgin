@@ -1,0 +1,12 @@
+diff -ur pidgin-2.6.1/libpurple/protocols/oscar/oscarcommon.h pidgin-2.6.1.new/libpurple/protocols/oscar/oscarcommon.h
+--- pidgin-2.6.1/libpurple/protocols/oscar/oscarcommon.h	2009-08-19 12:12:47 +0400
++++ pidgin-2.6.1.new/libpurple/protocols/oscar/oscarcommon.h	2009-09-07 15:57:39 +0400
+@@ -35,7 +35,7 @@
+ #define OSCAR_DEFAULT_SSL_LOGIN_SERVER "slogin.oscar.aol.com"
+ #define OSCAR_OLD_LOGIN_SERVER "login.oscar.aol.com"
+ #ifndef _WIN32
+-#define OSCAR_DEFAULT_CUSTOM_ENCODING "ISO-8859-1"
++#define OSCAR_DEFAULT_CUSTOM_ENCODING "CP1251"
+ #else
+ #define OSCAR_DEFAULT_CUSTOM_ENCODING oscar_get_locale_charset()
+ #endif

@@ -19,7 +19,7 @@
 
 Name: pidgin
 Version: 2.6.1
-Release: alt2
+Release: alt3
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -41,6 +41,8 @@ Patch0: %name-2.6.1-reread-resolvconf.patch
 Patch1: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
 Patch2: pidgin-2.6.1-alt-confdir.patch
 Patch3: pidgin-2.6.1-alt-gnome-proxy.patch
+Patch4: pidgin-alt-oscar-def_enc-CP1251.patch
+
 
 # From configure.ac
 BuildPreReq: glib2-devel libgtk+2-devel
@@ -55,11 +57,16 @@ BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_consoleui:BuildPreReq: libncurses-devel libncursesw-devel}
 %{?_enable_nm:BuildPreReq: NetworkManager-devel}
 %{?_enable_meanwhile:BuildPreReq: libmeanwhile-devel}
+%{?_enable_perl:BuildPreReq: perl-devel}
+%{?_enable_tcl:BuildPreReq: tcl-devel}
+%{?_enable_tk:BuildPreReq: tk-devel}
+%{?_enable_mono:BuildRequires: mono-devel mono-mcs rpm-build-mono mono-nunit-devel /proc}
+%{?_enable_gevolution:BuildPreReq: evolution-data-server-devel}
+%{?_enable_dbus:BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
 BuildPreReq: libavahi-devel libavahi-glib-devel
-BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35
 BuildPreReq: doxygen
 
 BuildRequires: gcc-c++ gstreamer-devel libgpg-error graphviz
@@ -138,7 +145,6 @@ Release notification plugin for Pidgin.
 Summary: Gevolution plugin for Pidgin
 Group: Networking/Instant messaging
 Requires: %name = %version-%release
-BuildRequires: evolution-data-server-devel
 Obsoletes: gaim-gevolution
 Provides: gaim-gevolution = %version
 
@@ -149,8 +155,6 @@ Gevolution plugin for Pidgin.
 Summary: Mono .NET plugin support for Pidgin
 Group: Networking/Instant messaging
 Requires: libpurple = %version-%release
-BuildRequires: mono-devel mono-mcs rpm-build-mono mono-nunit-devel
-BuildRequires: /proc
 Obsoletes: gaim-mono
 Provides: gaim-mono = %version
 
@@ -162,7 +166,6 @@ Summary: Perl support for Pidgin
 Group: Networking/Instant messaging
 Requires: libpurple = %version-%release
 Requires: perl-base
-BuildRequires: perl-devel perl-XML-Parser
 Obsoletes: gaim-perl
 Provides: gaim-perl = %version
 
@@ -173,7 +176,6 @@ Perl support for Pidgin.
 Summary: Tcl/Tk support for Pidgin
 Group: Networking/Instant messaging
 Requires: libpurple = %version-%release
-BuildRequires: tcl-devel tk-devel
 Obsoletes: gaim-tcl
 Provides: gaim-tcl = %version
 
@@ -210,7 +212,6 @@ and plugins.
 Summary: D-Bus client utiles for Pidgin
 Group: Networking/Instant messaging
 Requires: %name = %version-%release
-BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35
 Obsoletes: gaim-dbus
 Provides: gaim-dbus = %version
 
@@ -223,6 +224,7 @@ D-Bus client utiles for Pidgin.
 %patch1 -p1
 %patch2 -p1 -b .confdir
 %patch3 -p1 -b .proxy
+%patch4 -p1 -b .def_enc
 
 cp %SOURCE2 prefs.xml
 
@@ -396,6 +398,9 @@ fi
 %endif
 
 %changelog
+* Mon Sep 07 2009 Alexey Shabalin <shaba@altlinux.ru> 2.6.1-alt3
+- define OSCAR_DEFAULT_CUSTOM_ENCODING as "CP1251" (patch4) (ALT #16815)
+
 * Tue Aug 25 2009 Valery Inozemtsev <shrek@altlinux.ru> 2.6.1-alt2
 - fixed using GNOME proxy settings properly
 
