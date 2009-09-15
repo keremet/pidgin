@@ -18,8 +18,8 @@
 %def_enable dbus
 
 Name: pidgin
-Version: 2.6.1
-Release: alt3
+Version: 2.6.2
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -36,12 +36,14 @@ PreReq: GConf
 
 Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
+Source3: %name-ru.po.bz2
 Source2: purple-altlinux-prefs.xml
 Patch0: %name-2.6.1-reread-resolvconf.patch
 Patch1: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
 Patch2: pidgin-2.6.1-alt-confdir.patch
-Patch3: pidgin-2.6.1-alt-gnome-proxy.patch
+Patch3: pidgin-2.6.2-alt-gnome-proxy.patch
 Patch4: pidgin-alt-oscar-def_enc-CP1251.patch
+Patch5: pidgin-2.6.2-alt-l10n.patch
 
 
 # From configure.ac
@@ -225,12 +227,16 @@ D-Bus client utiles for Pidgin.
 %patch2 -p1 -b .confdir
 %patch3 -p1 -b .proxy
 %patch4 -p1 -b .def_enc
+%patch5 -p1 -b .l10n
 
 cp %SOURCE2 prefs.xml
 
 # belarusian translation
 bzcat %SOURCE1 > po/be.po
-sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure
+# update russian translation
+bzcat %SOURCE3 > po/ru.po
+
+sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 
 %build
 #autoreconf
@@ -398,6 +404,10 @@ fi
 %endif
 
 %changelog
+* Tue Sep 15 2009 Alexey Shabalin <shaba@altlinux.ru> 2.6.2-alt1
+- 2.6.2
+- update russian translation
+
 * Mon Sep 07 2009 Alexey Shabalin <shaba@altlinux.ru> 2.6.1-alt3
 - define OSCAR_DEFAULT_CUSTOM_ENCODING as "CP1251" (patch4) (ALT #16815)
 

@@ -1,0 +1,21 @@
+diff -ur pidgin-2.6.2/pidgin/gtkprefs.c pidgin-2.6.2.new/pidgin/gtkprefs.c
+--- pidgin-2.6.2/pidgin/gtkprefs.c	2009-09-06 01:12:04 +0400
++++ pidgin-2.6.2.new/pidgin/gtkprefs.c	2009-09-15 19:55:54 +0400
+@@ -1738,7 +1738,7 @@
+ {
+ 	GError *err = NULL;
+ 
+-	if (g_spawn_command_line_async ("gnome-network-preferences", &err))
++	if (g_spawn_command_line_async ("gnome-network-properties", &err))
+ 		return;
+ 
+ 	purple_notify_error(NULL, NULL, _("Cannot start proxy configuration program."), err->message);
+@@ -2054,7 +2054,7 @@
+ 		gtk_widget_hide(table);
+ 	} else if (purple_running_gnome()) {
+ 		gchar *path;
+-		path = g_find_program_in_path("gnome-network-preferences");
++		path = g_find_program_in_path("gnome-network-properties");
+ 		if (path != NULL) {
+ 			gtk_widget_set_sensitive(proxy_button, TRUE);
+ 			gtk_widget_hide(proxy_warning);

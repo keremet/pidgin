@@ -1,0 +1,83 @@
+diff -ur pidgin-2.6.2/pidgin/gtkprefs.c pidgin-2.6.2.new/pidgin/gtkprefs.c
+--- pidgin-2.6.2/pidgin/gtkprefs.c	2009-09-15 20:17:24 +0400
++++ pidgin-2.6.2.new/pidgin/gtkprefs.c	2009-09-15 20:39:11 +0400
+@@ -57,6 +57,8 @@
+ #include "gtkutils.h"
+ #include "pidginstock.h"
+ 
++#include <string.h>
++
+ #define PROXYHOST 0
+ #define PROXYPORT 1
+ #define PROXYUSER 2
+@@ -575,6 +577,10 @@
+ 		gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
+ }
+ 
++static char 
++_str_The_default_Pidgin_buddy_list_theme  [1024],
++_str_The_default_Pidgin_status_icon_theme [1024];
++
+ static void
+ prefs_themes_refresh(void)
+ {
+@@ -582,6 +588,32 @@
+ 	gchar *filename;
+ 	GtkTreeIter iter;
+ 
++	static int first_call = 1;
++	
++	if (first_call) { /* FIXME: this should be done in a regular way */
++
++		_str_The_default_Pidgin_buddy_list_theme [0] =
++		_str_The_default_Pidgin_status_icon_theme[0] = '\0';
++
++		strcat (_str_The_default_Pidgin_buddy_list_theme, "<b>(");
++		strcat (_str_The_default_Pidgin_buddy_list_theme, _("Default") );
++		strcat (_str_The_default_Pidgin_buddy_list_theme, ")</b> - ");
++		strcat (_str_The_default_Pidgin_buddy_list_theme, _("None") );
++		strcat (_str_The_default_Pidgin_buddy_list_theme, "\n<span color='dim grey'>");
++		strcat (_str_The_default_Pidgin_buddy_list_theme, _("The default Pidgin buddy list theme") );
++		strcat (_str_The_default_Pidgin_buddy_list_theme, "</span>");
++
++		strcat (_str_The_default_Pidgin_status_icon_theme, "<b>(");
++		strcat (_str_The_default_Pidgin_status_icon_theme, _("Default") );
++		strcat (_str_The_default_Pidgin_status_icon_theme, ")</b> - ");
++		strcat (_str_The_default_Pidgin_status_icon_theme, _("None") );
++		strcat (_str_The_default_Pidgin_status_icon_theme, "\n<span color='dim grey'>");
++		strcat (_str_The_default_Pidgin_status_icon_theme, _("The default Pidgin status icon theme") );
++		strcat (_str_The_default_Pidgin_status_icon_theme, "</span>");
++
++		first_call = 0;
++}
++
+ 	prefs_sound_themes_loading = TRUE;
+ 	/* refresh the list of themes in the manager */
+ 	purple_theme_manager_refresh();
+@@ -599,15 +631,13 @@
+ 	gtk_list_store_clear(prefs_blist_themes);
+ 	gtk_list_store_append(prefs_blist_themes, &iter);
+ 	gtk_list_store_set(prefs_blist_themes, &iter, 0, pixbuf, 1,
+-	                   "<b>(Default)</b> - None\n<span color='dim grey'>"
+-	                   "The default Pidgin buddy list theme</span>", 2, "", -1);
++	                   _str_The_default_Pidgin_buddy_list_theme, 2, "", -1);
+ 
+ 	/* status icon themes */
+ 	gtk_list_store_clear(prefs_status_icon_themes);
+ 	gtk_list_store_append(prefs_status_icon_themes, &iter);
+ 	gtk_list_store_set(prefs_status_icon_themes, &iter, 0, pixbuf, 1,
+-	                   "<b>(Default)</b> - None\n<span color='dim grey'>"
+-	                   "The default Pidgin status icon theme</span>", 2, "", -1);
++	                   _str_The_default_Pidgin_status_icon_theme, 2, "", -1);
+ 	g_object_unref(G_OBJECT(pixbuf));
+ 
+ 	purple_theme_manager_for_each_theme(prefs_themes_sort);
+@@ -1784,7 +1814,7 @@
+ 			G_CALLBACK(network_stun_server_changed_cb), NULL);
+ 	gtk_widget_show(entry);
+ 
+-	pidgin_add_widget_to_vbox(GTK_BOX(vbox), "ST_UN server:",
++	pidgin_add_widget_to_vbox(GTK_BOX(vbox), _("ST_UN server:"),
+ 			sg, entry, TRUE, NULL);
+ 
+ 	hbox = gtk_hbox_new(FALSE, PIDGIN_HIG_BOX_SPACE);
