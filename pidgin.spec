@@ -20,6 +20,7 @@
 %def_enable dot
 %def_enable doxygen
 %def_enable relnot
+%def_enable idn
 
 Name: pidgin
 Version: 2.6.3
@@ -72,12 +73,13 @@ BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_avahi:BuildPreReq: libavahi-devel libavahi-glib-devel}
 %{?_enable_dot:BuildPreReq: graphviz}
 %{?_enable_doxygen:BuildPreReq: doxygen}
+%{?_enable_idn:BuildPreReq: libidn-devel}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
 
 BuildRequires: gcc-c++ gstreamer-devel libgpg-error
-BuildRequires: python-modules-encodings libidn-devel
+BuildRequires: python-modules-encodings
 # for shared gadu plugin
 BuildRequires: libgadu-devel
 BuildRequires: intltool
@@ -274,6 +276,7 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	%{subst_enable tcl} \
 	%{subst_enable consoleui} \
 	%{subst_enable meanwhile} \
+	%{subst_enable idn} \
 	--with-system-ssl-certs=%_datadir/ca-certificates \
 %if_enabled gnutls
 	--enable-gnutls=yes \
