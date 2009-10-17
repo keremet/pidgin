@@ -18,6 +18,7 @@
 %def_enable dbus
 %def_enable avahi
 %def_enable dot
+%def_enable doxygen
 
 Name: pidgin
 Version: 2.6.3
@@ -69,10 +70,10 @@ BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_dbus:BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35}
 %{?_enable_avahi:BuildPreReq: libavahi-devel libavahi-glib-devel}
 %{?_enable_dot:BuildPreReq: graphviz}
+%{?_enable_doxygen:BuildPreReq: doxygen}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
-BuildPreReq: doxygen
 
 BuildRequires: gcc-c++ gstreamer-devel libgpg-error
 BuildRequires: python-modules-encodings libidn-devel
@@ -256,10 +257,10 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 %build
 %autoreconf
 %configure \
-	--enable-doxygen \
 	--disable-schemas-install \
 	%{subst_enable avahi} \
 	%{subst_enable dot} \
+	%{subst_enable doxygen} \
 	%{subst_enable mono} \
 	%{subst_enable cap} \
 	%{subst_enable nm} \
