@@ -233,7 +233,7 @@ D-Bus client utilities for Pidgin.
 %endif
 
 %prep
-%setup -q
+%setup
 %patch0 -p1 -b .resolv
 %patch1 -p1
 %patch2 -p1 -b .confdir
