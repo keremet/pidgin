@@ -211,14 +211,14 @@ documentation, and libraries required for development of Finch scripts
 and plugins.
 
 %package -n libpurple-dbus
-Summary: D-Bus client utiles for Pidgin
+Summary: D-Bus client utilities for Pidgin
 Group: Networking/Instant messaging
 Requires: %name = %version-%release
 Obsoletes: gaim-dbus
 Provides: gaim-dbus = %version
 
 %description -n libpurple-dbus
-D-Bus client utiles for Pidgin.
+D-Bus client utilities for Pidgin.
 
 %prep
 %setup -q
