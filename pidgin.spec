@@ -167,6 +167,7 @@ Provides: gaim-mono = %version
 Mono support for Pidgin.
 %endif
 
+%if_enabled perl
 %package -n libpurple-perl
 Summary: Perl support for Pidgin
 Group: Networking/Instant messaging
@@ -177,6 +178,7 @@ Provides: gaim-perl = %version
 
 %description -n libpurple-perl
 Perl support for Pidgin.
+%endif
 
 %package -n libpurple-tcl
 Summary: Tcl/Tk support for Pidgin
