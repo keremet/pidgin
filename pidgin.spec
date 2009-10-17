@@ -155,6 +155,7 @@ Provides: gaim-gevolution = %version
 Gevolution plugin for Pidgin.
 %endif
 
+%if_enabled mono
 %package -n libpurple-mono
 Summary: Mono .NET plugin support for Pidgin
 Group: Networking/Instant messaging
@@ -164,6 +165,7 @@ Provides: gaim-mono = %version
 
 %description -n libpurple-mono
 Mono support for Pidgin.
+%endif
 
 %package -n libpurple-perl
 Summary: Perl support for Pidgin
