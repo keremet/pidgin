@@ -21,6 +21,7 @@
 %def_enable doxygen
 %def_enable relnot
 %def_enable idn
+%def_enable farsight
 
 Name: pidgin
 Version: 2.6.3
@@ -74,6 +75,7 @@ BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_dot:BuildPreReq: graphviz}
 %{?_enable_doxygen:BuildPreReq: doxygen}
 %{?_enable_idn:BuildPreReq: libidn-devel}
+%{?_enable_farsight:BuildPreReq: farsight2-devel}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
@@ -90,7 +92,7 @@ BuildPreReq: desktop-file-utils
 BuildPreReq: ca-certificates
 
 # audio/video
-BuildRequires: gst-plugins-devel farsight2-devel
+BuildRequires: gst-plugins-devel
 
 %description
 Pidgin allows you to talk to anyone using a variety of messaging
@@ -277,6 +279,7 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	%{subst_enable consoleui} \
 	%{subst_enable meanwhile} \
 	%{subst_enable idn} \
+	%{subst_enable farsight} \
 	--with-system-ssl-certs=%_datadir/ca-certificates \
 %if_enabled gnutls
 	--enable-gnutls=yes \
