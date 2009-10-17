@@ -143,6 +143,7 @@ Requires: %name = %version-%release
 %description -n %name-relnot
 Release notification plugin for Pidgin.
 
+%if_enabled gevolution
 %package -n %name-gevolution
 Summary: Gevolution plugin for Pidgin
 Group: Networking/Instant messaging
@@ -152,6 +153,7 @@ Provides: gaim-gevolution = %version
 
 %description -n %name-gevolution
 Gevolution plugin for Pidgin.
+%endif
 
 %package -n libpurple-mono
 Summary: Mono .NET plugin support for Pidgin
