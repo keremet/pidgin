@@ -22,6 +22,7 @@
 %def_enable relnot
 %def_enable idn
 %def_enable farsight
+%def_enable gstreamer
 
 # voice and video
 %def_enable vv
@@ -80,11 +81,12 @@ BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_idn:BuildPreReq: libidn-devel}
 %{?_enable_farsight:BuildPreReq: farsight2-devel}
 %{?_enable_vv:BuildPreReq: gst-plugins-devel}
+%{?_enable_gstreamer:BuildPreReq: gstreamer-devel}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
 
-BuildRequires: gcc-c++ gstreamer-devel libgpg-error
+BuildRequires: gcc-c++ libgpg-error
 BuildRequires: python-modules-encodings
 # for shared gadu plugin
 BuildRequires: libgadu-devel
@@ -282,6 +284,10 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	%{subst_enable idn} \
 	%{subst_enable farsight} \
 	%{subst_enable vv} \
+	%{subst_enable gstreamer} \
+%if_disabled gstreamer
+	--disable-gstreamer-interfaces \
+%endif
 	--with-system-ssl-certs=%_datadir/ca-certificates \
 %if_enabled gnutls
 	--enable-gnutls=yes \
