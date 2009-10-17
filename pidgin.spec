@@ -19,6 +19,7 @@
 %def_enable avahi
 %def_enable dot
 %def_enable doxygen
+%def_enable relnot
 
 Name: pidgin
 Version: 2.6.3
@@ -139,6 +140,7 @@ The libpurple-devel package contains the header files, developer
 documentation, and libraries required for development of libpurple based
 instant messaging clients or plugins for any libpurple based client.
 
+%if_enabled relnot
 %package -n %name-relnot
 Summary: Release notification plugin for Pidgin
 Group: Networking/Instant messaging
@@ -146,6 +148,7 @@ Requires: %name = %version-%release
 
 %description -n %name-relnot
 Release notification plugin for Pidgin.
+%endif
 
 %if_enabled gevolution
 %package -n %name-gevolution
@@ -335,10 +338,14 @@ fi
 %if_enabled gevolution
 %exclude %_libdir/%name/gevolution.so
 %endif
+%if_enabled relnot
 %exclude %_libdir/%name/relnot.so
+%endif
 
+%if_enabled relnot
 %files -n %name-relnot
 %_libdir/%name/relnot.so
+%endif
 
 %files -n libpurple
 %config(noreplace) %_sysconfdir/purple
