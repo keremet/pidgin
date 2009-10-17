@@ -180,6 +180,7 @@ Provides: gaim-perl = %version
 Perl support for Pidgin.
 %endif
 
+%if_enabled tcl
 %package -n libpurple-tcl
 Summary: Tcl/Tk support for Pidgin
 Group: Networking/Instant messaging
@@ -189,6 +190,7 @@ Provides: gaim-tcl = %version
 
 %description -n libpurple-tcl
 Tcl/Tk support for Pidgin.
+%endif
 
 %package -n finch
 Summary: A text-based user interface for Pidgin
