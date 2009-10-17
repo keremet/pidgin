@@ -220,6 +220,7 @@ documentation, and libraries required for development of Finch scripts
 and plugins.
 %endif
 
+%if_enabled dbus
 %package -n libpurple-dbus
 Summary: D-Bus client utilities for Pidgin
 Group: Networking/Instant messaging
@@ -229,6 +230,7 @@ Provides: gaim-dbus = %version
 
 %description -n libpurple-dbus
 D-Bus client utilities for Pidgin.
+%endif
 
 %prep
 %setup -q
@@ -393,7 +395,9 @@ fi
 %doc ChangeLog.API HACKING PLUGIN_HOWTO libpurple/purple-notifications-example
 %_includedir/libpurple
 %_libdir/libpurple.so
+%if_enabled dbus
 %_libdir/libpurple-client.so
+%endif
 %_pkgconfigdir/purple.pc
 %_datadir/aclocal/purple.m4
 
