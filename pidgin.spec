@@ -16,6 +16,7 @@
 %def_disable mono
 %def_enable consoleui
 %def_enable dbus
+%def_enable avahi
 
 Name: pidgin
 Version: 2.6.3
@@ -65,10 +66,10 @@ BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_mono:BuildRequires: mono-devel mono-mcs rpm-build-mono mono-nunit-devel /proc}
 %{?_enable_gevolution:BuildPreReq: evolution-data-server-devel}
 %{?_enable_dbus:BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35}
+%{?_enable_avahi:BuildPreReq: libavahi-devel libavahi-glib-devel}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
-BuildPreReq: libavahi-devel libavahi-glib-devel
 BuildPreReq: doxygen
 
 BuildRequires: gcc-c++ gstreamer-devel libgpg-error graphviz
@@ -256,6 +257,7 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	--enable-dot \
 	--enable-doxygen \
 	--disable-schemas-install \
+	%{subst_enable avahi} \
 	%{subst_enable mono} \
 	%{subst_enable cap} \
 	%{subst_enable nm} \
