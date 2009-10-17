@@ -192,6 +192,7 @@ Provides: gaim-tcl = %version
 Tcl/Tk support for Pidgin.
 %endif
 
+%if_enabled consoleui
 %package -n finch
 Summary: A text-based user interface for Pidgin
 Group: Networking/Instant messaging
@@ -217,6 +218,7 @@ Obsoletes: gaim-text-devel
 The finch-devel package contains the header files, developer
 documentation, and libraries required for development of Finch scripts
 and plugins.
+%endif
 
 %package -n libpurple-dbus
 Summary: D-Bus client utilities for Pidgin
