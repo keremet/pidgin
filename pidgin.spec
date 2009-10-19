@@ -24,6 +24,9 @@
 %def_enable farsight
 %def_enable gstreamer
 
+# X session management
+%def_enable sm
+
 # voice and video
 %def_enable vv
 
@@ -59,7 +62,7 @@ Patch5: pidgin-2.6.2-alt-l10n.patch
 # From configure.ac
 BuildPreReq: glib2-devel libgtk+2-devel
 BuildPreReq: libpango-devel >= 1.4.0
-BuildPreReq: libXext-devel libSM-devel libXScrnSaver-devel xorg-scrnsaverproto-devel
+BuildPreReq: libXext-devel libXScrnSaver-devel xorg-scrnsaverproto-devel
 BuildPreReq: libX11-devel
 BuildPreReq: libstartup-notification-devel >= 0.5
 BuildPreReq: libgtkspell-devel >= 2.0.2
@@ -82,6 +85,7 @@ BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_farsight:BuildPreReq: farsight2-devel}
 %{?_enable_vv:BuildPreReq: gst-plugins-devel}
 %{?_enable_gstreamer:BuildPreReq: gstreamer-devel}
+%{?_enable_sm:BuildPreReq: libSM-devel}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
@@ -285,6 +289,7 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	%{subst_enable farsight} \
 	%{subst_enable vv} \
 	%{subst_enable gstreamer} \
+	%{subst_enable sm} \
 %if_disabled gstreamer
 	--disable-gstreamer-interfaces \
 %endif
