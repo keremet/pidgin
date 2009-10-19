@@ -24,6 +24,7 @@
 %def_enable farsight
 %def_enable gstreamer
 %def_enable screensaver
+%def_enable startup_notification
 
 # X session management
 %def_enable sm
@@ -64,7 +65,6 @@ Patch5: pidgin-2.6.2-alt-l10n.patch
 BuildPreReq: glib2-devel libgtk+2-devel
 BuildPreReq: libpango-devel >= 1.4.0
 BuildPreReq: libXext-devel libX11-devel
-BuildPreReq: libstartup-notification-devel >= 0.5
 BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_nss:BuildPreReq: libnss-devel libnspr-devel}
 %{?_enable_cyrus_sasl:BuildPreReq: libsasl2-devel}
@@ -87,6 +87,7 @@ BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_gstreamer:BuildPreReq: gstreamer-devel}
 %{?_enable_sm:BuildPreReq: libSM-devel}
 %{?_enable_screensaver:BuildPreReq: libXScrnSaver-devel xorg-scrnsaverproto-devel}
+%{?_enable_startup_notification:BuildPreReq: libstartup-notification-devel >= 0.5}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
@@ -292,6 +293,9 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	%{subst_enable gstreamer} \
 	%{subst_enable sm} \
 	%{subst_enable screensaver} \
+%if_disabled startup_notification
+	--disable-startup-notification \
+%endif
 %if_disabled gstreamer
 	--disable-gstreamer-interfaces \
 %endif
