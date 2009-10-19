@@ -28,6 +28,7 @@
 %def_enable gestures
 %def_enable msnp15
 %def_enable gtkspell
+%def_enable devhelp
 
 # X session management
 %def_enable sm
@@ -299,6 +300,7 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	%{subst_enable gestures} \
 	%{subst_enable msnp15} \
 	%{subst_enable gtkspell} \
+	%{subst_enable devhelp} \
 %if_disabled startup_notification
 	--disable-startup-notification \
 %endif
