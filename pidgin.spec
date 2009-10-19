@@ -27,6 +27,7 @@
 %def_enable startup_notification
 %def_enable gestures
 %def_enable msnp15
+%def_enable gtkspell
 
 # X session management
 %def_enable sm
@@ -67,7 +68,7 @@ Patch5: pidgin-2.6.2-alt-l10n.patch
 BuildPreReq: glib2-devel libgtk+2-devel
 BuildPreReq: libpango-devel >= 1.4.0
 BuildPreReq: libXext-devel libX11-devel
-BuildPreReq: libgtkspell-devel >= 2.0.2
+%{?_enable_gtkspell:BuildPreReq: libgtkspell-devel >= 2.0.2}
 %{?_enable_nss:BuildPreReq: libnss-devel libnspr-devel}
 %{?_enable_cyrus_sasl:BuildPreReq: libsasl2-devel}
 %{?_enable_gnutls:BuildPreReq: libgnutls-devel}
@@ -297,6 +298,7 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	%{subst_enable screensaver} \
 	%{subst_enable gestures} \
 	%{subst_enable msnp15} \
+	%{subst_enable gtkspell} \
 %if_disabled startup_notification
 	--disable-startup-notification \
 %endif
