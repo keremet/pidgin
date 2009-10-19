@@ -25,6 +25,7 @@
 %def_enable gstreamer
 %def_enable screensaver
 %def_enable startup_notification
+%def_enable gestures
 
 # X session management
 %def_enable sm
@@ -293,6 +294,7 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	%{subst_enable gstreamer} \
 	%{subst_enable sm} \
 	%{subst_enable screensaver} \
+	%{subst_enable gestures} \
 %if_disabled startup_notification
 	--disable-startup-notification \
 %endif
