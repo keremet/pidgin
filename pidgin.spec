@@ -26,6 +26,7 @@
 %def_enable screensaver
 %def_enable startup_notification
 %def_enable gestures
+%def_enable msnp15
 
 # X session management
 %def_enable sm
@@ -295,6 +296,7 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	%{subst_enable sm} \
 	%{subst_enable screensaver} \
 	%{subst_enable gestures} \
+	%{subst_enable msnp15} \
 %if_disabled startup_notification
 	--disable-startup-notification \
 %endif
