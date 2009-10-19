@@ -23,6 +23,7 @@
 %def_enable idn
 %def_enable farsight
 %def_enable gstreamer
+%def_enable screensaver
 
 # X session management
 %def_enable sm
@@ -62,8 +63,7 @@ Patch5: pidgin-2.6.2-alt-l10n.patch
 # From configure.ac
 BuildPreReq: glib2-devel libgtk+2-devel
 BuildPreReq: libpango-devel >= 1.4.0
-BuildPreReq: libXext-devel libXScrnSaver-devel xorg-scrnsaverproto-devel
-BuildPreReq: libX11-devel
+BuildPreReq: libXext-devel libX11-devel
 BuildPreReq: libstartup-notification-devel >= 0.5
 BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_nss:BuildPreReq: libnss-devel libnspr-devel}
@@ -86,6 +86,7 @@ BuildPreReq: libgtkspell-devel >= 2.0.2
 %{?_enable_vv:BuildPreReq: gst-plugins-devel}
 %{?_enable_gstreamer:BuildPreReq: gstreamer-devel}
 %{?_enable_sm:BuildPreReq: libSM-devel}
+%{?_enable_screensaver:BuildPreReq: libXScrnSaver-devel xorg-scrnsaverproto-devel}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf
@@ -290,6 +291,7 @@ sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 	%{subst_enable vv} \
 	%{subst_enable gstreamer} \
 	%{subst_enable sm} \
+	%{subst_enable screensaver} \
 %if_disabled gstreamer
 	--disable-gstreamer-interfaces \
 %endif
