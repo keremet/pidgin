@@ -18,7 +18,7 @@
 %def_enable dbus
 
 Name: pidgin
-Version: 2.6.2
+Version: 2.6.3
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -36,8 +36,8 @@ PreReq: GConf
 
 Source0: %name-%version.tar.bz2
 Source1: %name-be.po.bz2
-Source3: %name-ru.po.bz2
 Source2: purple-altlinux-prefs.xml
+Source3: %name-ru.po.bz2
 Patch0: %name-2.6.1-reread-resolvconf.patch
 Patch1: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
 Patch2: pidgin-2.6.1-alt-confdir.patch
@@ -233,13 +233,13 @@ cp %SOURCE2 prefs.xml
 
 # belarusian translation
 bzcat %SOURCE1 > po/be.po
-# update russian translation
+# update russian translation 
 bzcat %SOURCE3 > po/ru.po
 
 sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
 
 %build
-#autoreconf
+%autoreconf
 %configure \
 	--enable-dot \
 	--enable-doxygen \
@@ -404,6 +404,9 @@ fi
 %endif
 
 %changelog
+* Tue Oct 20 2009 Valery Inozemtsev <shrek@altlinux.ru> 2.6.3-alt1
+- 2.6.3
+
 * Tue Sep 15 2009 Alexey Shabalin <shaba@altlinux.ru> 2.6.2-alt1
 - 2.6.2
 - update russian translation
