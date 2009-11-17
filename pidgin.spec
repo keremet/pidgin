@@ -38,7 +38,7 @@
 
 Name: pidgin
 Version: 2.6.3
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -54,16 +54,16 @@ Requires(post,postun): desktop-file-utils
 PreReq: GConf
 
 Source0: %name-%version.tar.bz2
-Source1: %name-be.po.bz2
+Source1: pidgin-be.po.bz2
 Source2: purple-altlinux-prefs.xml
-Source3: %name-ru.po.bz2
-Patch0: %name-2.6.1-reread-resolvconf.patch
+Source3: pidgin-ru.po.bz2
+Patch0: pidgin-2.6.1-reread-resolvconf.patch
 Patch1: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
 Patch2: pidgin-2.6.1-alt-confdir.patch
 Patch3: pidgin-2.6.2-alt-gnome-proxy.patch
 Patch4: pidgin-alt-oscar-def_enc-CP1251.patch
 Patch5: pidgin-2.6.2-alt-l10n.patch
-
+Patch6: pidgin-alt-doc-man_fix.patch
 
 # From configure.ac
 BuildPreReq: glib2-devel libgtk+2-devel
@@ -94,7 +94,7 @@ BuildPreReq: libXext-devel libX11-devel
 %{?_enable_startup_notification:BuildPreReq: libstartup-notification-devel >= 0.5}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
-BuildPreReq: GConf
+BuildPreReq: GConf libGConf-devel
 
 BuildRequires: gcc-c++ libgpg-error
 BuildRequires: python-modules-encodings
@@ -264,6 +264,7 @@ D-Bus client utilities for Pidgin.
 %patch3 -p1 -b .proxy
 %patch4 -p1 -b .def_enc
 %patch5 -p1 -b .l10n
+%patch6 -p2
 
 cp %SOURCE2 prefs.xml
 
@@ -463,6 +464,11 @@ fi
 %endif
 
 %changelog
+* Tue Nov 17 2009 Alexey Shabalin <shaba@altlinux.ru> 2.6.3-alt2
+- sync spec with pidgin-mini, thx to php-coder@
+- update russian translation from attachments #21176
+- Fixed uncompressed manual page (noted by repocop), thx to php-coder@
+
 * Tue Oct 20 2009 Valery Inozemtsev <shrek@altlinux.ru> 2.6.3-alt1
 - 2.6.3
 
