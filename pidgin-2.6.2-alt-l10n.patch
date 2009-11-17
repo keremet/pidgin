@@ -1,6 +1,5 @@
-diff -ur pidgin-2.6.2/pidgin/gtkprefs.c pidgin-2.6.2.new/pidgin/gtkprefs.c
---- pidgin-2.6.2/pidgin/gtkprefs.c	2009-09-15 20:17:24 +0400
-+++ pidgin-2.6.2.new/pidgin/gtkprefs.c	2009-09-15 20:39:11 +0400
+--- pidgin-2.6.2/pidgin/gtkprefs.c	2009-09-21 07:20:57 +0200
++++ pidgin-2.6.2/pidgin/gtkprefs.c.NEW	2009-09-21 07:31:25 +0200
 @@ -57,6 +57,8 @@
  #include "gtkutils.h"
  #include "pidginstock.h"
@@ -10,7 +9,53 @@ diff -ur pidgin-2.6.2/pidgin/gtkprefs.c pidgin-2.6.2.new/pidgin/gtkprefs.c
  #define PROXYHOST 0
  #define PROXYPORT 1
  #define PROXYUSER 2
-@@ -575,6 +577,10 @@
+@@ -460,6 +462,10 @@
+ }
+ 
+ /* Rebuild the markup for the sound theme selection for "(Custom)" themes */
++		
++static char
++_str_The_default_Pidgin_sound_theme [1024];
++
+ static void
+ pref_sound_generate_markup(void)
+ {
+@@ -469,6 +475,23 @@
+ 	PurpleSoundTheme *theme;
+ 	GtkTreeIter iter;
+ 
++	static int first_call = 1;
++	
++	if (first_call) { /* FIXME: this should be done in a regular way */
++
++		_str_The_default_Pidgin_sound_theme [0] = '\0';
++
++		strcat (_str_The_default_Pidgin_sound_theme, "<b>(");
++		strcat (_str_The_default_Pidgin_sound_theme, _("Default") );
++		strcat (_str_The_default_Pidgin_sound_theme, ")</b>%s%s - ");
++		strcat (_str_The_default_Pidgin_sound_theme, _("None") );
++		strcat (_str_The_default_Pidgin_sound_theme, "\n<span foreground='dim grey'>");
++		strcat (_str_The_default_Pidgin_sound_theme, _("The default Pidgin sound theme") );
++		strcat (_str_The_default_Pidgin_sound_theme, "</span>");
++
++		first_call = 0;
++	}
++
+ 	customized = pidgin_sound_is_customized();
+ 	current_theme = purple_prefs_get_string(PIDGIN_PREFS_ROOT "/sound/theme");
+ 
+@@ -479,8 +502,8 @@
+ 			print_custom = customized && g_str_equal(current_theme, name);
+ 
+ 			if (!name || *name == '\0')
+-				markup = g_strdup_printf("<b>(Default)</b>%s%s - None\n<span foreground='dim grey'>The default Pidgin sound theme</span>",
+-							 print_custom ? " " : "", print_custom ? "(Custom)" : "");
++				markup = g_strdup_printf(_str_The_default_Pidgin_sound_theme,
++							 print_custom ? " " : "", print_custom ? _("(Custom)") : "");
+ 			else {
+ 				theme = PURPLE_SOUND_THEME(purple_theme_manager_find_theme(name, "sound"));
+ 				author = purple_theme_get_author(PURPLE_THEME(theme));
+@@ -575,6 +598,10 @@
  		gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
  }
  
@@ -21,7 +66,7 @@ diff -ur pidgin-2.6.2/pidgin/gtkprefs.c pidgin-2.6.2.new/pidgin/gtkprefs.c
  static void
  prefs_themes_refresh(void)
  {
-@@ -582,6 +588,32 @@
+@@ -582,6 +609,32 @@
  	gchar *filename;
  	GtkTreeIter iter;
  
@@ -49,12 +94,12 @@ diff -ur pidgin-2.6.2/pidgin/gtkprefs.c pidgin-2.6.2.new/pidgin/gtkprefs.c
 +		strcat (_str_The_default_Pidgin_status_icon_theme, "</span>");
 +
 +		first_call = 0;
-+}
++	}
 +
  	prefs_sound_themes_loading = TRUE;
  	/* refresh the list of themes in the manager */
  	purple_theme_manager_refresh();
-@@ -599,15 +631,13 @@
+@@ -599,15 +652,13 @@
  	gtk_list_store_clear(prefs_blist_themes);
  	gtk_list_store_append(prefs_blist_themes, &iter);
  	gtk_list_store_set(prefs_blist_themes, &iter, 0, pixbuf, 1,
@@ -72,7 +117,7 @@ diff -ur pidgin-2.6.2/pidgin/gtkprefs.c pidgin-2.6.2.new/pidgin/gtkprefs.c
  	g_object_unref(G_OBJECT(pixbuf));
  
  	purple_theme_manager_for_each_theme(prefs_themes_sort);
-@@ -1784,7 +1814,7 @@
+@@ -1784,7 +1835,7 @@
  			G_CALLBACK(network_stun_server_changed_cb), NULL);
  	gtk_widget_show(entry);
  
