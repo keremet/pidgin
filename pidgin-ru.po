@@ -343,6 +343,14 @@ msgstr ""
 "\n"
 "Последнее появление: %s назад"
 
+#: ../pidgin/gtkprefs.c:489
+msgid "The default Pidgin sound theme"
+msgstr "Звуковое оформление по умолчанию"
+
+#: ../pidgin/gtkprefs.c:506
+msgid "(Custom)"
+msgstr "(по выбору)"
+
 #: ../finch/gntblist.c:319 ../pidgin/gtkprefs.c:372
 #: ../pidgin/pixmaps/emotes/default/24/default.theme.in.h:1
 #: ../pidgin/gtkprefs.c:597
@@ -767,7 +775,7 @@ msgstr "Канал"
 
 #: ../finch/gntblist.c:2869 ../pidgin/gtkblist.c:1169
 msgid "Join a Chat"
-msgstr "Присоединиться к чату"
+msgstr "Присоединиться к беседе"
 
 #: ../finch/gntblist.c:2871
 msgid "Please enter the name of the chat you want to join."
@@ -13890,7 +13898,7 @@ msgstr "Не всегда не в сети"
 
 #: ../libpurple/protocols/yahoo/libymsg.c:3906
 msgid "Join in Chat"
-msgstr "Присоединиться в чате"
+msgstr "Присоединиться к чату"
 
 #: ../libpurple/protocols/yahoo/libymsg.c:3912
 msgid "Initiate Conference"
@@ -15095,7 +15103,7 @@ msgstr "/_Собеседники"
 msgid "/Buddies/New Instant _Message..."
 msgstr "/Контакты/Новое _сообщение..."
 
-#: ../pidgin/gtkblist.c:3439
+#: ../pidgin/gtkblist.c:3441
 msgid "/Buddies/Join a _Chat..."
 msgstr "/Контакты/Присоединиться к _чату..."
 
@@ -15637,6 +15645,10 @@ msgstr "/_Беседа"
 #: ../pidgin/gtkconv.c:3134
 msgid "/Conversation/New Instant _Message..."
 msgstr "/Беседа/Новое _сообщение..."
+
+#: ../pidgin/gtkconv.c:3142
+msgid "/Conversation/Join a _Chat..."
+msgstr "/Беседа/Присоединиться к _беседе..."
 
 #: ../pidgin/gtkconv.c:3139
 msgid "/Conversation/_Find..."
