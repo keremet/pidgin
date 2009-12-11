@@ -35,7 +35,7 @@
 #define OSCAR_DEFAULT_SSL_LOGIN_SERVER "slogin.oscar.aol.com"
 #define OSCAR_OLD_LOGIN_SERVER "login.oscar.aol.com"
 #ifndef _WIN32
-#define OSCAR_DEFAULT_CUSTOM_ENCODING "ISO-8859-1"
+#define OSCAR_DEFAULT_CUSTOM_ENCODING "CP1251"
 #else
 #define OSCAR_DEFAULT_CUSTOM_ENCODING oscar_get_locale_charset()
 #endif
