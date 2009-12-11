@@ -1,0 +1,4 @@
+tar: @version@:.
+diff: @version@:. .
+spec:.gear/pidgin.spec
+copy:.gear/purple-altlinux-prefs.xml
