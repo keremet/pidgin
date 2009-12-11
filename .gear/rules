@@ -1,4 +1,0 @@
-copy: *.patch
-bzip2: *.po
-copy: *.xml
-tar.bz2: pidgin
