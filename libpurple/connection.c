@@ -42,6 +42,10 @@
 
 #define KEEPALIVE_INTERVAL 30
 
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <resolv.h>
+
 static GList *connections = NULL;
 static GList *connections_connecting = NULL;
 static PurpleConnectionUiOps *connection_ui_ops = NULL;
@@ -153,6 +157,9 @@ _purple_connection_new(PurpleAccount *account, gboolean regist, const char *pass
 	purple_account_set_connection(account, gc);
 
 	purple_signal_emit(purple_connections_get_handle(), "signing-on", gc);
+
+	/* Re-read resolv.conf and friends in case DNS servers have changed */
+	res_init();
 
 	if (regist)
 	{
