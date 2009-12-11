@@ -407,8 +407,8 @@ gboolean
 purple_core_migrate(void)
 {
 	const char *user_dir = purple_user_dir();
-	char *old_user_dir = g_strconcat(purple_home_dir(),
-	                                 G_DIR_SEPARATOR_S ".gaim", NULL);
+	char *old_user_dir = g_strconcat(g_get_home_dir(),
+	                                 G_DIR_SEPARATOR_S ".purple", NULL);
 	char *status_file;
 	FILE *fp;
 	GDir *dir;
@@ -421,9 +421,13 @@ purple_core_migrate(void)
 
 	if (!g_file_test(old_user_dir, G_FILE_TEST_EXISTS))
 	{
-		/* ~/.gaim doesn't exist, so there's nothing to migrate. */
-		g_free(old_user_dir);
-		return TRUE;
+		old_user_dir = g_strconcat(g_get_home_dir(), G_DIR_SEPARATOR_S ".gaim", NULL);
+		if (!g_file_test(old_user_dir, G_FILE_TEST_EXISTS))
+		{
+			/* ~/.gaim doesn't exist, so there's nothing to migrate. */
+			g_free(old_user_dir);
+			return TRUE;
+		}
 	}
 
 	status_file = g_strconcat(user_dir, G_DIR_SEPARATOR_S "migrating", NULL);
@@ -536,8 +540,7 @@ purple_core_migrate(void)
 
 				logs_dir = g_build_filename(user_dir, "logs", NULL);
 
-				if (purple_strequal(link, "../.purple/logs") ||
-				    purple_strequal(link, logs_dir))
+				if (purple_strequal(link, logs_dir))
 				{
 					/* If the symlink points to the new directory, we're
 					 * likely just trying again after a failed migration,
@@ -634,7 +637,8 @@ purple_core_migrate(void)
 					if (g_file_test(icons_name, G_FILE_TEST_IS_DIR))
 					{
 						if (!move_and_symlink_dir(icons_name, icons_entry,
-						                          name, new_icons_dir, "../../.purple/icons"))
+						                          name, new_icons_dir,
+						                          g_strconcat(user_dir, G_DIR_SEPARATOR_S "icons", NULL)))
 						{
 							g_free(icons_name);
 							g_free(new_icons_dir);
@@ -659,7 +663,7 @@ purple_core_migrate(void)
 			else
 			{
 				/* All other directories are moved and symlinked. */
-				if (!move_and_symlink_dir(name, entry, old_user_dir, user_dir, "../.purple"))
+				if (!move_and_symlink_dir(name, entry, old_user_dir, user_dir, user_dir))
 				{
 					g_free(name);
 					g_dir_close(dir);

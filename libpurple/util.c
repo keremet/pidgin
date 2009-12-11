@@ -2626,7 +2626,7 @@ const char *
 purple_home_dir(void)
 {
 #ifndef _WIN32
-	return g_get_home_dir();
+	return g_get_user_config_dir();
 #else
 	return wpurple_data_dir();
 #endif
@@ -2639,7 +2639,7 @@ purple_user_dir(void)
 	if (custom_user_dir != NULL)
 		return custom_user_dir;
 	else if (!user_dir)
-		user_dir = g_build_filename(purple_home_dir(), ".purple", NULL);
+		user_dir = g_build_filename(purple_home_dir(), "purple", NULL);
 
 	return user_dir;
 }
