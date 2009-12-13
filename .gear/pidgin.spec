@@ -446,7 +446,7 @@ fi
 * Fri Dec 11 2009 Alexey Shabalin <shaba@altlinux.ru> 2.6.4-alt1
 - 2.6.4
 - drop patch for old be translation
-- drop patch for russian translation
+- update russian translation, thx to dkoryavov at yandex.ru
 
 * Thu Dec 03 2009 Eugeny A. Rostovtsev (REAL) <real at altlinux.org> 2.6.3-alt2.1
 - Rebuilt with python 2.6
