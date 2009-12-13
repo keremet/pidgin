@@ -1,4 +1,4 @@
-copy: *.patch
-bzip2: *.po
-copy: *.xml
-tar.bz2: pidgin
+tar: v@version@:.
+diff: v@version@:. .
+spec:.gear/pidgin.spec
+copy:.gear/purple-altlinux-prefs.xml

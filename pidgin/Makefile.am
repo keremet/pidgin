@@ -1,150 +1,234 @@
 EXTRA_DIST = \
-		COPYRIGHT \
-		ChangeLog.API \
-		ChangeLog.win32 \
-		Doxyfile.in \
-		HACKING \
+		getopt.c \
+		getopt.h \
+		getopt1.c \
 		Makefile.mingw \
-		PLUGIN_HOWTO \
-		README.MTN \
-		README.mingw \
-		config.h.mingw \
-		doxy2devhelp.xsl \
-		fix-casts.sh \
-		gaim.pc.in \
-		gaim-uninstalled.pc.in \
-		intltool-extract.in \
-		intltool-merge.in \
-		intltool-update.in \
-		package_revision.h \
-		pidgin.apspec.in \
-		pidgin.spec.in \
-		pidgin.desktop.in \
-		po/Makefile.mingw \
-		valgrind-suppressions
-
-noinst_HEADERS = config.h package_revision.h
-
-dist-hook: pidgin.spec
-	cp pidgin.spec $(distdir)
-	rm $(distdir)/config.h
-
-distcheck-hook: libpurple/plugins/perl/common/Purple.pm pidgin/plugins/perl/common/Pidgin.pm
-#	cp libpurple/plugins/perl/common/Gaim.pm $(distdir)/libpurple/plugins/perl/common
-
-commit-check:
-	(cd po ; intltool-update -m 2>&1 | grep -v '^mismatched quotes.*\.py$$' | sed "s|current directory|po directory|" | grep . ; if [ $$? = 0 ] ; then exit 1 ; else exit 0 ; fi)
-	LC_ALL=C sort -c -t/ -u po/POTFILES.in
-	LC_ALL=C sort -c -t/ -u po/POTFILES.skip
-	iconv -f utf8 -t utf8 COPYRIGHT | cmp COPYRIGHT -
-
-version-check: commit-check
-# We don't want to release development versions.
-	test x`echo $(PACKAGE_VERSION) | grep dev` = x
-
-# Make sure there is a NEWS entry for this version
-	head NEWS | grep "^$(PACKAGE_VERSION) (`date +%m/%d/%Y`):$$" > /dev/null
-
-# Ensure NEWS has no spaces at the start of a line.
-# Using spaces instead of tabs there is a common mistake.
-	test x`grep "^ " NEWS` = x
-
-# When doing a new minor (or major) release (X.Y.0), there must be a section in
-# ChangeLog.API.
-	echo $(PACKAGE_VERSION) | grep -v "^[0-9]\+\.[0-9]\+\.0$$" >/dev/null || head ChangeLog.API | grep "^version $(PACKAGE_VERSION) (`date +%m/%d/%Y`):$$" >/dev/null
-
-# For all releases, check the ChangeLogs.
-	head ChangeLog | grep "^version $(PACKAGE_VERSION) (`date +%m/%d/%Y`):$$" >/dev/null
-	head ChangeLog.win32 | grep "^version $(PACKAGE_VERSION) (`date +%m/%d/%Y`):$$" >/dev/null
-	head po/ChangeLog | grep "^version $(PACKAGE_VERSION)$$" >/dev/null
-
-# Ensure we're working from a tag...
-	test x`mtn automate select t:v$(PACKAGE_VERSION)` = x`mtn automate get_base_revision_id`
-# ... and have no changes in the working copy.
-	test "x`mtn diff | grep -v '^#'`" = x
-
-release: version-check distcheck packages
-
-packages:
-	gpg -ab pidgin-$(PACKAGE_VERSION).tar.gz
-	gpg -ab pidgin-$(PACKAGE_VERSION).tar.bz2
-	gpg --verify pidgin-$(PACKAGE_VERSION).tar.gz.asc pidgin-$(PACKAGE_VERSION).tar.gz
-	gpg --verify pidgin-$(PACKAGE_VERSION).tar.bz2.asc pidgin-$(PACKAGE_VERSION).tar.bz2
+		pidgin.pc.in \
+		pidgin-uninstalled.pc.in \
+		win32/IdleTracker/Makefile.mingw \
+		win32/IdleTracker/idletrack.c \
+		win32/IdleTracker/idletrack.h \
+		win32/MinimizeToTray.h \
+		win32/MinimizeToTray.c \
+		win32/pidgin_dll_rc.rc.in \
+		win32/pidgin_exe_rc.rc.in \
+		win32/gtkdocklet-win32.c \
+		win32/gtkwin32dep.c \
+		win32/gtkwin32dep.h \
+		win32/resource.h \
+		win32/untar.c \
+		win32/untar.h \
+		win32/winpidgin.c \
+		win32/wspell.c \
+		win32/wspell.h \
+		win32/nsis/pixmaps/pidgin-header.bmp \
+		win32/nsis/pixmaps/pidgin-intro.bmp \
+		win32/nsis/pixmaps/pidgin-install.ico \
+		win32/nsis/pidgin-installer.nsi \
+		win32/nsis/pidgin-plugin.nsh \
+		win32/nsis/langmacros.nsh \
+		win32/nsis/translations/afrikaans.nsh \
+		win32/nsis/translations/albanian.nsh \
+		win32/nsis/translations/arabic.nsh \
+		win32/nsis/translations/basque.nsh \
+		win32/nsis/translations/bulgarian.nsh \
+		win32/nsis/translations/catalan.nsh \
+		win32/nsis/translations/czech.nsh \
+		win32/nsis/translations/danish.nsh \
+		win32/nsis/translations/dutch.nsh \
+		win32/nsis/translations/english.nsh \
+		win32/nsis/translations/finnish.nsh \
+		win32/nsis/translations/french.nsh \
+		win32/nsis/translations/german.nsh \
+		win32/nsis/translations/hebrew.nsh \
+		win32/nsis/translations/hungarian.nsh \
+		win32/nsis/translations/italian.nsh \
+		win32/nsis/translations/japanese.nsh \
+		win32/nsis/translations/korean.nsh \
+		win32/nsis/translations/kurdish.nsh \
+		win32/nsis/translations/lithuanian.nsh \
+		win32/nsis/translations/norwegian.nsh \
+		win32/nsis/translations/persian.nsh \
+		win32/nsis/translations/polish.nsh \
+		win32/nsis/translations/portuguese.nsh \
+		win32/nsis/translations/portuguese-br.nsh \
+		win32/nsis/translations/romanian.nsh \
+		win32/nsis/translations/russian.nsh \
+		win32/nsis/translations/serbian-latin.nsh \
+		win32/nsis/translations/simp-chinese.nsh \
+		win32/nsis/translations/slovak.nsh \
+		win32/nsis/translations/slovenian.nsh \
+		win32/nsis/translations/spanish.nsh \
+		win32/nsis/translations/swedish.nsh \
+		win32/nsis/translations/trad-chinese.nsh \
+		win32/nsis/translations/vietnamese.nsh
 
 if ENABLE_GTK
-appsdir = $(datadir)/applications
-apps_in_files = pidgin.desktop.in
-apps_DATA = $(apps_in_files:.desktop.in=.desktop)
-@INTLTOOL_DESKTOP_RULE@
-GTK_DIR=pidgin
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = pidgin.pc
+
+SUBDIRS = pixmaps plugins
+
+bin_PROGRAMS = pidgin
+
+pidgin_SOURCES = \
+	eggtrayicon.c \
+	pidgincombobox.c \
+	pidginstock.c \
+	gtkaccount.c \
+	gtkblist.c \
+	gtkblist-theme.c \
+	gtkblist-theme-loader.c \
+	gtkcelllayout.c \
+	gtkcellrendererexpander.c \
+	gtkcellrendererprogress.c \
+	gtkcellview.c \
+	gtkcellviewmenuitem.c \
+	gtkcertmgr.c \
+	gtkconn.c \
+	gtkconv.c \
+	gtkdebug.c \
+	gtkdialogs.c \
+	gtkdnd-hints.c \
+	gtkdocklet.c \
+	gtkdocklet-x11.c \
+	gtkeventloop.c \
+	gtkexpander.c \
+	gtkft.c \
+	gtkicon-theme.c \
+	gtkicon-theme-loader.c \
+	gtkidle.c \
+	gtkimhtml.c \
+	gtkimhtmltoolbar.c \
+	gtklog.c \
+	gtkmain.c \
+	gtkmedia.c \
+	gtkmenutray.c \
+	gtknotify.c \
+	gtkplugin.c \
+	gtkpluginpref.c \
+	gtkpounce.c \
+	gtkprefs.c \
+	gtkprivacy.c \
+	gtkrequest.c \
+	gtkroomlist.c \
+	gtksavedstatuses.c \
+	gtkscrollbook.c \
+	gtksession.c \
+	gtksmiley.c \
+	gtksound.c \
+	gtksourceiter.c \
+	gtksourceundomanager.c \
+	gtksourceview-marshal.c \
+	gtkstatus-icon-theme.c \
+	gtkstatusbox.c \
+	gtkthemes.c \
+	gtkutils.c \
+	gtkwhiteboard.c \
+	minidialog.c \
+	pidgintooltip.c
+
+pidgin_headers = \
+	eggtrayicon.h \
+	gtkaccount.h \
+	gtkblist.h \
+	gtkblist-theme.h \
+	gtkblist-theme-loader.h \
+	gtkcelllayout.h \
+	gtkcellrendererexpander.h \
+	gtkcellrendererprogress.h \
+	gtkcellview.h \
+	gtkcellviewmenuitem.h \
+	gtkcertmgr.h \
+	pidgincombobox.h \
+	gtkconn.h \
+	gtkconv.h \
+	gtkconvwin.h \
+	gtkdebug.h \
+	gtkdialogs.h \
+	gtkdnd-hints.h \
+	gtkdocklet.h \
+	gtkeventloop.h \
+	gtkexpander.h \
+	gtkft.h \
+	gtkicon-theme.h \
+	gtkicon-theme-loader.h \
+	gtkidle.h \
+	gtkgaim-compat.h \
+	gtkimhtml.h \
+	gtkimhtmltoolbar.h \
+	gtklog.h \
+	gtkmedia.h \
+	gtkmenutray.h \
+	gtknickcolors.h \
+	gtknotify.h \
+	gtkplugin.h \
+	gtkpluginpref.h \
+	gtkprefs.h \
+	gtkprivacy.h \
+	gtkpounce.h \
+	gtkrequest.h \
+	gtkroomlist.h \
+	gtksavedstatuses.h \
+	gtkscrollbook.h \
+	gtksession.h \
+	gtksmiley.h \
+	gtksound.h \
+	gtksourceiter.h \
+	gtksourceundomanager.h \
+	gtksourceview-marshal.h \
+	gtkstatus-icon-theme.h \
+	gtkstatusbox.h \
+	pidginstock.h \
+	gtkthemes.h \
+	gtkutils.h \
+	gtkwhiteboard.h \
+	minidialog.h \
+	pidgintooltip.h \
+	pidgin.h
+
+pidginincludedir=$(includedir)/pidgin
+pidgininclude_HEADERS = \
+	$(pidgin_headers)
+
+
+pidgin_DEPENDENCIES = @LIBOBJS@
+pidgin_LDFLAGS = -export-dynamic
+pidgin_LDADD = \
+	@LIBOBJS@ \
+	$(GLIB_LIBS) \
+	$(DBUS_LIBS) \
+	$(GSTREAMER_LIBS) \
+	$(XSS_LIBS) \
+	$(SM_LIBS) \
+	$(INTLLIBS) \
+	$(GTKSPELL_LIBS) \
+	$(STARTUP_NOTIFICATION_LIBS) \
+	$(LIBXML_LIBS) \
+	$(GTK_LIBS) \
+	$(top_builddir)/libpurple/libpurple.la
+
+if USE_INTERNAL_LIBGADU
+INTGG_CFLAGS = -DUSE_INTERNAL_LIBGADU
 endif
 
-if ENABLE_GNT
-GNT_DIR=finch
-endif
-
-if INSTALL_I18N
-PO_DIR=po
-endif
-
-# This is phony, so that we always try to rebuild it.  If it succeeds
-# in calculating changes, it produces its target; otherwise, its
-# target does not exist.
-.PHONY: package_revision_raw.txt
-# if both attempts fail, then we need to remove the empty file that >
-# creates, and also make sure that the shell command exits
-# successfully; the rm -f ensures both
-package_revision_raw.txt:
-	REAL_BLDDIR=$$PWD/$(top_builddir); \
-	(cd $(srcdir) && $$REAL_BLDDIR/mtn --root=. automate get_base_revision_id) 2>/dev/null >$@ \
-	|| (cd $(srcdir) && mtn --root=. automate get_base_revision_id) 2>/dev/null >$@ \
-	|| rm -f $@
-package_revision.h: package_revision_raw.txt
-	if test -f $<; then \
-	  echo "#define REVISION \"`cat $<`\"" > $@; \
-	fi
-	if test ! -f $@ -a -f $(srcdir)/$@; then \
-	  cp $(srcdir)/$@ $@; \
-	fi
-	test -f $@ || echo "#define REVISION \"unknown\"" > $@
-
-# This is a magic directive copy-and-pasted, then modified, from the
-# automake 1.9 manual, section 13.4, "Checking the distribution".
-# Normally, 'distcheck' does a clean build, and then afterwards runs
-# 'distclean', and 'distclean' is supposed to remove everything that
-# the build created.  However, we have some targets (package_revision.txt)
-# that we distribute, but then always attempt to rebuild optimistically, and
-# then if that fails fall back on the distributed versions.  This
-# means that 'distclean' should _not_ remove those files, since they
-# are distributed, yet building the package will generate those files,
-# thus automake thinks that 'distclean' _should_ remove those files,
-# and 'distcheck' gets cranky if we don't.  So basically what this
-# line does is tell 'distcheck' to shut up and ignore those two files.
-distcleancheck_listfiles = find . -type f -a ! -name package_revision.h
-
-SUBDIRS = . libpurple doc $(GNT_DIR) $(GTK_DIR) m4macros $(PO_DIR) share/ca-certs share/sounds
-
-docs: Doxyfile
-if HAVE_DOXYGEN
-	@echo "Running doxygen..."
-	@doxygen
-if HAVE_XSLTPROC
-	@echo "Generating devhelp index..."
-	@xsltproc $(top_srcdir)/doxy2devhelp.xsl doc/xml/index.xml > doc/html/pidgin.devhelp
-	@echo "(Symlink doc/html to ~/.local/share/gtk-doc/html/pidgin to make devhelp see the documentation)"
-else
-	@echo "Not generating devhelp index: xsltproc was not found by configure"
-endif
-else
-	@echo "doxygen was not found during configure.  Unable to build documentation."
-	@echo;
-endif
-
-# perl's MakeMaker uninstall foo doesn't work well with DESTDIR set, which
-# breaks "make distcheck" unless we ignore perl things
-
-distuninstallcheck_listfiles = \
-	find . -type f -print | grep -v perl | grep -v Purple.3pm
-
-DISTCLEANFILES= pidgin.desktop libpurple/gconf/purple.schemas intltool-extract \
-			intltool-merge intltool-update
+AM_CPPFLAGS = \
+	-DDATADIR=\"$(datadir)\" \
+	-DLIBDIR=\"$(libdir)/pidgin/\" \
+	-DLOCALEDIR=\"$(datadir)/locale\" \
+	-DSYSCONFDIR=\"$(sysconfdir)\" \
+	-I$(top_builddir)/libpurple \
+	-I$(top_srcdir)/libpurple/ \
+	-I$(top_builddir) \
+	-I$(top_srcdir) \
+	$(GLIB_CFLAGS) \
+	$(GSTREAMER_CFLAGS) \
+	$(DEBUG_CFLAGS) \
+	$(GTK_CFLAGS) \
+	$(DBUS_CFLAGS) \
+	$(GTKSPELL_CFLAGS) \
+	$(STARTUP_NOTIFICATION_CFLAGS) \
+	$(LIBXML_CFLAGS) \
+	$(INTGG_CFLAGS)
+endif  # ENABLE_GTK

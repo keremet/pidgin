@@ -1,115 +1,165 @@
-%add_findprov_lib_path %_libdir/pidgin
-%add_findprov_lib_path %_libdir/purple-2
-%add_findprov_lib_path %_libdir/finch
-%add_findreq_skiplist %perl_vendor_archlib/*
+# Older RPM doesn't define these by default
+%{!?perl_vendorlib: %define perl_vendorlib %(eval "`%{__perl} -V:installvendorlib`"; echo $installvendorlib)}
+%{!?perl_vendorarch: %define perl_vendorarch %(eval "`%{__perl} -V:installvendorarch`"; echo $installvendorarch)}
+%{!?perl_archlib: %define perl_archlib %(eval "`%{__perl} -V:installarchlib`"; echo $installarchlib)}
 
-%def_disable perl
-%def_disable tcl
-%def_disable tk
-%def_enable nss
-%def_disable cyrus_sasl
-%def_disable gnutls
-%def_enable gevolution
-%def_enable meanwhile
-%def_enable cap
-%def_enable nm
-%def_disable mono
-%def_enable consoleui
-%def_enable dbus
-%def_enable avahi
-%def_enable dot
-%def_enable doxygen
-%def_enable relnot
-%def_enable idn
-%def_enable farsight
-%def_enable gstreamer
-%def_enable screensaver
-%def_enable startup_notification
-%def_enable gestures
-%def_enable msnp15
-%def_enable gtkspell
-%def_enable devhelp
+# When not doing betas comment this out
+# NOTE: %defines in spec files are evaluated in comments so the correct
+#       way to comment it out is to replace the % with #
+#define beta 7
 
-# X session management
-%def_enable sm
+%if 0%{?beta}
+%define pidginver %(echo "2.6.4"|sed -e 's/dev.*//; s/beta.*//')
+%else
+%define pidginver 2.6.4
+%endif
 
-# voice and video
-%def_enable vv
+# define the minimum API version required, so we can use it for plugin deps
+%define apiver %(echo "2.6.4"|awk -F. '{print $1"."$2}')
 
-Name: pidgin
-Version: 2.6.3
-Release: alt2.1
+Summary:    A GTK+ based multiprotocol instant messaging client
+Name:       pidgin
+Version:    %pidginver
+Release:    0%{?beta:.beta%{beta}}
+License:    GPL
+Group:      Applications/Internet
+URL:        http://pidgin.im/
+Source:     %{name}-2.6.4.tar.bz2
+BuildRoot:  %{_tmppath}/%{name}-%{version}-root
 
-Summary: A GTK+ based multiprotocol instant messaging client
-License: GPL
-Group: Networking/Instant messaging
-Url: http://pidgin.im
-Packager: Alexey Shabalin <shaba@altlinux.ru>
+# Generic build requirements
+BuildRequires: libtool, pkgconfig, intltool, gettext, libxml2-devel
+BuildRequires: gtk2-devel, libidn-devel
 
-Provides: gaim = %version
-Obsoletes: gaim
+%{!?_without_startupnotification:BuildRequires: startup-notification-devel}
+%{?_with_avahi:BuildRequires: avahi-glib-devel}
+%{!?_without_gtkspell:BuildRequires: gtkspell-devel}
+%{?_with_meanwhile:BuildRequires: meanwhile-devel}
+%{?_with_mono:BuildRequires: mono-devel}
+%{?_with_sasl:BuildRequires: cyrus-sasl-devel >= 2}
+%{!?_without_silc:BuildRequires: /usr/include/silc/silcclient.h}
+%{!?_without_tcl:BuildRequires: tcl, tk, /usr/include/tcl.h}
+%{!?_without_text:BuildRequires: ncurses-devel}
+%{!?_without_nm:BuildRequires: NetworkManager-devel}
+%{!?_without_gevolution:BuildRequires: evolution-data-server-devel}
 
-Requires: libpurple = %version-%release
-Requires(post,postun): desktop-file-utils
-PreReq: GConf
+%if "%{_vendor}" == "suse"
+# For SuSE:
+BuildRequires: gnutls-devel
+%{?_with_dbus:BuildRequires: dbus-1-devel >= 0.35}
+%{!?_without_gstreamer:BuildRequires: gstreamer010-devel >= 0.10}
+Requires(pre): gconf2
+Requires(post): gconf2
+Requires(preun): gconf2
+%else
+%{?_with_dbus:BuildRequires: dbus-devel >= 0.35}
+%{!?_without_gstreamer:BuildRequires: gstreamer-devel >= 0.10}
+Requires(pre): GConf2
+Requires(post): GConf2
+Requires(preun): GConf2
+%endif
 
-Source0: %name-%version.tar.bz2
-Source1: pidgin-be.po.bz2
-Source2: purple-altlinux-prefs.xml
-Source3: pidgin-ru.po.bz2
-Patch0: pidgin-2.6.1-reread-resolvconf.patch
-Patch1: pidgin-NOT-UPSTREAM-2.5.4-icq-russia.patch
-Patch2: pidgin-2.6.1-alt-confdir.patch
-Patch3: pidgin-2.6.2-alt-gnome-proxy.patch
-Patch4: pidgin-alt-oscar-def_enc-CP1251.patch
-Patch5: pidgin-2.6.2-alt-l10n.patch
-Patch6: pidgin-alt-doc-man_fix.patch
-
-# From configure.ac
-BuildPreReq: glib2-devel libgtk+2-devel
-BuildPreReq: libpango-devel >= 1.4.0
-BuildPreReq: libXext-devel libX11-devel
-%{?_enable_gtkspell:BuildPreReq: libgtkspell-devel >= 2.0.2}
-%{?_enable_nss:BuildPreReq: libnss-devel libnspr-devel}
-%{?_enable_cyrus_sasl:BuildPreReq: libsasl2-devel}
-%{?_enable_gnutls:BuildPreReq: libgnutls-devel}
-%{?_enable_consoleui:BuildPreReq: libncurses-devel libncursesw-devel}
-%{?_enable_nm:BuildPreReq: NetworkManager-devel}
-%{?_enable_meanwhile:BuildPreReq: libmeanwhile-devel}
-%{?_enable_perl:BuildPreReq: perl-devel}
-%{?_enable_tcl:BuildPreReq: tcl-devel}
-%{?_enable_tk:BuildPreReq: tk-devel}
-%{?_enable_mono:BuildRequires: mono-devel mono-mcs rpm-build-mono mono-nunit-devel /proc}
-%{?_enable_gevolution:BuildPreReq: evolution-data-server-devel}
-%{?_enable_dbus:BuildPreReq: libdbus-devel >= 0.35 libdbus-glib-devel >= 0.35}
-%{?_enable_avahi:BuildPreReq: libavahi-devel libavahi-glib-devel}
-%{?_enable_dot:BuildPreReq: graphviz}
-%{?_enable_doxygen:BuildPreReq: doxygen}
-%{?_enable_idn:BuildPreReq: libidn-devel}
-%{?_enable_farsight:BuildPreReq: farsight2-devel}
-%{?_enable_vv:BuildPreReq: gst-plugins-devel}
-%{?_enable_gstreamer:BuildPreReq: gstreamer-devel}
-%{?_enable_sm:BuildPreReq: libSM-devel}
-%{?_enable_screensaver:BuildPreReq: libXScrnSaver-devel xorg-scrnsaverproto-devel}
-%{?_enable_startup_notification:BuildPreReq: libstartup-notification-devel >= 0.5}
-BuildPreReq: libsqlite3-devel >= 3.3
-BuildPreReq: libxml2-devel >= 2.6.0
-BuildPreReq: GConf libGConf-devel
-
-BuildRequires: gcc-c++ libgpg-error
-BuildRequires: python-modules-encodings
-# for shared gadu plugin
-BuildRequires: libgadu-devel
-BuildRequires: intltool
-# now intltool wants that
+# Mandrake 10.1 and lower || Mandrake 10.2 (and higher?)
+%if "%{_vendor}" == "MandrakeSoft" || "%{_vendor}" == "Mandrakesoft" || "%{_vendor}" == "Mandriva"
+# For Mandrake/Mandriva:
+BuildRequires: libnss3-devel, perl-devel
+Obsoletes:  libgaim-remote0
+%{!?_without_modularx:BuildRequires: libsm-devel, libxscrnsaver-devel}
+%else
+# For !Mandriva
+%{!?_without_modularx:BuildRequires: libSM-devel, libXScrnSaver-devel}
+# For SuSE, Red Hat, Fedora and others:
+%if "%{_vendor}" != "suse"
+# For Red Hat, Fedora and others:
+# let's assume RH & FC1 are the only brain-dead distros missing the
+# perl-XML-Parser dependency on intltool and that other RH/FC releases
+# don't care if we specify it here
 BuildRequires: perl-XML-Parser
+BuildRequires: mozilla-nss-devel
+%endif
+%endif
 
-BuildPreReq: desktop-file-utils
-BuildPreReq: ca-certificates
+# For some reason perl isn't always automatically detected as a requirement :(
+Requires: perl
+
+Requires: libpurple = %{version}
+
+Obsoletes: gaim
+Provides: gaim
+Obsoletes: pidgin-perl < %{version}
+Provides: pidgin-perl = %{version}-%{release}
+
+%package devel
+Summary:    Development headers, documentation, and libraries for Pidgin
+Group:      Applications/Internet
+Requires:   pidgin = %{version}, libpurple-devel = %{version}
+Requires:   gtk2-devel
+Requires:   pkgconfig
+Obsoletes:  gaim-devel
+Provides:   gaim-devel
+
+%package -n libpurple
+Summary:    libpurple library for IM clients like Pidgin and Finch
+Group:      Applications/Internet
+Obsoletes:  gaim-silc
+Obsoletes:  gaim-tcl
+Obsoletes:  gaim-gadugadu
+Obsoletes:  pidgin-tcl < 2.0.0
+Obsoletes:  pidgin-silc < 2.0.0
+Obsoletes:  libpurple-perl < %{version}
+Provides:   libpurple-perl = %{version}-%{release}
+%{?_with_sasl:Requires:   cyrus-sasl-plain, cyrus-sasl-md5}
+
+%package -n libpurple-devel
+Summary:    Development headers, documentation, and libraries for libpurple
+Group:      Applications/Internet
+Requires:   libpurple = %{version}
+Requires:   pkgconfig
+%if "%{_vendor}" == "suse"
+# For SuSE:
+%{?_with_dbus:Requires: dbus-1-devel >= 0.35}
+%else
+%{?_with_dbus:Requires: dbus-devel >= 0.35}
+%endif
+
+%if 0%{?_with_avahi:1}
+%package -n libpurple-bonjour
+Summary:    Bonjour plugin for Pidgin
+Group:      Applications/Internet
+Requires:   libpurple >= %{apiver}
+%endif
+
+%if 0%{?_with_meanwhile:1}
+%package -n libpurple-meanwhile
+Summary:    Lotus Sametime plugin for Pidgin using the Meanwhile library
+Group:      Applications/Internet
+Requires:   libpurple >= %{apiver}
+%endif
+
+%if 0%{?_with_mono:1}
+%package -n libpurple-mono
+Summary:    Mono .NET plugin support for Pidgin
+Group:      Applications/Internet
+Requires:   libpurple >= %{apiver}
+%endif
+
+%if 0%{!?_without_text:1}
+%package -n finch
+Summary:    A text-based user interface for Pidgin
+Group:      Applications/Internet
+Requires:   libpurple = %{version}
+
+%package -n finch-devel
+Summary:    Headers etc. for finch stuffs
+Group:      Applications/Internet
+Requires:   finch = %{version}, libpurple-devel = %{version}
+Requires:   ncurses-devel
+Requires:   pkgconfig
+%endif
 
 %description
 Pidgin allows you to talk to anyone using a variety of messaging
-protocols including AIM, MSN, Yahoo!, Jabber, Bonjour, Gadu-Gadu,
+protocols including AIM, MSN, Yahoo!, XMPP, Bonjour, Gadu-Gadu,
 ICQ, IRC, Novell Groupwise, QQ, Lotus Sametime, SILC, Simple and
 Zephyr.  These protocols are implemented using a modular, easy to
 use design.  To use a protocol, just add an account using the
@@ -121,122 +171,46 @@ unique features, such as perl scripting, TCL scripting and C plugins.
 Pidgin is not affiliated with or endorsed by America Online, Inc.,
 Microsoft Corporation, Yahoo! Inc., or ICQ Inc.
 
-%package devel
-Summary: Development headers, documentation, and libraries for Pidgin
-Group: Development/Other
-Requires: %name = %version-%release
-Requires: libpurple-devel = %version-%release
-Provides: gaim-devel = %version
-Obsoletes: gaim-devel
-
 %description devel
 The pidgin-devel package contains the header files, developer
 documentation, and libraries required for development of Pidgin scripts
 and plugins.
-
-%package -n libpurple
-Summary: libpurple library for IM clients like Pidgin and Finch
-Group: Networking/Instant messaging
-Requires: ca-certificates
 
 %description -n libpurple
 libpurple contains the core IM support for IM clients such as Pidgin
 and Finch.
 
 libpurple supports a variety of messaging protocols including AIM, MSN,
-Yahoo!, Jabber, Bonjour, Gadu-Gadu, ICQ, IRC, Novell Groupwise, QQ,
+Yahoo!, XMPP, Bonjour, Gadu-Gadu, ICQ, IRC, Novell Groupwise, QQ,
 Lotus Sametime, SILC, Simple and Zephyr.
-
-%package -n libpurple-devel
-Summary: Development headers, documentation, and libraries for libpurple
-Group: Development/Other
-Requires: libpurple = %version-%release
 
 %description -n libpurple-devel
 The libpurple-devel package contains the header files, developer
 documentation, and libraries required for development of libpurple based
 instant messaging clients or plugins for any libpurple based client.
 
-%if_enabled relnot
-%package -n %name-relnot
-Summary: Release notification plugin for Pidgin
-Group: Networking/Instant messaging
-Requires: %name = %version-%release
-
-%description -n %name-relnot
-Release notification plugin for Pidgin.
+%if 0%{?_with_avahi:1}
+%description -n libpurple-bonjour
+Bonjour plugin for Pidgin.
 %endif
 
-%if_enabled gevolution
-%package -n %name-gevolution
-Summary: Gevolution plugin for Pidgin
-Group: Networking/Instant messaging
-Requires: %name = %version-%release
-Obsoletes: gaim-gevolution
-Provides: gaim-gevolution = %version
-
-%description -n %name-gevolution
-Gevolution plugin for Pidgin.
+%if 0%{?_with_meanwhile:1}
+%description -n libpurple-meanwhile
+Lotus Sametime plugin for Pidgin using the Meanwhile library.
 %endif
 
-%if_enabled mono
-%package -n libpurple-mono
-Summary: Mono .NET plugin support for Pidgin
-Group: Networking/Instant messaging
-Requires: libpurple = %version-%release
-Obsoletes: gaim-mono
-Provides: gaim-mono = %version
-
+%if 0%{?_with_mono:1}
 %description -n libpurple-mono
-Mono support for Pidgin.
+Mono plugin loader for Pidgin.  This package will allow you to write or
+use Pidgin plugins written in the .NET programming language.
 %endif
 
-%if_enabled perl
-%package -n libpurple-perl
-Summary: Perl support for Pidgin
-Group: Networking/Instant messaging
-Requires: libpurple = %version-%release
-Requires: perl-base
-Obsoletes: gaim-perl
-Provides: gaim-perl = %version
-
-%description -n libpurple-perl
-Perl support for Pidgin.
-%endif
-
-%if_enabled tcl
-%package -n libpurple-tcl
-Summary: Tcl/Tk support for Pidgin
-Group: Networking/Instant messaging
-Requires: libpurple = %version-%release
-Obsoletes: gaim-tcl
-Provides: gaim-tcl = %version
-
-%description -n libpurple-tcl
-Tcl/Tk support for Pidgin.
-%endif
-
-%if_enabled consoleui
-%package -n finch
-Summary: A text-based user interface for Pidgin
-Group: Networking/Instant messaging
-Requires: libpurple = %version-%release
-Provides: gaim-text = %version
-Obsoletes: gaim-text
-
+%if 0%{!?_without_text:1}
 %description -n finch
 A text-based user interface for using libpurple.  This can be run from a
 standard text console or from a terminal within X Windows.  It
 uses ncurses and our homegrown gnt library for drawing windows
 and text.
-
-%package -n finch-devel
-Summary: Headers etc. for finch stuffs
-Group: Development/Other
-Requires: finch = %version-%release
-Requires: libpurple-devel = %version-%release
-Provides: gaim-text-devel = %version
-Obsoletes: gaim-text-devel
 
 %description -n finch-devel
 The finch-devel package contains the header files, developer
@@ -244,597 +218,440 @@ documentation, and libraries required for development of Finch scripts
 and plugins.
 %endif
 
-%if_enabled dbus
-%package -n libpurple-dbus
-Summary: D-Bus client utilities for Pidgin
-Group: Networking/Instant messaging
-Requires: %name = %version-%release
-Obsoletes: gaim-dbus
-Provides: gaim-dbus = %version
-
-%description -n libpurple-dbus
-D-Bus client utilities for Pidgin.
-%endif
-
 %prep
-%setup
-%patch0 -p1 -b .resolv
-%patch1 -p1
-%patch2 -p1 -b .confdir
-%patch3 -p1 -b .proxy
-%patch4 -p1 -b .def_enc
-%patch5 -p1 -b .l10n
-%patch6 -p2
-
-cp %SOURCE2 prefs.xml
-
-# belarusian translation
-bzcat %SOURCE1 > po/be.po
-# update russian translation 
-bzcat %SOURCE3 > po/ru.po
-
-sed -i 's,\(ALL_LINGUAS=\"\),\1be ,' configure configure.ac
+%setup -q -n %{name}-2.6.4
 
 %build
-%autoreconf
-%configure \
-	--disable-schemas-install \
-	%{subst_enable avahi} \
-	%{subst_enable dot} \
-	%{subst_enable doxygen} \
-	%{subst_enable mono} \
-	%{subst_enable cap} \
-	%{subst_enable nm} \
-	%{subst_enable perl} \
-	%{subst_enable gevolution} \
-	%{subst_enable dbus} \
-	%{subst_enable tk} \
-	%{subst_enable tcl} \
-	%{subst_enable consoleui} \
-	%{subst_enable meanwhile} \
-	%{subst_enable idn} \
-	%{subst_enable farsight} \
-	%{subst_enable vv} \
-	%{subst_enable gstreamer} \
-	%{subst_enable sm} \
-	%{subst_enable screensaver} \
-	%{subst_enable gestures} \
-	%{subst_enable msnp15} \
-	%{subst_enable gtkspell} \
-	%{subst_enable devhelp} \
-%if_disabled startup_notification
-	--disable-startup-notification \
-%endif
-%if_disabled gstreamer
-	--disable-gstreamer-interfaces \
-%endif
-	--with-system-ssl-certs=%_datadir/ca-certificates \
-%if_enabled gnutls
-	--enable-gnutls=yes \
-%else
-	--enable-gnutls=no \
-%endif
-%if_enabled cyrus_sasl
-	--enable-cyrus-sasl \
-%else
-	--disable-cyrus-sasl \
-%endif
-%if_enabled nss
-	--with-nss-includes=%_includedir/nss \
-	--with-nspr-includes=%_includedir/nspr \
-	--with-nspr-libs=%_libdir \
-	--with-nss-libs=%_libdir \
-	--enable-nss=yes \
-%else
-	--enable-nss=no \
-%endif
-%if_enabled perl
-	--with-perl-lib=vendor \
-%endif
-	--with-extraversion=%release
+CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix} \
+                                    --bindir=%{_bindir} \
+                                    --datadir=%{_datadir} \
+                                    --includedir=%{_includedir} \
+                                    --libdir=%{_libdir} \
+                                    --mandir=%{_mandir} \
+                                    --sysconfdir=%{_sysconfdir} \
+                                    --disable-schemas-install \
+                                    %{!?_with_vv:--disable-vv} \
+                                    %{!?_with_dbus:--disable-dbus} \
+                                    %{!?_with_avahi:--disable-avahi} \
+                                    %{!?_with_meanwhile:--disable-meanwhile} \
+                                    %{?_without_gstreamer:--disable-gstreamer} \
+                                    %{?_without_gtkspell:--disable-gtkspell} \
+                                    %{?_without_nm:--disable-nm} \
+                                    %{!?_without_gevolution:--enable-gevolution} \
+                                    %{?_with_mono:--enable-mono} \
+                                    %{?_with_sasl:--enable-cyrus-sasl} \
+                                    %{?_without_tcl:--disable-tcl} \
+                                    %{?_without_text:--disable-consoleui}
 
-%make_build
+make %{?_smp_mflags} LIBTOOL=/usr/bin/libtool
 
 %install
-%make DESTDIR=%buildroot install
+rm -rf %{buildroot}
+make DESTDIR=$RPM_BUILD_ROOT LIBTOOL=/usr/bin/libtool install
 
-# install ALTLinux pidgin default prefs.xml
-mkdir -p %buildroot%_sysconfdir/purple
-install -m 644 prefs.xml %buildroot%_sysconfdir/purple/prefs.xml
+# Delete files that we don't want to put in any of the RPMs
+rm -f $RPM_BUILD_ROOT%{_libdir}/finch/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/gnt/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/pidgin/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/liboscar.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/libjabber.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/libymsg.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+rm -f $RPM_BUILD_ROOT%{perl_archlib}/perllocal.pod
+find $RPM_BUILD_ROOT -type f -name '*.a' -exec rm -f {} ';'
+find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
+find $RPM_BUILD_ROOT -type f -name '*.bs' -empty -exec rm -f {} ';'
 
-find %buildroot%_libdir -name \*.la -delete
+%if 0%{!?_with_avahi:1}
+rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/libbonjour.so
+%endif
 
-%find_lang --with-gnome %name
+%if 0%{!?_with_meanwhile:1}
+rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/libsametime.so
+%endif
 
-%post
-%gconf2_install purple
+%if 0%{!?_with_mono:1}
+rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/mono.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/*.dll
+%endif
 
-%preun
-if [ $1 = 0 ]; then
-    %gconf2_uninstall purple
+%if 0%{?_without_silc:1}
+rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/libsilcpurple.so
+%endif
+
+%if 0%{?_without_tcl:1}
+rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/tcl.so
+%endif
+
+%if 0%{?_without_text:1}
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/finch.*
+rm -rf $RPM_BUILD_ROOT%{_bindir}/finch
+rm -f $RPM_BUILD_ROOT%{_libdir}/libgnt.so.*
+%endif
+
+%find_lang %{name}
+
+find $RPM_BUILD_ROOT%{_libdir}/purple-2 -xtype f -print | \
+        sed "s@^$RPM_BUILD_ROOT@@g" | \
+        grep -v /libbonjour.so | \
+        grep -v /libsametime.so | \
+        grep -v /mono.so | \
+        grep -v ".dll$" > %{name}-%{version}-purpleplugins
+
+find $RPM_BUILD_ROOT%{_libdir}/pidgin -xtype f -print | \
+        sed "s@^$RPM_BUILD_ROOT@@g" > %{name}-%{version}-pidginplugins
+
+find $RPM_BUILD_ROOT%{_libdir}/finch -xtype f -print | \
+        sed "s@^$RPM_BUILD_ROOT@@g" > %{name}-%{version}-finchplugins
+
+# files -f file can only take one filename :(
+cat %{name}.lang >> %{name}-%{version}-purpleplugins
+
+%clean
+rm -rf %{buildroot}
+
+%pre
+if [ "$1" -gt 1 -a -n "`which gconftool-2 2>/dev/null`" ]; then
+    export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
+    if [ -f %{_sysconfdir}/gconf/schemas/purple.schemas ]; then
+        gconftool-2 --makefile-uninstall-rule \
+            %{_sysconfdir}/gconf/schemas/purple.schemas >/dev/null || :
+        killall -HUP gconfd-2 &> /dev/null || :
+    fi
 fi
 
-%files -f %name.lang
-%doc AUTHORS COPYRIGHT INSTALL NEWS README README.MTN doc/*.txt
-%config %_sysconfdir/gconf/schemas/*
-%_bindir/%name
-%_libdir/%name
-%_desktopdir/%name.desktop
-%_pixmapsdir/%name
-%_iconsdir/hicolor/*/apps/*
-%_man1dir/%name.*
-%if_enabled perl
-%perl_vendor_archlib/Pidgin.pm
-%dir %perl_vendor_autolib/Pidgin
-%perl_vendor_autolib/Pidgin/*
-%perl_vendor_man3dir/Pidgin*
-%endif
-%if_enabled gevolution
-%exclude %_libdir/%name/gevolution.so
-%endif
-%if_enabled relnot
-%exclude %_libdir/%name/relnot.so
-%endif
+%post
+if [ -n "`which gconftool-2 2>/dev/null`" ]; then
+    export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
+    gconftool-2 --makefile-install-rule \
+        %{_sysconfdir}/gconf/schemas/purple.schemas > /dev/null || :
+    killall -HUP gconfd-2 &> /dev/null || :
+fi
+touch --no-create %{_datadir}/icons/hicolor || :
+if [ -x %{_bindir}/gtk-update-icon-cache ]; then
+	%{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor &> /dev/null || :
+fi
 
-%if_enabled relnot
-%files -n %name-relnot
-%_libdir/%name/relnot.so
-%endif
+%post -n libpurple -p /sbin/ldconfig
 
-%files -n libpurple
-%config(noreplace) %_sysconfdir/purple
-%_libdir/libpurple.so.*
-%_libdir/purple-2
-%_datadir/sounds/purple
-%_datadir/purple
-%if_enabled tcl
-%exclude %_libdir/purple-2/tcl.so
-%endif
-%if_enabled mono
-%exclude %_libdir/purple-2/mono.so
-%exclude %_libdir/purple-2/*.dll
-%endif
-%if_enabled perl
-%exclude %_libdir/purple-2/perl.so
-%endif
+%post -n finch -p /sbin/ldconfig
 
-%if_enabled dbus
-%files -n libpurple-dbus
-%_bindir/purple-client-example
-%_bindir/purple-remote
-%_bindir/purple-send
-%_bindir/purple-send-async
-%_bindir/purple-url-handler
-%_libdir/libpurple-client.so.*
-%endif
+%preun
+if [ "$1" -eq 0 -a -n "`which gconftool-2 2>/dev/null`" ]; then
+    export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
+    gconftool-2 --makefile-uninstall-rule \
+      %{_sysconfdir}/gconf/schemas/purple.schemas > /dev/null || :
+    killall -HUP gconfd-2 &> /dev/null || :
+fi
 
-%if_enabled gevolution
-%files -n %name-gevolution
-%_libdir/%name/gevolution.so
-%endif
+%postun
+touch --no-create %{_datadir}/icons/hicolor || :
+if [ -x %{_bindir}/gtk-update-icon-cache ]; then
+	%{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor &> /dev/null || :
+fi
 
-%if_enabled mono
-%files -n libpurple-mono
-%_libdir/purple-2/mono.so
-%_libdir/purple-2/*.dll
-%endif
+%postun -n libpurple -p /sbin/ldconfig
 
-%if_enabled perl
-%files -n libpurple-perl
-%_libdir/purple-2/perl.so
-%perl_vendor_archlib/Purple.pm
-%dir %perl_vendor_autolib/Purple
-%perl_vendor_autolib/Purple/*
-%perl_vendor_man3dir/Purple*
-%endif
+%postun -n finch -p /sbin/ldconfig
 
-%if_enabled tcl
-%files -n libpurple-tcl
-%_libdir/purple-2/tcl.so
+%files -f %{name}-%{version}-pidginplugins
+%defattr(-, root, root)
+
+%doc AUTHORS
+%doc COPYING
+%doc COPYRIGHT
+%doc ChangeLog
+%doc NEWS
+%doc README
+%doc README.MTN
+%doc doc/the_penguin.txt
+%doc %{_mandir}/man1/pidgin.*
+%doc %{_mandir}/man3*/*
+
+%dir %{_libdir}/pidgin
+%dir %{_libdir}/pidgin/perl
+%dir %{_libdir}/pidgin/perl/auto
+%dir %{_libdir}/pidgin/perl/auto/Pidgin
+%{_bindir}/pidgin
+%{_datadir}/pixmaps/pidgin
+%{_datadir}/icons/hicolor/*/apps/pidgin.*
+%{_datadir}/applications/*
+%{_sysconfdir}/gconf/schemas/purple.schemas
+
+
+%files -f %{name}-%{version}-purpleplugins -n libpurple
+%defattr(-, root, root)
+
+%{_libdir}/libpurple.so.*
+%dir %{_libdir}/purple-2
+%dir %{_libdir}/purple-2/perl
+%dir %{_libdir}/purple-2/perl/auto
+%dir %{_libdir}/purple-2/perl/auto/Purple
+%{_datadir}/purple
+%{_datadir}/sounds/purple
+
+%if 0%{?_with_dbus:1}
+%{_bindir}/purple-client-example
+%{_bindir}/purple-remote
+%{_bindir}/purple-send
+%{_bindir}/purple-send-async
+%{_bindir}/purple-url-handler
+%{_libdir}/libpurple-client.so.*
+%doc libpurple/purple-notifications-example
 %endif
 
 %files devel
-%_includedir/%name
-%_pkgconfigdir/%name.pc
+%defattr(-, root, root)
+%dir %{_includedir}/pidgin
+%{_includedir}/pidgin/*.h
+%{_libdir}/pkgconfig/pidgin.pc
 
 %files -n libpurple-devel
-%doc ChangeLog.API HACKING PLUGIN_HOWTO libpurple/purple-notifications-example
-%_includedir/libpurple
-%_libdir/libpurple.so
-%if_enabled dbus
-%_libdir/libpurple-client.so
-%endif
-%_pkgconfigdir/purple.pc
-%_datadir/aclocal/purple.m4
+%defattr(-, root, root)
 
-%if_enabled consoleui
-%files -n finch
-%_man1dir/finch.*
-%_bindir/finch
-%_libdir/libgnt.so.*
-%_libdir/gnt
-%_libdir/finch
+%doc ChangeLog.API
+%doc HACKING
+%doc PLUGIN_HOWTO
+
+%dir %{_includedir}/libpurple
+%{_includedir}/libpurple/*.h
+%{_libdir}/libpurple.so
+%{_libdir}/pkgconfig/purple.pc
+%{_datadir}/aclocal/purple.m4
+%if 0%{?_with_dbus:1}
+%{_libdir}/libpurple-client.so
+%endif
+
+
+%if 0%{?_with_avahi:1}
+%files -n libpurple-bonjour
+%defattr(-, root, root)
+
+%{_libdir}/purple-2/libbonjour.*
+%endif
+
+%if 0%{?_with_meanwhile:1}
+%files -n libpurple-meanwhile
+%defattr(-, root, root)
+
+%{_libdir}/purple-2/libsametime.*
+%endif
+
+%if 0%{?_with_mono:1}
+%files -n libpurple-mono
+%defattr(-, root, root)
+
+%{_libdir}/purple-2/mono.so
+%{_libdir}/purple-2/*.dll
+%endif
+
+%if 0%{!?_without_text:1}
+%files -f %{name}-%{version}-finchplugins -n finch
+%defattr(-, root, root)
+
+%doc %{_mandir}/man1/finch.*
+%{_bindir}/finch
+%{_libdir}/libgnt.so.*
+%{_libdir}/gnt/irssi.so
+%{_libdir}/gnt/s.so
 
 %files -n finch-devel
-%_includedir/finch
-%_includedir/gnt
-%_pkgconfigdir/gnt.pc
-%_pkgconfigdir/finch.pc
-%_libdir/libgnt.so
+%defattr(-, root, root)
+%dir %{_includedir}/finch
+%{_includedir}/finch/*.h
+# libgnt
+%dir %{_includedir}/gnt
+%{_includedir}/gnt/*.h
+%{_libdir}/pkgconfig/finch.pc
+%{_libdir}/pkgconfig/gnt.pc
+%{_libdir}/libgnt.so
+
 %endif
 
 %changelog
-* Thu Dec 03 2009 Eugeny A. Rostovtsev (REAL) <real at altlinux.org> 2.6.3-alt2.1
-- Rebuilt with python 2.6
-
-* Tue Nov 17 2009 Alexey Shabalin <shaba@altlinux.ru> 2.6.3-alt2
-- sync spec with pidgin-mini, thx to php-coder@
-- update russian translation from attachments #21176
-- Fixed uncompressed manual page (noted by repocop), thx to php-coder@
-
-* Tue Oct 20 2009 Valery Inozemtsev <shrek@altlinux.ru> 2.6.3-alt1
-- 2.6.3
-
-* Tue Sep 15 2009 Alexey Shabalin <shaba@altlinux.ru> 2.6.2-alt1
-- 2.6.2
-- update russian translation
-
-* Mon Sep 07 2009 Alexey Shabalin <shaba@altlinux.ru> 2.6.1-alt3
-- define OSCAR_DEFAULT_CUSTOM_ENCODING as "CP1251" (patch4) (ALT #16815)
-
-* Tue Aug 25 2009 Valery Inozemtsev <shrek@altlinux.ru> 2.6.1-alt2
-- fixed using GNOME proxy settings properly
-
-* Wed Aug 19 2009 Valery Inozemtsev <shrek@altlinux.ru> 2.6.1-alt1
-- 2.6.1
-- fixed CVE-2009-2694
-
-* Fri Jul 17 2009 Michael Shigorin <mike@altlinux.org> 2.5.8-alt2
-- built with NM support enabled by default (shrek@'s request)
-
-* Fri Jul 10 2009 Alexey Shabalin <shaba@altlinux.ru> 2.5.8-alt1
-- 2.5.8
-- fixed CVE-2009-1889
-
-* Thu Jun 25 2009 Michael Shigorin <mike@altlinux.org> 2.5.7-alt1
-- 2.5.7 rebuilt for Sisyphus
-  + solves Yahoo Messenger problems (protocol 16 support)
-- restored Packager: to shaba@
-- minor spec cleanup
-
-* Wed Jun 24 2009 Alex Negulescu <a@wdu.ro> 2.5.7-alt0
-- initial build of 2.5.7, which permits connecting to all messenger servers
-
-* Fri May 22 2009 Michael Shigorin <mike@altlinux.org> 2.5.6-alt1
-- 2.5.6:
-  + CVE-2009-1373: XMPP SOCKS5 stream server buffer overflow
-  + CVE-2009-1374: remote DoS with a special QQ packet
-  + CVE-2009-1375: PurpleCircBuffer (XMPP/Sametime) BoF
-  + CVE-2009-1376: buffer overflow via specially crafted SLP
-    message due to incomplete fix for CVE-2008-2927
-- thanks crux@ for notification (fixes: #20141)
-
-* Wed May 13 2009 Michael Shigorin <mike@altlinux.org> 2.5.5-alt2
-- fixed FTBFS
-
-* Wed Mar 11 2009 Michael Shigorin <mike@altlinux.org> 2.5.5-alt1
-- forward-ported M41 spec to Sisyphus: it was cleaned up
-  but Sisyphus spec got better in the meanwhile too
-
-* Wed Mar 04 2009 Michael Shigorin <mike@altlinux.org> 2.5.5-alt0.M41.1
-- 2.5.5
-
-* Thu Jan 22 2009 Michael Shigorin <mike@altlinux.org> 2.5.4-alt0.M41.2
-- added ICQ-related patch referenced at http://developer.pidgin.im/ticket/8198
-- spec cleanup
-
-* Thu Jan 15 2009 Michael Shigorin <mike@altlinux.org> 2.5.4-alt0.M41.1
-- 2.5.4 built for M41
-- patch0 updated from Sisyphus' 2.5.3-alt1
-
-* Mon Dec 01 2008 Vladimir Scherbaev <vladimir@altlinux.org> 2.5.1-alt2.M41.1
-- Backport to Desktop 4.1
-- 2.5.1
-
-* Tue Nov 04 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.1-alt2
-- rebuild with new evolution-data-server
-
-* Mon Sep 01 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.1-alt1
-- 2.5.1
-
-* Fri Aug 22 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.0-alt2
-- change requires %_datadir/ca-certificates to package ca-certificates(16816)
-
-* Tue Aug 19 2008 Alexey Shabalin <shaba@altlinux.ru> 2.5.0-alt1
-- 2.5.0
-- build --with-system-ssl-certs=%_datadir/ca-certificates
-
-* Wed Jul 02 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.3-alt1
-- 2.4.3
-- disable gnutls, enable nss(#15810)
-- add default system prefs.xml
-- Add debian patch to re-read resolv.conf when connecting to a server
-
-* Thu May 22 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.2-alt1
-- 2.4.2
-- fix charset in status userinfo (#15384)
-- add more options for configure
-
-* Wed Apr 23 2008 Igor Zubkov <icesik@altlinux.org> 2.4.1-alt3
-- build with external libgadu
-
-* Sun Apr 20 2008 Igor Zubkov <icesik@altlinux.org> 2.4.1-alt2
-- move release notification plugin to separate package (closes #15379)
-
-* Wed Apr 02 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.1-alt1
-- 2.4.1
-
-* Sun Mar 16 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.0-alt1.1
-- fix autotools (thanks to Igor Zubkov <icesik at altlinux.org> - patch1)
-- update BuildPreReq
-
-* Wed Mar 12 2008 Alexey Shabalin <shaba@altlinux.ru> 2.4.0-alt1
-- 2.4.0
-- update patch for linking
-
-* Fri Jan 25 2008 Grigory Batalov <bga@altlinux.ru> 2.3.1-alt1.1
-- Rebuilt with python-2.5.
-
-* Mon Dec 10 2007 Alexey Shabalin <shaba@altlinux.ru> 2.3.1-alt1
-- 2.3.1
-
-* Thu Dec 06 2007 Alexey Shabalin <shaba@altlinux.ru> 2.3.0-alt1
-- 2.3.0
-
-* Sat Oct 27 2007 Alexey Shabalin <shaba@altlinux.ru> 2.2.2-alt1
-- 2.2.2
-- move dbus client utiles(exec scripts and lib) from libpurple to libpurple-dbus
-- must fix #13026 with new rpm-build-python find requires
-
-* Wed Oct 10 2007 Alexey Shabalin <shaba@altlinux.ru> 2.2.1-alt1
-- 2.2.1
-
-* Mon Sep 17 2007 Igor Zubkov <icesik@altlinux.org> 2.2.0-alt1
-- 2.1.1 -> 2.2.0
-
-* Mon Aug 27 2007 Alexey Shabalin <shaba@altlinux.ru> 2.1.1-alt1.1
-- rebuild with new evolution-data-server-1.10.3.1
-
-* Sat Aug 25 2007 Alexey Shabalin <shaba@altlinux.ru> 2.1.1-alt1
-- 2.1.1
-- move sounds from pidgin to purple package
-- more fine use icons in %%files
-
-* Sat Aug 18 2007 Igor Zubkov <icesik@altlinux.org> 2.1.0-alt2
-- NMU:
-  + add packager tag
-  + remove packages-info-i18n-common from buildrequires
-  + fix plugins linking
-
-* Mon Aug 13 2007 Alexey Shabalin <shaba@altlinux.ru> 2.1.0-alt1
-- 2.1.0
-- mini fix spec in %%files
-
-* Thu Jun 21 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.2-alt1
-- 2.0.2
-
-* Sat Jun 02 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.1-alt1
-- 2.0.1
-
-* Thu May 10 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt9
-- fix spec
-
-* Mon May 07 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt8
-- 2.0.0 release
-- rename gaim -> pidgin
-- rename libgaim -> libpurple
-- rename gaim-test -> finch
-- drop all patches
-
-* Sat Mar 31 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt7.beta6
-- add PreReq: GConf (#11166)
-
-* Tue Feb 27 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt6.beta6
-- fix library path provides
-- drop gaim-text (move files to gaim)
-- drop gaim-text-devel (move header files to gaim-devel)
-- add patches from debian (6,102.103,111)
-
-* Mon Feb 05 2007 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt5.beta6
-- 2.0.0beta6
-- remove patch for perl
-
-* Mon Dec 25 2006 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt4.beta5
-- rebuild with new dbus
-
-* Thu Nov 30 2006 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt3.beta5
-- no build plugins: perl, tk/tcl, mono
-- disable support libnss/libnspr, cyrus-sasl
-- fix spec
-
-* Wed Nov 15 2006 Alexey Shabalin <shaba@altlinux.ru> 2.0.0-alt2.beta5
--  2.0.0beta5
-
-* Mon Dec 19 2005 Vital Khilko <vk@altlinux.ru> 2.0.0beta1-alt1
-- new version
-
-* Thu Dec 08 2005 Vital Khilko <vk@altlinux.ru> 1.5.0-alt2
-- #8215
-
-* Fri Aug 12 2005 Vital Khilko <vk@altlinux.ru> 1.5.0-alt1
-- 1.5.0
-
-* Mon Jul 11 2005 Vital Khilko <vk@altlinux.ru> 1.4.0-alt1
-- 1.4.0
-
-* Tue Jun 21 2005 Vital Khilko <vk@altlinux.ru> 1.3.1-alt1
-- 1.3.1
-
-* Mon May 16 2005 Vital Khilko <vk@altlinux.ru> 1.3.0-alt1
-- 1.3.0
-
-* Mon Apr 04 2005 Vital Khilko <vk@altlinux.ru> 1.2.1-alt1
-- 1.2.1
-
-* Tue Mar 22 2005 Vital Khilko <vk@altlinux.ru> 1.2.0-alt1
-- 1.2.0
-- gevolution plugin moved to separate package
-- added Perl support
-
-* Wed Mar 02 2005 Vital Khilko <vk@altlinux.ru> 1.1.4-alt1
-- 1.1.4
-
-* Tue Feb 22 2005 Vital Khilko <vk@altlinux.ru> 1.1.3-alt1
-- 1.1.3
-
-* Tue Feb 01 2005 Vital Khilko <vk@altlinux.ru> 1.1.2-alt1
-- 1.1.2
-
-* Thu Jan 20 2005 Vital Khilko <vk@altlinux.ru> 1.1.1-alt1
-- 1.1.1
-- xosd plugin moved to separate package
-- added package independent smileys themes support
-
-* Mon Nov 15 2004 Vital Khilko <vk@altlinux.ru> 1.0.3-alt1
-- 1.0.3
-
-* Fri Nov 05 2004 Vital Khilko <vk@altlinux.ru> 1.0.2-alt2
-- Rebuilded with libgnutls
-
-* Mon Oct 25 2004 Vital Khilko <vk@altlinux.ru> 1.0.2-alt1
-- new version released
-- added belarusian translation
-
-* Mon Sep 20 2004 Vital Khilko <vk@altlinux.ru> 1.0.0-alt1
-- new version released
-
-* Mon Aug 30 2004 Vital Khilko <vk@altlinux.ru> 0.82.1-alt1
-- new version released
-
-* Wed Aug 11 2004 Vital Khilko <vk@altlinux.ru> 0.81-alt1
-- new version released
-- include osd plugin
-
-* Wed Jul 21 2004 Vital Khilko <vk@altlinux.ru> 0.80-alt2
-- enabled evolution plugin
-
-* Mon Jul 19 2004 Vital Khilko <vk@altlinux.ru> 0.80-alt1
-- new version released
-
-* Wed Jun 09 2004 Vital Khilko <vk@altlinux.ru> 0.78-alt2
-- oscar protocol patch by Slava Astashonak
-
-* Mon May 31 2004 Vital Khilko <vk@altlinux.ru> 0.78-alt1
-- new version released
-
-* Sun Apr 25 2004 Vital Khilko <vk@altlinux.ru> 0.77-alt1
-- new version released
-
-* Sun Apr 04 2004 Vital Khilko <vk@altlinux.ru> 0.76-alt1
-- new version released
-
-* Tue Mar 16 2004 Vital Khilko <vk@altlinux.ru> 0.75-alt2
-- added security patch
-
-* Thu Dec 11 2003 Vital Khilko <vk@altlinux.ru> 0.74-alt1
-- new version released
-- enabled all features
-
-* Fri Jul 18 2003 Grigory Milev <week@altlinux.ru> 0.65-alt1
-- new version released
-
-* Wed Apr 16 2003 Grigory Milev <week@altlinux.ru> 0.61-alt1
-- new version released
-
-* Wed Jan 29 2003 Grigory Milev <week@altlinux.ru> 0.59.8-alt2
-- added recode plugin
-
-* Wed Jan  8 2003 Grigory Milev <week@altlinux.ru> 0.59.8-alt1
-- new version released
-
-* Tue Nov 12 2002 AEN <aen@altlinux.ru> 0.59.1-alt1
-- new version (non maintainer build)
-
-* Mon Apr 29 2002 Grigory Milev <week@altlinux.ru> 0.57-alt1
-- new version released
-
-* Mon Apr  1 2002 Grigory Milev <week@altlinux.ru> 0.55-alt1
-- new version released
-
-* Mon Mar  4 2002 Grigory Milev <week@altlinux.ru> 0.53-alt1
-- new version released
-
-* Tue Feb 19 2002 Grigory Milev <week@altlinux.ru> 0.52-alt1
-- new version released
-
-* Mon Jan 28 2002 Dmitry V. Levin <ldv@alt-linux.org> 0.51-alt2
-- Updated buildrequires.
-
-* Fri Jan 25 2002 Grigory Milev <week@altlinux.ru> 0.51-alt1
-- new version released
-
-* Mon Dec 17 2001 Grigory Milev <week@altlinux.ru> 0.50-alt1
-- New version released
-
-* Thu Nov 15 2001 Alexander Bokovoy <ab@altlinux.ru> 0.48-alt2
-- 0.48
-- wmgaim + recode from Grigory Bakunov (black@asplinux.ru)
-
-* Mon Oct 15 2001 Stanislav Ievlev <inger@altlinux.ru> 0.44-alt1
-- 0.44
-
-* Wed Jul 25 2001 Dmitry V. Levin <ldv@altlinux.ru> 0.11.0-alt2
-- Rebuilt with new perl.
-
-* Mon Jun 25 2001 Stanislav Ievlev <inger@altlinux.ru> 0.11.0-alt1
-- 0.11.0 . Rebuilt with perl-5.6.1
-
-* Sat Jan 13 2001 AEN <aen@logic.ru>
-- RE  adaptation
-
-* Tue Oct 10 2000 Guillaume Cottenceau <gc@mandrakesoft.com> 0.10.3-1mdk
-- up to 0.10.3
-
-* Tue Sep 26 2000 Daouda Lo <daouda@mandrakesoft.com> 0.9.20-5mdk
-- menu title should begin with capital letter.
-- ICQ section was replaced by Instant messaging.
-
-* Thu Sep  7 2000 Vincent Saugey <vince@mandrakesoft.com> 0.9.20-4mdk
-- Adding small and large icons
-
-* Tue Aug 29 2000 Vincent Saugey <vince@mandrakesoft.com> 0.9.20-3mdk
-- Change icon for menu
-
-* Mon Aug 07 2000 Frederic Lepied <flepied@mandrakesoft.com> 0.9.20-2mdk
-- automatically added BuildRequires
-
-* Mon Jul 17 2000 Vincent Saugey <vince@mandrakesoft.com> 0.9.20-1mdk
-- up to 0.9.20
-
-* Fri Jun 23 2000 Vincent Saugey <vince@mandrakesoft.com> 0.9.19-1mdk
-- 0.9.19
-
-* Thu Jun  8 2000 Guillaume Cottenceau <gc@mandrakesoft.com> 0.9.18-1mdk
-- 0.9.18
-- minor fixes in specfile
-
-* Fri Apr 28 2000 Daouda Lo <daouda@mandrakesoft.com> 0.9.11-3mdk
-- add 32*32 icon
-
-* Fri Mar 31 2000 Chmouel Boudjnah <chmouel@mandrakesoft.com> 0.9.11-2mdk
-- Don't +x the menu entries.
-
-* Fri Mar 31 2000 John Buswell <johnb@mandrakesoft.com> 0.9.11-1mdk
-- v0.9.11
-- Added menu
-- fixed group
-- spec-helper
-
-* Wed Nov 03 1999 John Buswell <johnb@mandrakesoft.com>
-Build Release
-
-* Tue Nov 02 1999 Lenny Cartier <lenny@mandrakesoft.com>
-v0.9.9
-
-* Wed Oct 13 1999 Lenny Cartier <lenny@mandrakesoft.com>
-- Specfile adaptations.
+* Sat Sep 05 2009 Stu Tomlinson <stu@nosnilmot.com>
+- Disable Voice & Video unless --with vv is used
+- Add BuildRequires for libidn-devel
+- Add Provides/Obsoletes to ease transition from Red Hat / Fedora RPMs
+
+* Sat Jul 11 2009 Stu Tomlinson <stu@nosnilmot.com>
+- Update to reflect changes in perl module installation directories
+
+* Mon May 19 2008 Stu Tomlinson <stu@nosnilmot.com>
+- Fix building without meanwhile support
+
+* Fri May 16 2008 Stu Tomlinson <stu@nosnilmot.com>
+- Add "--without nm" support to build without NetworkManager
+
+* Thu Feb 28 2008 Stu Tomlinson <stu@nosnilmot.com>
+- Remove --with-howl options as we no longer support using howl for bonjour
+
+* Wed Dec  5 2007 Stu Tomlinson <stu@nosnilmot.com>
+- When building with avahi, use native avahi instead of howl compatability
+  headers
+- Make the split out plugins depend only on the minimum necessary API
+  version of libpurple
+
+* Tue Oct 23 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Add finch.pc to finch-devel
+
+* Mon Sep 17 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Add version dependency on libpurple for pidgin
+- Support for OpenSuse lowercase package name for GConf2
+
+* Fri Sep 14 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Fix spec file for moved sounds & new CA certificates
+
+* Thu Jul 12 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Don't hardcode silc header locations, rely on pkg-config for those,
+  because I think I broke non-pkg-config detection of older silc
+  toolkit.
+
+* Tue Jun 5 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Add missing Requires for gtk2-devel, dbus-devel & ncurses-devel to
+  appropriate -devel subpackages
+
+* Sun May 27 2007 Stu Tomlinson <stu@nosnilmot.com>
+- add cyrus-sasl-plain & cyrus-sasl-md5 to Requires
+
+* Thu May 24 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Silence errors from gtk-update-icon-cache
+- Change Mandriva build dependencies to reflect the correct (lower case)
+  names for libSM-devel & libXScrnSaver-devel (Sunny Dubey)
+
+* Thu May 10 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Add scriptlet Requires for GConf2 to fix schema installation
+- Silence harmless errors when gconfd-2 is not running at install time
+
+* Thu May 3 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Add missing BuildRequires: startup-notification-devel, if you really
+  need to build on a distro without it use --without startupnotification
+- Add BuildRequires: libSM-devel, libXScrnSaver-devel for distros with
+  modular X. For those without, build with --without modularx
+- Change Mandriva BuildRequires to gkt2-devel (reported by Götz Waschk)
+
+* Tue May 1 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Run gtk-update-icon-cache on installation/uninstallation
+- Guard against errors when upgrading from Gaim/Pidgin 1.5.x which had
+  no schemas file
+
+* Sun Apr 29 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Update to reflect perl Purple::GtkUI -> Pidgin change
+
+* Wed Apr 25 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Update libpurple to pick up plugins in %%{_libdir}/purple
+
+* Sun Apr 22 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Remove Epoch because it's gone in Fedora now
+- Add virtual provides for gaim & gaim-devel
+
+* Thu Apr 19 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Fix pkgconfig Requires
+- Add ldconfig in pre/post scripts for libpurple & finch
+- Bump Epoch to 2 because Fedora unfortunately forgot to drop the Epoch
+  during the rename :(
+
+* Tue Apr 17 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Add some Obsolete:s to help upgrades
+- Remove explicit Packager: %%{packager} from spec, it was redundant
+
+* Sun Apr 15 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Fix for building without Finch
+- Drop -tcl & -silc sub-packages, include them in the main libpurple
+  package (--without tcl and --without silc can be used to build libpurple
+  without support for these).
+
+* Thu Apr 12 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Actually move libpurple.so.* to the libpurple RPM
+
+* Wed Apr 11 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Separate out libpurple, libpurple-devel and finch-devel
+
+* Sat Mar 24 2007 Stu Tomlinson <stu@nosnilmot.com>
+- Update to reflect renaming to pidgin/libpurple
+
+* Sun Oct  1 2006 Stu Tomlinson <stu@nosnilmot.com>
+- We can build with internal gadu gadu again, so bring it back into the
+  main package
+- Deal with gconf schame uninstallation on package upgrade and removal
+
+* Sun Aug 20 2006 Stu Tomlinson <stu@nosnilmot.com>
+- Make the gstreamer-devel dependency overridable with '--without-gstreamer'
+  to allow building on older distributions without suitable gstreamer
+
+* Tue Aug 15 2006 Mark Doliner <thekingant@users.sourceforge.net>
+- Add a BuildRequire for gstreamer-devel
+- Remove the BuildRequires for audiofile-devel and libao-devel
+
+* Mon May 8 2006 Mark Doliner <thekingant@users.sourceforge.net>
+- Add --with avahi option to compile the gaim-bonjour package against
+  Avahi's Howl compatibility layer
+
+* Wed Mar 29 2006 Stu Tomlinson <stu@nosnilmot.com>
+- Source RPM uses tar.bz2 now to save space
+- Update BuildRequires for new intltool dependencies
+- Add a --with perlmakehack option to allow builds to succeed on RH9
+- Add a --with gadugadu to build (separate) gaim-gadugadu package
+
+* Sat Dec 17 2005 Stu Tomlinson <stu@nosnilmot.com>
+- Add support for beta versions so the subsequent releases are seen as newer
+  by RPM
+- Split of sametime support to gaim-meanwhile
+- Use make DESTDIR=... instead of overloading prefix etc. when installing
+- Default build to include cyrus-sasl support in Jabber
+- Add --with dbus to build with DBUS support
+
+* Sun Dec 04 2005 Christopher O'Brien <siege@preoccupied.net>
+- Added obsoletes gaim-meanwhile
+
+* Sun Oct 30 2005 Stu Tomlinson <stu@nosnilmot.com>
+- Add separate gaim-bonjour package if built with --with-howl
+- Add separate gaim-mono package if built with --with-mono
+- Exclude some unwanted perl files
+
+* Sat Aug 20 2005 Stu Tomlinson <stu@nosnilmot.com>
+- Include libgaimperl.so
+- Include gaim.m4 in gaim-devel
+
+* Thu Apr 28 2005 Stu Tomlinson <stu@nosnilmot.com>
+- Use perl_vendorlib & perl_archlib for better 64bit compat (Jeff Mahoney)
+- Clean up Requires, most should be auto-detected
+- Restore gtkspell-devel build requirement (and add --without gtkspell option)
+- Fix Tcl build requirements to work across more distros
+- Fix SILC build requirements to work across more distros
+
+* Mon Oct 11 2004 John Jolly <john.jolly@gmail.com>
+- Added if "%%{_vendor}" == "suse" to handle GnuTLS libraries for SuSE
+
+* Sat Oct  2 2004 Stu Tomlinson <stu@nosnilmot.com>
+- If --with tcl or silc are not specified, make sure the plugins don't
+  exist to prevent RPM complaining about unpackaged files
+
+* Tue Jun 29 2004 Ethan Blanton <eblanton@cs.ohiou.edu>
+- Change Tcl to use --with tcl, the same as SILC, and build a gaim-tcl
+  package if specified.
+
+* Thu Jun 24 2004 Mark Doliner <thekingant@users.sourceforge.net>
+- Add --with silc rebuild option for compiling a separate gaim-silc
+  RPM containing the silc protocol plugin (Stu Tomlinson).
+
+* Wed Jun 23 2004 Ethan Blanton <eblanton@cs.ohiou.edu>
+- Moved gaim headers and a pkgconfig configuration file into the
+  gaim-devel RPM (Stu Tomlinson).
+
+* Thu Jan 15 2004 Ethan Blanton <eblanton@cs.ohiou.edu>
+- Removed the manual strip command, as it seems to be unwarranted if
+  the necessary programs are properly installed.  (For me, this was
+  elfutils.)
+
+* Sun Jul 20 2003 Bjoern Voigt <bjoern@cs.tu-berlin.de>
+- Added pkgconfig build dependency.
+- if "%%{_vendor}" != "MandrakeSoft" now also works with rpm 3.x.
+- Added Gaim-specific directories to list of Gaim's files.
+
+* Wed Jul 16 2003 Ethan Blanton <eblanton@cs.ohiou.edu>
+- Complete spec file rewrite to take advantage of "new" RPM features
+  and make things prettier.
+- Use system-supplied %%{_prefix}, %%{_datadir}, etc. rather than
+  attempt to define our own.

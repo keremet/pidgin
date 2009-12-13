@@ -1,137 +1,186 @@
+#
 # Makefile.mingw
 #
-# Author: hermanator12002@yahoo.com
-# Date 9/11/02
-# Description: Top Makefile for win32 (mingw) port of Pidgin and libpurple
+# Description: Makefile for win32 (mingw) version of Pidgin
 #
 
-PIDGIN_TREE_TOP := .
+PIDGIN_TREE_TOP := ..
 include $(PIDGIN_TREE_TOP)/libpurple/win32/global.mak
 
-# Generate a X.X.X.X version for the installer file versioning header
-# The last digit will be 99 for a final release, 0 for dev or unknown, or the beta number
-PIDGIN_PRODUCT_VERSION = $(shell \
-awk 'BEGIN {FS="."} { \
-    if (int($$3) == $$3) { \
-        $$4 = "99"; \
-    } else { \
-        $$5 = $$3; \
-        sub(int($$3), "", $$5); \
-        if ($$5 == "dev") { \
-            $$4 = "0"; \
-        } else { \
-            if (sub("beta", "", $$5) > 0) { \
-                $$4 = $$5; \
-            } else { \
-                $$4 = "0"; \
-            } \
-        } \
-    } \
-    printf("%s.%s.%s.%s", $$1, $$2, int($$3), $$4); \
-    exit; \
-}' VERSION)
+DEFINES := $(subst -DWIN32_LEAN_AND_MEAN,,$(DEFINES))
 
-GTK_INSTALL_VERSION = $(shell \
-  source ../gtk_installer/version.sh; \
-  echo $$gtk_version \
-)
+NEEDED_DLLS = $(GTKSPELL_TOP)/gtkspell/libgtkspell.dll
 
-STRIPPED_RELEASE_DIR = $(PIDGIN_TREE_TOP)/pidgin-$(PIDGIN_VERSION)-win32bin
+##
+## VARIABLE DEFINITIONS
+##
+EXE_TARGET := pidgin
+PIDGIN_TARGET := pidgin
+EXE_NAME := $(EXE_TARGET).exe
 
+WINAPP := -mwindows
 
-# Any *.dll or *.exe files included in win32-install-dir that we don't compile
-# should be included in this list so they don't get stripped
-EXTERNAL_DLLS = \
-	comerr32.dll \
-	freebl3.dll \
-	gssapi32.dll \
-	k5sprt32.dll \
-	krb5_32.dll \
-	libgtkspell.dll \
-	libmeanwhile-1.dll \
-	libsasl.dll \
-	libxml2.dll \
-	nspr4.dll \
-	nss3.dll \
-	nssckbi.dll \
-	plc4.dll \
-	plds4.dll \
-	saslANONYMOUS.dll \
-	saslCRAMMD5.dll \
-	saslDIGESTMD5.dll \
-	saslGSSAPI.dll \
-	saslLOGIN.dll \
-	saslPLAIN.dll \
-	libsilc-1-1-2.dll \
-	libsilcclient-1-1-2.dll \
-	smime3.dll \
-	softokn3.dll \
-	ssl3.dll
+LDFLAGS := $(WINAPP)
 
-#build an expression for `find` to use to ignore the above files
-EXTERNAL_DLLS_FIND_EXP = $(patsubst %,-o -name %,$(EXTERNAL_DLLS))
+##
+## INCLUDE PATHS
+##
+PURPLE_INCLUDE_PATHS =	\
+			-I$(PURPLE_TOP) \
+			-I$(PURPLE_TOP)/win32 \
+			-I$(PIDGIN_TREE_TOP) \
+			-I$(GTK_TOP)/include \
+			-I$(GTK_TOP)/include/glib-2.0 \
+			-I$(GTK_TOP)/lib/glib-2.0/include
 
-.PHONY: all docs install installer installer_nogtk installer_debug installers clean uninstall create_release_install_dir
+INCLUDE_PATHS +=	\
+			$(PURPLE_INCLUDE_PATHS) \
+			-I$(PIDGIN_IDLETRACK_TOP) \
+			-I$(PIDGIN_TOP) \
+			-I$(PIDGIN_TOP)/win32 \
+			-I$(GTK_TOP)/include/gtk-2.0 \
+			-I$(GTK_TOP)/include/pango-1.0 \
+			-I$(GTK_TOP)/include/atk-1.0 \
+			-I$(GTK_TOP)/include/cairo \
+			-I$(GTK_TOP)/lib/gtk-2.0/include \
+			-I$(GTKSPELL_TOP) \
+			-I$(ASPELL_TOP)/include
 
-all: $(PIDGIN_CONFIG_H) $(PIDGIN_REVISION_H)
-	$(MAKE) -C $(PURPLE_TOP) -f $(MINGW_MAKEFILE)
-	$(MAKE) -C $(PIDGIN_TOP) -f $(MINGW_MAKEFILE)
-ifndef DISABLE_NLS
-	$(MAKE) -C $(PURPLE_PO_TOP) -f $(MINGW_MAKEFILE)
-endif
+LIB_PATHS +=		-L$(GTK_TOP)/lib \
+			-L$(PURPLE_TOP) \
+			-L$(PIDGIN_TOP) \
+			-L$(PIDGIN_IDLETRACK_TOP) \
+			-L$(ASPELL_TOP)/lib
 
-install: all $(PIDGIN_INSTALL_DIR)
-	$(MAKE) -C $(PURPLE_TOP) -f $(MINGW_MAKEFILE) install
-	$(MAKE) -C $(PIDGIN_TOP) -f $(MINGW_MAKEFILE) install
-ifndef DISABLE_NLS
-	$(MAKE) -C $(PURPLE_PO_TOP) -f $(MINGW_MAKEFILE) install
-endif
-	$(MAKE) -C share/ca-certs -f $(MINGW_MAKEFILE) install
-	$(MAKE) -C share/sounds -f $(MINGW_MAKEFILE) install
+##
+##  SOURCES, OBJECTS
+##
+PIDGIN_C_SRC =	\
+			gtkaccount.c \
+			gtkblist-theme-loader.c \
+			gtkblist-theme.c \
+			gtkblist.c \
+			gtkcellrendererexpander.c \
+			gtkcellrendererprogress.c \
+			gtkcertmgr.c \
+			gtkconn.c \
+			gtkconv.c \
+			gtkdebug.c \
+			gtkdialogs.c \
+			gtkdnd-hints.c \
+			gtkdocklet.c \
+			gtkeventloop.c \
+			gtkexpander.c \
+			gtkft.c \
+			gtkicon-theme-loader.c \
+			gtkicon-theme.c \
+			gtkidle.c \
+			gtkimhtml.c \
+			gtkimhtmltoolbar.c \
+			gtklog.c \
+			gtkmain.c \
+			gtkmedia.c \
+			gtkmenutray.c \
+			gtknotify.c \
+			gtkplugin.c \
+			gtkpluginpref.c \
+			gtkpounce.c \
+			gtkprefs.c \
+			gtkprivacy.c \
+			gtkrequest.c \
+			gtkroomlist.c \
+			gtksavedstatuses.c \
+			gtkscrollbook.c \
+			gtksmiley.c \
+			gtksound.c \
+			gtksourceiter.c \
+			gtksourceundomanager.c \
+			gtkstatus-icon-theme.c \
+			gtkstatusbox.c \
+			gtkthemes.c \
+			gtkutils.c \
+			gtkwhiteboard.c \
+			minidialog.c \
+			pidginstock.c \
+			pidgintooltip.c \
+			win32/MinimizeToTray.c \
+			win32/gtkdocklet-win32.c \
+			win32/gtkwin32dep.c \
+			win32/untar.c \
+			win32/wspell.c
 
-create_release_install_dir: install
-	rm -rf $(STRIPPED_RELEASE_DIR)
-	cp -R $(PIDGIN_INSTALL_DIR) $(STRIPPED_RELEASE_DIR)
-	find $(STRIPPED_RELEASE_DIR) \( -name '*.dll' -o -name '*.exe' \) \
-	 -not \( -false $(EXTERNAL_DLLS_FIND_EXP) \) -exec $(STRIP) --strip-unneeded {} ';'
+PIDGIN_RC_SRC = win32/pidgin_dll_rc.rc
+PIDGIN_OBJECTS = $(PIDGIN_C_SRC:%.c=%.o) $(PIDGIN_RC_SRC:%.rc=%.o)
 
-installer: create_release_install_dir
-	$(MAKENSIS) $(MAKENSISOPT)V3 $(MAKENSISOPT)DPIDGIN_VERSION="$(PIDGIN_VERSION)" $(MAKENSISOPT)DPIDGIN_PRODUCT_VERSION="$(PIDGIN_PRODUCT_VERSION)" $(MAKENSISOPT)DWITH_GTK $(MAKENSISOPT)DPIDGIN_INSTALL_DIR="$(STRIPPED_RELEASE_DIR)" $(MAKENSISOPT)DGTK_INSTALL_VERSION="$(GTK_INSTALL_VERSION)" pidgin/win32/nsis/pidgin-installer.nsi
-	mv pidgin/win32/nsis/pidgin-$(PIDGIN_VERSION).exe ./
+EXE_RC_SRC = win32/pidgin_exe_rc.rc
+EXE_C_SRC = win32/winpidgin.c
+EXE_OBJECTS = $(EXE_C_SRC:%.c=%.o) $(EXE_RC_SRC:%.rc=%.o)
 
-installer_nogtk: create_release_install_dir
-	$(MAKENSIS) $(MAKENSISOPT)V3 $(MAKENSISOPT)DPIDGIN_VERSION="$(PIDGIN_VERSION)" $(MAKENSISOPT)DPIDGIN_PRODUCT_VERSION="$(PIDGIN_PRODUCT_VERSION)" $(MAKENSISOPT)DPIDGIN_INSTALL_DIR="$(STRIPPED_RELEASE_DIR)" $(MAKENSISOPT)DGTK_INSTALL_VERSION="$(GTK_INSTALL_VERSION)" pidgin/win32/nsis/pidgin-installer.nsi
-	mv pidgin/win32/nsis/pidgin-$(PIDGIN_VERSION)-no-gtk.exe ./
+##
+## LIBRARIES
+##
 
-installer_debug: install
-	$(MAKENSIS) $(MAKENSISOPT)V3 $(MAKENSISOPT)DPIDGIN_VERSION="$(PIDGIN_VERSION)" $(MAKENSISOPT)DPIDGIN_PRODUCT_VERSION="$(PIDGIN_PRODUCT_VERSION)" $(MAKENSISOPT)DPIDGIN_INSTALL_DIR="$(PIDGIN_INSTALL_DIR)" $(MAKENSISOPT)DDEBUG $(MAKENSISOPT)DGTK_INSTALL_VERSION="$(GTK_INSTALL_VERSION)" pidgin/win32/nsis/pidgin-installer.nsi
-	mv pidgin/win32/nsis/pidgin-$(PIDGIN_VERSION)-debug.exe ./
+PIDGIN_LIBS =	\
+		-lintl \
+		-lglib-2.0 \
+		-lgobject-2.0 \
+		-lgthread-2.0 \
+		-lpurple \
+		-lz \
+		-lidletrack \
+		-lgtk-win32-2.0 \
+		-latk-1.0 \
+		-lpango-1.0 \
+		-lgdk-win32-2.0 \
+		-lgdk_pixbuf-2.0 \
+		-lgdi32 \
+		-lwinmm
 
-installer_zip: create_release_install_dir
-	rm -f pidgin-$(PIDGIN_VERSION)-win32-bin.zip
-	zip -9 -r pidgin-$(PIDGIN_VERSION)-win32-bin.zip $(STRIPPED_RELEASE_DIR)
+include $(PIDGIN_COMMON_RULES)
 
-installers: installer installer_nogtk installer_debug installer_zip
+##
+## TARGET DEFINITIONS
+##
+.PHONY: all install install_shallow clean
 
-Doxyfile.mingw: Doxyfile.in
-	sed -e "s/@PACKAGE@/pidgin/" -e "s/@VERSION@/$(PIDGIN_VERSION)/" -e "s/@top_srcdir@/$(PIDGIN_TREE_TOP)/g" -e "s/@enable_dot@/NO/" Doxyfile.in > Doxyfile.mingw
+all: $(EXE_TARGET).exe $(PIDGIN_TARGET).dll
+	$(MAKE) -C $(PIDGIN_PLUGINS_TOP) -f $(MINGW_MAKEFILE)
 
-docs: Doxyfile.mingw
-	@echo "Running doxygen..."
-	@doxygen Doxyfile.mingw
+win32/pidgin_exe_rc.rc: win32/pidgin_exe_rc.rc.in $(PIDGIN_TREE_TOP)/VERSION
+	sed -e 's/@PIDGIN_VERSION@/$(PIDGIN_VERSION)/g' \
+	    -e 's/@ORIGINAL_FILENAME@/$(EXE_NAME)/' \
+	    $@.in > $@
 
+install_shallow: $(PIDGIN_INSTALL_DIR) $(EXE_TARGET).exe $(PIDGIN_TARGET).dll
+	cp $(EXE_TARGET).exe $(PIDGIN_TARGET).dll $(PIDGIN_INSTALL_DIR)
+	cp $(NEEDED_DLLS) $(PIDGIN_INSTALL_DIR)
+
+install: install_shallow all
+	$(MAKE) -C $(PIDGIN_PLUGINS_TOP) -f $(MINGW_MAKEFILE) install
+	$(MAKE) -C $(PIDGIN_PIXMAPS_TOP) -f $(MINGW_MAKEFILE) install
+	$(MAKE) -C $(PIDGIN_IDLETRACK_TOP) -f $(MINGW_MAKEFILE) install
+
+win32/pidgin_dll_rc.rc: win32/pidgin_dll_rc.rc.in $(PIDGIN_TREE_TOP)/VERSION
+	sed -e 's/@PIDGIN_VERSION@/$(PIDGIN_VERSION)/g' \
+	    $@.in > $@
+
+$(EXE_OBJECTS) $(PIDGIN_OBJECTS): $(PIDGIN_CONFIG_H)
+
+$(PIDGIN_TARGET).dll $(PIDGIN_TARGET).dll.a: $(PURPLE_DLL).a $(PIDGIN_IDLETRACK_DLL).a $(PIDGIN_OBJECTS)
+	$(CC) -shared $(PIDGIN_OBJECTS) $(LIB_PATHS) $(PIDGIN_LIBS) $(DLL_LD_FLAGS) -Wl,--output-def,$(PIDGIN_TARGET).def,--out-implib,$(PIDGIN_TARGET).dll.a -o $(PIDGIN_TARGET).dll
+
+$(EXE_TARGET).exe: $(PIDGIN_CONFIG_H) $(PIDGIN_DLL).a $(PIDGIN_IDLETRACK_DLL).a $(EXE_OBJECTS)
+	$(CC) $(LDFLAGS) $(EXE_OBJECTS) -o $(EXE_TARGET).exe
+
+##
+## CLEAN RULES
+##
 clean:
-	$(MAKE) -C $(PURPLE_PO_TOP) -f $(MINGW_MAKEFILE) clean
-	$(MAKE) -C $(PIDGIN_TOP) -f $(MINGW_MAKEFILE) clean
-	$(MAKE) -C $(PURPLE_TOP) -f $(MINGW_MAKEFILE) clean
-	$(MAKE) -C share/ca-certs -f $(MINGW_MAKEFILE) clean
-	rm -f $(PIDGIN_CONFIG_H) $(PIDGIN_REVISION_H) $(PIDGIN_REVISION_RAW_TXT) ./VERSION pidgin-$(PIDGIN_VERSION)*.exe pidgin-$(PIDGIN_VERSION)-win32-bin.zip
-	rm -rf doc/html Doxyfile.mingw
-
-uninstall:
-	rm -rf $(PURPLE_INSTALL_PERL_DIR) $(PIDGIN_INSTALL_PLUGINS_DIR) $(PURPLE_INSTALL_PO_DIR) $(PIDGIN_INSTALL_DIR) $(STRIPPED_RELEASE_DIR)
-	rm -f ./VERSION
+	$(MAKE) -C $(PIDGIN_IDLETRACK_TOP) -f $(MINGW_MAKEFILE) clean
+	$(MAKE) -C $(PIDGIN_PLUGINS_TOP) -f $(MINGW_MAKEFILE) clean
+	$(MAKE) -C $(PIDGIN_PIXMAPS_TOP) -f $(MINGW_MAKEFILE) clean
+	rm -f $(PIDGIN_OBJECTS) $(PIDGIN_RC_SRC) $(EXE_OBJECTS) $(EXE_RC_SRC)
+	rm -f $(PIDGIN_TARGET).dll $(PIDGIN_TARGET).dll.a $(PIDGIN_TARGET).def
+	rm -f $(EXE_TARGET).exe
 
 include $(PIDGIN_COMMON_TARGETS)
-
-.PHONY: $(PIDGIN_REVISION_H) $(PIDGIN_REVISION_RAW_TXT)
