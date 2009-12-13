@@ -448,6 +448,9 @@ fi
 - drop patch for old be translation
 - drop patch for russian translation
 
+* Thu Dec 03 2009 Eugeny A. Rostovtsev (REAL) <real at altlinux.org> 2.6.3-alt2.1
+- Rebuilt with python 2.6
+
 * Tue Nov 17 2009 Alexey Shabalin <shaba@altlinux.ru> 2.6.3-alt2
 - sync spec with pidgin-mini, thx to php-coder@
 - update russian translation from attachments #21176
