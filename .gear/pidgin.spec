@@ -38,7 +38,7 @@
 
 Name: pidgin
 Version: 2.6.5
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -287,7 +287,6 @@ cp %SOURCE2 prefs.xml
 %if_disabled gstreamer
 	--disable-gstreamer-interfaces \
 %endif
-	--with-system-ssl-certs=%_datadir/ca-certificates \
 %if_enabled gnutls
 	--enable-gnutls=yes \
 %else
@@ -311,6 +310,8 @@ cp %SOURCE2 prefs.xml
 	--with-perl-lib=vendor \
 %endif
 	--with-extraversion=%release
+
+#	--with-system-ssl-certs=%_datadir/ca-certificates \
 
 %make_build
 
@@ -443,6 +444,9 @@ fi
 %endif
 
 %changelog
+* Mon Jan 25 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.5-alt2
+- build without system-ssl-certs
+
 * Tue Jan 12 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.5-alt1
 - 2.6.5
 
