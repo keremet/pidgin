@@ -23,8 +23,7 @@ irssi_la_LIBADD =  \
 s_la_SOURCES = s.c
 s_la_LIBADD =  \
   $(GLIB_LIBS) \
-  ../libgnt.la \
-  $(top_builddir)/libpurple/libpurple.la
+  ../libgnt.la
 
 EXTRA_DIST = 
 
