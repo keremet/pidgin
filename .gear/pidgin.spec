@@ -1,6 +1,3 @@
-%add_findprov_lib_path %_libdir/pidgin
-%add_findprov_lib_path %_libdir/purple-2
-%add_findprov_lib_path %_libdir/finch
 %add_findreq_skiplist %perl_vendor_archlib/*
 
 %def_disable perl
@@ -37,8 +34,8 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.6.5
-Release: alt2
+Version: 2.6.6
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -444,6 +441,13 @@ fi
 %endif
 
 %changelog
+* Mon Feb 22 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.6-alt1
+- 2.6.6:
+    + Fixes a remote MSN SLP crash (CVE-2010-0277) (Closes: #566775)
+    + Fixes a remote Finch XMPP crash (CVE-2010-0420)
+    + Fixes a remote smiley freeze/CPU pegging DoS (CVE-2010-0423)
+- drop %%add_findprov_lib_path for %%_libdir/pidgin %%_libdir/purple-2 %%_libdir/finch
+
 * Mon Jan 25 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.5-alt2
 - build without system-ssl-certs
 
