@@ -35,7 +35,7 @@
 
 Name: pidgin
 Version: 2.6.6
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -319,7 +319,12 @@ cp %SOURCE2 prefs.xml
 mkdir -p %buildroot%_sysconfdir/purple
 install -m 644 prefs.xml %buildroot%_sysconfdir/purple/prefs.xml
 
+
 find %buildroot%_libdir -name \*.la -delete
+# remove non-plugin unrequired library symlinks
+rm -f %buildroot%_libdir/purple-2/liboscar.so
+rm -f %buildroot%_libdir/purple-2/libjabber.so
+rm -f %buildroot%_libdir/purple-2/libymsg.so 
 
 %find_lang --with-gnome %name
 
@@ -441,6 +446,11 @@ fi
 %endif
 
 %changelog
+* Sat Mar 06 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.6-alt2
+- Upstream backports:
+  + Fix AIM SSL clientLogin
+  + Fix AIM clientLogin with proxy
+
 * Mon Feb 22 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.6-alt1
 - 2.6.6:
     + Fixes a remote MSN SLP crash (CVE-2010-0277) (Closes: #566775)
