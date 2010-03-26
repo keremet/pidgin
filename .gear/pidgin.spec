@@ -35,7 +35,7 @@
 
 Name: pidgin
 Version: 2.6.6
-Release: alt2
+Release: alt3
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -446,6 +446,9 @@ fi
 %endif
 
 %changelog
+* Sat Mar 27 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.6-alt3
+- update Russian translation by Alexandre Prokoudine
+
 * Sat Mar 06 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.6-alt2
 - Upstream backports:
   + Fix AIM SSL clientLogin
