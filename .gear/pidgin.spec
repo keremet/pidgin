@@ -6,7 +6,7 @@
 %def_enable nss
 %def_disable cyrus_sasl
 %def_disable gnutls
-%def_enable gevolution
+%def_disable gevolution
 %def_enable meanwhile
 %def_enable cap
 %def_enable nm
@@ -35,7 +35,7 @@
 
 Name: pidgin
 Version: 2.6.6
-Release: alt3
+Release: alt4
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -446,6 +446,9 @@ fi
 %endif
 
 %changelog
+* Mon Apr 19 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.6-alt4
+- disable build gevolution plugin; it hasn't been ported to the de-bonobo-ized eds-2.30
+
 * Sat Mar 27 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.6-alt3
 - update Russian translation by Alexandre Prokoudine
 
