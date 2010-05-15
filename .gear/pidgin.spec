@@ -87,7 +87,7 @@ BuildPreReq: GConf libGConf-devel
 BuildRequires: gcc-c++ libgpg-error
 BuildRequires: python-modules-encodings
 # for shared gadu plugin
-BuildRequires: libgadu-devel
+BuildRequires: libgadu-devel >= 1.9.0
 BuildRequires: intltool
 # now intltool wants that
 BuildRequires: perl-XML-Parser
