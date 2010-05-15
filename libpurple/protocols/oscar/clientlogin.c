@@ -177,10 +177,23 @@ static gboolean parse_start_oscar_session_response(PurpleConnection *gc, const g
 	code = atoi(tmp);
 	if (code != 200)
 	{
+		xmlnode *status_detail_node;
+		guint status_detail = 0;
+
+		status_detail_node = xmlnode_get_child(response_node,
+		                                       "statusDetailCode");
+		if (status_detail_node) {
+			gchar *data = xmlnode_get_data(status_detail_node);
+			if (data) {
+				status_detail = atoi(data);
+				g_free(data);
+			}
+		}
+
 		purple_debug_error("oscar", "startOSCARSession response statusCode "
 				"was %s: %s\n", tmp, response);
 
-		if (code == 401 || code == 607)
+		if ((code == 401 && status_detail != 1014) || code == 607)
 			purple_connection_error_reason(gc,
 					PURPLE_CONNECTION_ERROR_OTHER_ERROR,
 					_("You have been connecting and disconnecting too "
@@ -415,6 +428,9 @@ static gboolean parse_client_login_response(PurpleConnection *gc, const gchar *r
 				"was %d (%d): %s\n", status_code, status_detail_code, response);
 
 		if (status_code == 330 && status_detail_code == 3011) {
+			PurpleAccount *account = purple_connection_get_account(gc);
+			if (!purple_account_get_remember_password(account))
+				purple_account_set_password(account, NULL);
 			purple_connection_error_reason(gc,
 					PURPLE_CONNECTION_ERROR_AUTHENTICATION_FAILED,
 					_("Incorrect password"));
@@ -502,8 +518,12 @@ static void client_login_cb(PurpleUtilFetchUrlData *url_data, gpointer user_data
 
 	if (error_message != NULL || len == 0) {
 		gchar *tmp;
-		tmp = g_strdup_printf(_("Error requesting %s: %s"),
-				URL_CLIENT_LOGIN, error_message);
+		if (error_message != NULL)
+			tmp = g_strdup_printf(_("Error requesting %s: %s"),
+					URL_CLIENT_LOGIN, error_message);
+		else
+			tmp = g_strdup_printf(_("Error requesting %s"),
+					URL_CLIENT_LOGIN);
 		purple_connection_error_reason(gc,
 				PURPLE_CONNECTION_ERROR_NETWORK_ERROR, tmp);
 		g_free(tmp);
