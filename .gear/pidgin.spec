@@ -253,7 +253,6 @@ cp %SOURCE2 prefs.xml
 %build
 %autoreconf
 %configure \
-	--disable-schemas-install \
 	%{subst_enable avahi} \
 	%{subst_enable dot} \
 	%{subst_enable doxygen} \
@@ -308,10 +307,17 @@ cp %SOURCE2 prefs.xml
 
 #	--with-system-ssl-certs=%_datadir/ca-certificates \
 
+# we can't use --disable-schemas-install here as of Pidgin 2.7.0 because
+# it broke, so we disable in install instead 
+#	--disable-schemas-install \
+
+
 %make_build
 
 %install
+export GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1
 %make DESTDIR=%buildroot install
+unset GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL
 
 # install ALTLinux pidgin default prefs.xml
 mkdir -p %buildroot%_sysconfdir/purple
