@@ -23,7 +23,6 @@
 %def_enable screensaver
 %def_enable startup_notification
 %def_enable gestures
-%def_enable msnp15
 %def_enable gtkspell
 %def_enable devhelp
 
@@ -275,7 +274,6 @@ cp %SOURCE2 prefs.xml
 	%{subst_enable sm} \
 	%{subst_enable screensaver} \
 	%{subst_enable gestures} \
-	%{subst_enable msnp15} \
 	%{subst_enable gtkspell} \
 	%{subst_enable devhelp} \
 %if_disabled startup_notification
