@@ -112,8 +112,11 @@ AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
 AC_PROG_INSTALL
+AC_PROG_INTLTOOL
 PKG_PROG_PKG_CONFIG
 AC_FUNC_ALLOCA
+GETTEXT_PACKAGE=pidgin
+AC_SUBST(GETTEXT_PACKAGE)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -264,9 +267,9 @@ dnl #######################################################################
 AC_ARG_ENABLE(nls, AC_HELP_STRING([--disable-nls], [disable installation of translation files]), enable_i18n="$enableval", enable_i18n=yes)
 
 if test x$enable_i18n = xyes; then
-	AC_PROG_INTLTOOL
-	GETTEXT_PACKAGE=pidgin
-	AC_SUBST(GETTEXT_PACKAGE)
+dnl	AC_PROG_INTLTOOL
+dnl	GETTEXT_PACKAGE=pidgin
+dnl	AC_SUBST(GETTEXT_PACKAGE)
 
 
 	# before gettexting, in case iconv matters
