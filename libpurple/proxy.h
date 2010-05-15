@@ -43,13 +43,21 @@ typedef enum
 
 } PurpleProxyType;
 
+typedef enum
+{
+	PURPLE_PROXY_AUTH_UNKNOWN = 0,
+	PURPLE_PROXY_AUTH_BASIC,
+	PURPLE_PROXY_AUTH_NTLM
+} PurpleProxyAuth;
+
 /**
  * Information on proxy settings.
  */
 typedef struct
 {
 	PurpleProxyType type;   /**< The proxy type.  */
-
+    PurpleProxyAuth auth;   /**< Auth type on the proxy. */
+	
 	char *host;           /**< The host.        */
 	int   port;           /**< The port number. */
 	char *username;       /**< The username.    */
@@ -96,6 +104,14 @@ void purple_proxy_info_destroy(PurpleProxyInfo *info);
 void purple_proxy_info_set_type(PurpleProxyInfo *info, PurpleProxyType type);
 
 /**
+ * Sets the type of auth for proxy.
+ *
+ * @param info The proxy information.
+ * @param auth The proxy auth type.
+ */
+void purple_proxy_info_set_auth(PurpleProxyInfo *info, PurpleProxyAuth auth);
+
+/**
  * Sets the proxy host.
  *
  * @param info The proxy information.
@@ -135,6 +151,15 @@ void purple_proxy_info_set_password(PurpleProxyInfo *info, const char *password)
  * @return The type.
  */
 PurpleProxyType purple_proxy_info_get_type(const PurpleProxyInfo *info);
+
+/**
+ * Returns the proxy's auth type.
+ *
+ * @param info The proxy information.
+ *
+ * @return The auth.
+ */
+PurpleProxyAuth purple_proxy_info_get_auth(const PurpleProxyInfo *info);
 
 /**
  * Returns the proxy's host.

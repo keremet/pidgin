@@ -125,6 +125,14 @@ purple_proxy_info_set_type(PurpleProxyInfo *info, PurpleProxyType type)
 }
 
 void
+purple_proxy_info_set_auth(PurpleProxyInfo *info, PurpleProxyAuth auth)
+{
+	g_return_if_fail(info != NULL);
+
+	info->auth = auth;
+}
+
+void
 purple_proxy_info_set_host(PurpleProxyInfo *info, const char *host)
 {
 	g_return_if_fail(info != NULL);
@@ -165,6 +173,14 @@ purple_proxy_info_get_type(const PurpleProxyInfo *info)
 	g_return_val_if_fail(info != NULL, PURPLE_PROXY_NONE);
 
 	return info->type;
+}
+
+PurpleProxyAuth
+purple_proxy_info_get_auth(const PurpleProxyInfo *info)
+{
+	g_return_val_if_fail(info != NULL, PURPLE_PROXY_AUTH_UNKNOWN);
+
+	return info->auth;
 }
 
 const char *
@@ -221,7 +237,7 @@ purple_global_proxy_set_info(PurpleProxyInfo *info)
 static PurpleProxyInfo *
 purple_gnome_proxy_get_info(void)
 {
-	static PurpleProxyInfo info = {0, NULL, 0, NULL, NULL};
+	static PurpleProxyInfo info = {0, 0, NULL, 0, NULL, NULL};
 	gboolean use_same_proxy = FALSE;
 	gchar *tmp, *err = NULL;
 
@@ -399,7 +415,7 @@ purple_win32_proxy_get_info(void)
 {
 	static LPFNWINHTTPGETIEPROXYCONFIG MyWinHttpGetIEProxyConfig = NULL;
 	static gboolean loaded = FALSE;
-	static PurpleProxyInfo info = {0, NULL, 0, NULL, NULL};
+	static PurpleProxyInfo info = {0, 0, NULL, 0, NULL, NULL};
 
 	WINHTTP_CURRENT_USER_IE_PROXY_CONFIG ie_proxy_config;
 
@@ -523,13 +539,8 @@ purple_proxy_connect_data_destroy(PurpleProxyConnectData *connect_data)
 
 	if (connect_data->query_data != NULL)
 		purple_dnsquery_destroy(connect_data->query_data);
-
 	while (connect_data->hosts != NULL)
 	{
-		/* Discard the length... */
-		connect_data->hosts = g_slist_remove(connect_data->hosts, connect_data->hosts->data);
-		/* Free the address... */
-		g_free(connect_data->hosts->data);
 		connect_data->hosts = g_slist_remove(connect_data->hosts, connect_data->hosts->data);
 	}
 
@@ -574,6 +585,11 @@ purple_proxy_connect_data_disconnect(PurpleProxyConnectData *connect_data, const
 
 	g_free(connect_data->read_buffer);
 	connect_data->read_buffer = NULL;
+
+	if (connect_data->hosts != NULL) {
+			connect_data->hosts = g_slist_remove(connect_data->hosts, connect_data->hosts->data);
+			connect_data->hosts = g_slist_remove(connect_data->hosts, connect_data->hosts->data);
+	}
 
 	if (error_message != NULL)
 	{
@@ -989,7 +1005,6 @@ http_canread(gpointer data, gint source, PurpleInputCondition cond)
 							_("HTTP proxy connection error %d"), status);
 					return;
 				}
-				*username = '\0';
 
 				/* Is there a message? */
 				if (*header_end == ' ') {
@@ -997,6 +1012,7 @@ http_canread(gpointer data, gint source, PurpleInputCondition cond)
 					char *tmp = (char*) header;
 					guint8 *nonce;
 
+					*username = '\0';
 					header_end++;
 					username++;
 					while(*tmp != '\r' && *tmp != '\0') tmp++;
@@ -1007,11 +1023,20 @@ http_canread(gpointer data, gint source, PurpleInputCondition cond)
 						hostname,
 						domain, nonce, NULL);
 					username--;
-				} else /* Empty message */
-					response = purple_ntlm_gen_type1(hostname, domain);
-
-				*username = '\\';
-
+					*username = '\\';
+				} else { /* Empty message */
+					if (purple_proxy_info_get_auth(connect_data->gpi) != PURPLE_PROXY_AUTH_NTLM) {
+						purple_proxy_info_set_auth(connect_data->gpi,PURPLE_PROXY_AUTH_NTLM);
+						/* place some trash to the begin of the GSList,
+						  * it will be removed in purple_proxy_connect_data_disconnect(),
+						  * so, next attempt to connect will be done to the same proxy host */
+						connect_data->hosts = g_slist_prepend(connect_data->hosts, g_strdup("") );
+						connect_data->hosts = g_slist_prepend(connect_data->hosts, g_strdup("") );
+					}
+					purple_proxy_connect_data_disconnect_formatted(connect_data,
+						_("HTTP proxy connection error %d"), status);
+					return;
+				}
 				request = g_strdup_printf(
 					"CONNECT %s:%d HTTP/1.1\r\n"
 					"Host: %s:%d\r\n"
@@ -1024,28 +1049,17 @@ http_canread(gpointer data, gint source, PurpleInputCondition cond)
 				g_free(response);
 
 			} else if((header = g_strrstr((const char *)connect_data->read_buffer, "Proxy-Authenticate: Basic"))) {
-				gchar *t1, *t2;
-				const char *username, *password;
-
-				username = purple_proxy_info_get_username(connect_data->gpi);
-				password = purple_proxy_info_get_password(connect_data->gpi);
-
-				t1 = g_strdup_printf("%s:%s",
-									 username ? username : "",
-									 password ? password : "");
-				t2 = purple_base64_encode((guchar *)t1, strlen(t1));
-				g_free(t1);
-
-				request = g_strdup_printf(
-					"CONNECT %s:%d HTTP/1.1\r\n"
-					"Host: %s:%d\r\n"
-					"Proxy-Authorization: Basic %s\r\n",
-					connect_data->host, connect_data->port,
-					connect_data->host, connect_data->port,
-					t2);
-
-				g_free(t2);
-
+				if (purple_proxy_info_get_auth(connect_data->gpi) != PURPLE_PROXY_AUTH_BASIC) {
+					purple_proxy_info_set_auth(connect_data->gpi,PURPLE_PROXY_AUTH_BASIC);
+					/* place some trash to the begin of the GSList,
+					  * it will be removed in purple_proxy_connect_data_disconnect(),
+					  * so, next attempt to connect will be done to the same proxy host */
+					connect_data->hosts = g_slist_prepend(connect_data->hosts, g_strdup("") );
+					connect_data->hosts = g_slist_prepend(connect_data->hosts, g_strdup("") );
+				}
+				purple_proxy_connect_data_disconnect_formatted(connect_data,
+					_("HTTP proxy connection error %d"), status);
+				return;
 			} else {
 				purple_proxy_connect_data_disconnect_formatted(connect_data,
 						_("HTTP proxy connection error %d"), status);
@@ -1134,6 +1148,43 @@ http_start_connect_tunneling(PurpleProxyConnectData *connect_data) {
 		g_free(t2);
 	}
 
+	if (purple_proxy_info_get_username(connect_data->gpi) != NULL
+		&& purple_proxy_info_get_auth(connect_data->gpi) != 0)
+	{
+		char *t1, *t2, *ntlm_type1, hostname[256];
+		switch(purple_proxy_info_get_auth(connect_data->gpi)) {
+			case PURPLE_PROXY_AUTH_BASIC:
+				t1 = g_strdup_printf("%s:%s",
+					purple_proxy_info_get_username(connect_data->gpi),
+					purple_proxy_info_get_password(connect_data->gpi) ?
+					purple_proxy_info_get_password(connect_data->gpi) : "");
+				t2 = purple_base64_encode((const guchar *)t1, strlen(t1));
+				g_free(t1);
+				g_string_append_printf(request,
+					"Proxy-Authorization: Basic %s\r\n"
+					"Proxy-Connection: Keep-Alive\r\n",
+					t2);
+				g_free(t2);
+				break;
+			case PURPLE_PROXY_AUTH_NTLM:
+
+				ret = gethostname(hostname, sizeof(hostname));
+				hostname[sizeof(hostname) - 1] = '\0';
+				if (ret < 0 || hostname[0] == '\0') {
+					purple_debug_warning("proxy", "gethostname() failed -- is your hostname set?");
+					strcpy(hostname, "localhost");
+				}
+				ntlm_type1 = purple_ntlm_gen_type1(hostname, "");
+				g_string_append_printf(request,
+					"Proxy-Authorization: NTLM %s\r\n"
+					"Proxy-Connection: Keep-Alive\r\n",
+					ntlm_type1);
+				g_free(ntlm_type1);
+				break;
+			default:
+				break;
+		}
+	}
 	g_string_append(request, "\r\n");
 
 	connect_data->write_buf_len = request->len;
@@ -2101,9 +2152,8 @@ static void try_connect(PurpleProxyConnectData *connect_data)
 	char ipaddr[INET6_ADDRSTRLEN];
 
 	addrlen = GPOINTER_TO_INT(connect_data->hosts->data);
-	connect_data->hosts = g_slist_remove(connect_data->hosts, connect_data->hosts->data);
-	addr = connect_data->hosts->data;
-	connect_data->hosts = g_slist_remove(connect_data->hosts, connect_data->hosts->data);
+	addr = connect_data->hosts->next->data;
+
 #ifdef HAVE_INET_NTOP
 	if (addr->sa_family == AF_INET)
 		inet_ntop(addr->sa_family, &((struct sockaddr_in *)addr)->sin_addr,
@@ -2147,8 +2197,6 @@ static void try_connect(PurpleProxyConnectData *connect_data)
 		default:
 			break;
 	}
-
-	g_free(addr);
 }
 
 static void
