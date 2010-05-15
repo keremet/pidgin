@@ -452,6 +452,9 @@ fi
 %changelog
 * Sat May 15 2010 Alexey Shabalin <shaba@altlinux.ru> 2.7.0-alt1
 - 2.7.0
+- fix NTLM proxy authorization (ALT #23474)
+- Upstream backport:
+  87ada76abf90c44e615679efc5f8128bb941bba1 Reduce MSN traffic
 
 * Mon Apr 19 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.6-alt4
 - disable build gevolution plugin; it hasn't been ported to the de-bonobo-ized eds-2.30
