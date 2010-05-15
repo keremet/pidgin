@@ -34,8 +34,8 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.6.6
-Release: alt4
+Version: 2.7.0
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -446,6 +446,9 @@ fi
 %endif
 
 %changelog
+* Sat May 15 2010 Alexey Shabalin <shaba@altlinux.ru> 2.7.0-alt1
+- 2.7.0
+
 * Mon Apr 19 2010 Alexey Shabalin <shaba@altlinux.ru> 2.6.6-alt4
 - disable build gevolution plugin; it hasn't been ported to the de-bonobo-ized eds-2.30
 
