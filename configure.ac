@@ -1034,7 +1034,7 @@ else
 	gadu_manual_check="no"
 fi
 if test "x$gadu_manual_check" = "xno"; then
-	PKG_CHECK_MODULES(GADU, [libgadu >= 1.9.0-rc2], [
+	PKG_CHECK_MODULES(GADU, [libgadu >= 1.9.0], [
 		gadu_includes="yes"
 		gadu_libs="yes"
 	], [
