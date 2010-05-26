@@ -34,7 +34,7 @@
 
 Name: pidgin
 Version: 2.7.0
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -450,6 +450,16 @@ fi
 %endif
 
 %changelog
+* Wed May 26 2010 Alexey Shabalin <shaba@altlinux.ru> 2.7.0-alt2
+- Upstream backports:
+ 3c30f64efedafc379b6536852bbb3b6ef5f1f6c9 - fix for receiving HTML on ICQ
+ 13fbe0815f84d5b3c001947559f5818c10275f4c - prevent null deref on disconnecting account
+ c4a874926d07b8597db4b78a181a89cf720a8418 - fix blinking tray icon on new message
+ cfe0e649dda34d9252d40d8f67e445336a247998 - prevent race condition on Yahoo! login
+ e3dd36706068f3b8eabd630ff71d270c145cce42 - fix crash in Oscar
+ 13fbe0815f84d5b3c001947559f5818c10275f4c - fix crash during network disconnect
+- patches for support pidgin-sipe (upstream #11598, #11830)
+
 * Sat May 15 2010 Alexey Shabalin <shaba@altlinux.ru> 2.7.0-alt1
 - 2.7.0
 - fix NTLM proxy authorization (ALT #23474)
