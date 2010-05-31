@@ -33,8 +33,8 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.7.0
-Release: alt2
+Version: 2.7.1
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -44,6 +44,7 @@ Packager: Alexey Shabalin <shaba@altlinux.ru>
 
 Provides: gaim = %version
 Obsoletes: gaim
+%{?_disable_gevolution:Obsoletes: pidgin-gevolution <= %version-%release}
 
 Requires: libpurple = %version-%release
 Requires(post,postun): desktop-file-utils
@@ -253,6 +254,7 @@ cp %SOURCE2 prefs.xml
 %build
 %autoreconf
 %configure \
+	--disable-schemas-install \
 	%{subst_enable avahi} \
 	%{subst_enable dot} \
 	%{subst_enable doxygen} \
@@ -307,17 +309,10 @@ cp %SOURCE2 prefs.xml
 
 #	--with-system-ssl-certs=%_datadir/ca-certificates \
 
-# we can't use --disable-schemas-install here as of Pidgin 2.7.0 because
-# it broke, so we disable in install instead 
-#	--disable-schemas-install \
-
-
 %make_build
 
 %install
-export GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL=1
 %make DESTDIR=%buildroot install
-unset GCONF_DISABLE_MAKEFILE_SCHEMA_INSTALL
 
 # install ALTLinux pidgin default prefs.xml
 mkdir -p %buildroot%_sysconfdir/purple
@@ -450,6 +445,10 @@ fi
 %endif
 
 %changelog
+* Mon May 31 2010 Alexey Shabalin <shaba@altlinux.ru> 2.7.1-alt1
+- 2.7.1
+- Add Obsoletes pidgin-gevolution
+
 * Wed May 26 2010 Alexey Shabalin <shaba@altlinux.ru> 2.7.0-alt2
 - Upstream backports:
  3c30f64efedafc379b6536852bbb3b6ef5f1f6c9 - fix for receiving HTML on ICQ
