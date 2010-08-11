@@ -33,7 +33,7 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.7.1
+Version: 2.7.3
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -363,7 +363,8 @@ fi
 %endif
 
 %files -n libpurple
-%config(noreplace) %_sysconfdir/purple
+%dir %_sysconfdir/purple
+%config(noreplace) %_sysconfdir/purple/*
 %_libdir/libpurple.so.*
 %_libdir/purple-2
 %_datadir/sounds/purple
@@ -445,6 +446,11 @@ fi
 %endif
 
 %changelog
+* Wed Aug 11 2010 Alexey Shabalin <shaba@altlinux.ru> 2.7.3-alt1
+- 2.7.3
+- fixed in 2.7.2:
+ + CVE-2010-2528: crash bug that can be triggered by remove users
+
 * Mon May 31 2010 Alexey Shabalin <shaba@altlinux.ru> 2.7.1-alt1
 - 2.7.1
 - Add Obsoletes pidgin-gevolution
