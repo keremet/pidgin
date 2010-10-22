@@ -1048,7 +1048,7 @@ http_canread(gpointer data, gint source, PurpleInputCondition cond)
 
 				g_free(response);
 
-			} else if((header = g_strrstr((const char *)connect_data->read_buffer, "Proxy-Authenticate: Basic"))) {
+			} else if (g_strrstr((const char *)connect_data->read_buffer, "Proxy-Authenticate: Basic") != NULL) {
 				if (purple_proxy_info_get_auth(connect_data->gpi) != PURPLE_PROXY_AUTH_BASIC) {
 					purple_proxy_info_set_auth(connect_data->gpi,PURPLE_PROXY_AUTH_BASIC);
 					/* place some trash to the begin of the GSList,
