@@ -33,7 +33,7 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.7.4
+Version: 2.7.5
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -446,6 +446,9 @@ fi
 %endif
 
 %changelog
+* Fri Nov 12 2010 Alexey Shabalin <shaba@altlinux.ru> 2.7.5-alt1
+- 2.7.5
+
 * Sun Oct 24 2010 Alexey Shabalin <shaba@altlinux.ru> 2.7.4-alt1
 - 2.7.4
 
