@@ -21,7 +21,6 @@
 %def_enable farsight
 %def_enable gstreamer
 %def_enable screensaver
-%def_enable startup_notification
 %def_enable gestures
 %def_enable gtkspell
 %def_enable devhelp
@@ -33,7 +32,7 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.7.10
+Version: 2.7.11
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -80,7 +79,6 @@ BuildPreReq: libXext-devel libX11-devel
 %{?_enable_gstreamer:BuildPreReq: gstreamer-devel}
 %{?_enable_sm:BuildPreReq: libSM-devel}
 %{?_enable_screensaver:BuildPreReq: libXScrnSaver-devel xorg-scrnsaverproto-devel}
-%{?_enable_startup_notification:BuildPreReq: libstartup-notification-devel >= 0.5}
 BuildPreReq: libsqlite3-devel >= 3.3
 BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf libGConf-devel
@@ -277,9 +275,6 @@ cp %SOURCE2 prefs.xml
 	%{subst_enable gestures} \
 	%{subst_enable gtkspell} \
 	%{subst_enable devhelp} \
-%if_disabled startup_notification
-	--disable-startup-notification \
-%endif
 %if_disabled gstreamer
 	--disable-gstreamer-interfaces \
 %endif
@@ -446,6 +441,10 @@ fi
 %endif
 
 %changelog
+* Mon Mar 14 2011 Alexey Shabalin <shaba@altlinux.ru> 2.7.11-alt1
+- 2.7.11
+- CVE-2011-1091: remote denial of service in Yahoo protocol plugin
+
 * Mon Feb 14 2011 Alexey Shabalin <shaba@altlinux.ru> 2.7.10-alt1
 - 2.7.10
 
