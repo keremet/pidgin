@@ -33,7 +33,7 @@
 
 Name: pidgin
 Version: 2.7.11
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -441,6 +441,9 @@ fi
 %endif
 
 %changelog
+* Tue May 31 2011 Alexey Shabalin <shaba@altlinux.ru> 2.7.11-alt2
+- rebuild for NetworkManager 0.9
+
 * Mon Mar 14 2011 Alexey Shabalin <shaba@altlinux.ru> 2.7.11-alt1
 - 2.7.11
 - CVE-2011-1091: remote denial of service in Yahoo protocol plugin
