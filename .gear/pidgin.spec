@@ -32,8 +32,8 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.7.11
-Release: alt2
+Version: 2.8.0
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -86,7 +86,7 @@ BuildPreReq: GConf libGConf-devel
 BuildRequires: gcc-c++ libgpg-error
 BuildRequires: python-modules-encodings
 # for shared gadu plugin
-BuildRequires: libgadu-devel >= 1.9.0
+BuildRequires: libgadu-devel >= 1.11.0
 BuildRequires: intltool
 # now intltool wants that
 BuildRequires: perl-XML-Parser
@@ -441,6 +441,9 @@ fi
 %endif
 
 %changelog
+* Wed Jun 08 2011 Alexey Shabalin <shaba@altlinux.ru> 2.8.0-alt1
+- 2.8.0
+
 * Tue May 31 2011 Alexey Shabalin <shaba@altlinux.ru> 2.7.11-alt2
 - rebuild for NetworkManager 0.9
 
