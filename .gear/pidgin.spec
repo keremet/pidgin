@@ -6,7 +6,7 @@
 %def_enable nss
 %def_disable cyrus_sasl
 %def_disable gnutls
-%def_disable gevolution
+%def_enable gevolution
 %def_enable meanwhile
 %def_enable cap
 %def_enable nm
@@ -32,7 +32,7 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.8.0
+Version: 2.9.0
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -441,6 +441,10 @@ fi
 %endif
 
 %changelog
+* Tue Jun 28 2011 Alexey Shabalin <shaba@altlinux.ru> 2.9.0-alt1
+- 2.9.0 (fixed CVE-2011-2485: remote denial of service from corrupt buddy icons)
+- enable evolution plugin
+
 * Wed Jun 08 2011 Alexey Shabalin <shaba@altlinux.ru> 2.8.0-alt1
 - 2.8.0
 
