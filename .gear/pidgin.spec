@@ -33,7 +33,7 @@
 
 Name: pidgin
 Version: 2.9.0
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -44,6 +44,8 @@ Packager: Alexey Shabalin <shaba@altlinux.ru>
 Provides: gaim = %version
 Obsoletes: gaim
 %{?_disable_gevolution:Obsoletes: pidgin-gevolution <= %version-%release}
+
+Conflicts: pidgin-mini
 
 Requires: libpurple = %version-%release
 Requires(post,postun): desktop-file-utils
@@ -115,6 +117,7 @@ Requires: %name = %version-%release
 Requires: libpurple-devel = %version-%release
 Provides: gaim-devel = %version
 Obsoletes: gaim-devel
+Conflicts: pidgin-mini-devel
 
 %description devel
 The pidgin-devel package contains the header files, developer
@@ -125,6 +128,7 @@ and plugins.
 Summary: libpurple library for IM clients like Pidgin and Finch
 Group: Networking/Instant messaging
 Requires: ca-certificates
+Conflicts: libpurple-mini
 
 %description -n libpurple
 libpurple contains the core IM support for IM clients such as Pidgin
@@ -138,6 +142,7 @@ Lotus Sametime, SILC, Simple and Zephyr.
 Summary: Development headers, documentation, and libraries for libpurple
 Group: Development/Other
 Requires: libpurple = %version-%release
+Conflicts: libpurple-mini-devel
 
 %description -n libpurple-devel
 The libpurple-devel package contains the header files, developer
@@ -441,6 +446,9 @@ fi
 %endif
 
 %changelog
+* Wed Jun 29 2011 Alexey Shabalin <shaba@altlinux.ru> 2.9.0-alt2
+- add conflicts with pidgin-mini
+
 * Tue Jun 28 2011 Alexey Shabalin <shaba@altlinux.ru> 2.9.0-alt1
 - 2.9.0 (fixed CVE-2011-2485: remote denial of service from corrupt buddy icons)
 - enable evolution plugin
