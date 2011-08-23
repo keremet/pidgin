@@ -32,8 +32,8 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.9.0
-Release: alt2
+Version: 2.10.0
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -446,6 +446,9 @@ fi
 %endif
 
 %changelog
+* Tue Aug 23 2011 Alexey Shabalin <shaba@altlinux.ru> 2.10.0-alt1
+- 2.10.0
+
 * Wed Jun 29 2011 Alexey Shabalin <shaba@altlinux.ru> 2.9.0-alt2
 - add conflicts with pidgin-mini
 
