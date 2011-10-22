@@ -33,7 +33,7 @@
 
 Name: pidgin
 Version: 2.10.0
-Release: alt1
+Release: alt1.1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -446,6 +446,9 @@ fi
 %endif
 
 %changelog
+* Sat Oct 22 2011 Vitaly Kuznetsov <vitty@altlinux.ru> 2.10.0-alt1.1
+- Rebuild with Python-2.7
+
 * Tue Aug 23 2011 Alexey Shabalin <shaba@altlinux.ru> 2.10.0-alt1
 - 2.10.0
 
