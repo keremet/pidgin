@@ -33,7 +33,7 @@
 
 Name: pidgin
 Version: 2.10.0
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -305,9 +305,9 @@ cp %SOURCE2 prefs.xml
 %if_enabled perl
 	--with-perl-lib=vendor \
 %endif
+	--with-system-ssl-certs=%_datadir/ca-certificates \
 	--with-extraversion=%release
 
-#	--with-system-ssl-certs=%_datadir/ca-certificates \
 
 %make_build
 
@@ -446,6 +446,10 @@ fi
 %endif
 
 %changelog
+* Fri Oct 28 2011 Alexey Shabalin <shaba@altlinux.ru> 2.10.0-alt2
+- rebuild
+- build --with-system-ssl-certs
+
 * Tue Aug 23 2011 Alexey Shabalin <shaba@altlinux.ru> 2.10.0-alt1
 - 2.10.0
 
