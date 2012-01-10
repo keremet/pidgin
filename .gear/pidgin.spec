@@ -32,8 +32,8 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.10.0
-Release: alt2.1
+Version: 2.10.1
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -446,6 +446,9 @@ fi
 %endif
 
 %changelog
+* Tue Jan 10 2012 Alexey Shabalin <shaba@altlinux.ru> 2.10.1-alt1
+- 2.10.1 (fixed CVE-2011-3594,CVE-2011-4601,CVE-2011-4602,CVE-2011-4603)
+
 * Mon Oct 31 2011 Vitaly Kuznetsov <vitty@altlinux.ru> 2.10.0-alt2.1
 - Rebuild with Python-2.7
 
