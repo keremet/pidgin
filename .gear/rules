@@ -2,3 +2,4 @@ tar: v@version@:.
 diff: v@version@:. .
 spec:.gear/pidgin.spec
 copy:.gear/purple-altlinux-prefs.xml
+copy:.gear/*.patch

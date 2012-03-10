@@ -18,7 +18,7 @@
 %def_enable doxygen
 %def_enable relnot
 %def_enable idn
-%def_enable farsight
+%def_enable farstream
 %def_enable gstreamer
 %def_enable screensaver
 %def_enable gestures
@@ -33,7 +33,7 @@
 
 Name: pidgin
 Version: 2.10.1
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -54,6 +54,8 @@ PreReq: GConf
 Source0: %name-%version.tar
 Source2: purple-altlinux-prefs.xml
 Patch0: %name-%version-%release.patch
+# http://pkgs.fedoraproject.org/gitweb/?p=pidgin.git;a=blob;f=port-to-farstream.patch;h=d2c5ed72998e0580c006d79704db998575338056;hb=HEAD
+Patch1: pidgin-port-to-farstream.patch
 
 # From configure.ac
 BuildPreReq: glib2-devel libgtk+2-devel
@@ -76,7 +78,7 @@ BuildPreReq: libXext-devel libX11-devel
 %{?_enable_dot:BuildPreReq: graphviz}
 %{?_enable_doxygen:BuildPreReq: doxygen}
 %{?_enable_idn:BuildPreReq: libidn-devel}
-%{?_enable_farsight:BuildPreReq: farsight2-devel}
+%{?_enable_farstream:BuildPreReq: farstream-devel}
 %{?_enable_vv:BuildPreReq: gst-plugins-devel}
 %{?_enable_gstreamer:BuildPreReq: gstreamer-devel}
 %{?_enable_sm:BuildPreReq: libSM-devel}
@@ -251,6 +253,7 @@ D-Bus client utilities for Pidgin.
 %prep
 %setup
 %patch0 -p1
+%patch1 -p1
 
 cp %SOURCE2 prefs.xml
 
@@ -272,7 +275,7 @@ cp %SOURCE2 prefs.xml
 	%{subst_enable consoleui} \
 	%{subst_enable meanwhile} \
 	%{subst_enable idn} \
-	%{subst_enable farsight} \
+	%{subst_enable farstream} \
 	%{subst_enable vv} \
 	%{subst_enable gstreamer} \
 	%{subst_enable sm} \
@@ -446,6 +449,9 @@ fi
 %endif
 
 %changelog
+* Sat Mar 10 2012 Yuri N. Sedunov <aris@altlinux.org> 2.10.1-alt2
+- port to farstream (fc patch)
+
 * Tue Jan 10 2012 Alexey Shabalin <shaba@altlinux.ru> 2.10.1-alt1
 - 2.10.1 (fixed CVE-2011-3594,CVE-2011-4601,CVE-2011-4602,CVE-2011-4603)
 
