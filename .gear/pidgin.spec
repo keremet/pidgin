@@ -33,7 +33,7 @@
 
 Name: pidgin
 Version: 2.10.1
-Release: alt2
+Release: alt3
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -449,6 +449,9 @@ fi
 %endif
 
 %changelog
+* Thu Mar 29 2012 Michael Shigorin <mike@altlinux.org> 2.10.1-alt3
+- rebuilt against current gnome
+
 * Sat Mar 10 2012 Yuri N. Sedunov <aris@altlinux.org> 2.10.1-alt2
 - port to farstream (fc patch)
 
