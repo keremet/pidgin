@@ -32,8 +32,8 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.10.1
-Release: alt3
+Version: 2.10.4
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -54,8 +54,6 @@ PreReq: GConf
 Source0: %name-%version.tar
 Source2: purple-altlinux-prefs.xml
 Patch0: %name-%version-%release.patch
-# http://pkgs.fedoraproject.org/gitweb/?p=pidgin.git;a=blob;f=port-to-farstream.patch;h=d2c5ed72998e0580c006d79704db998575338056;hb=HEAD
-Patch1: pidgin-port-to-farstream.patch
 
 # From configure.ac
 BuildPreReq: glib2-devel libgtk+2-devel
@@ -253,7 +251,6 @@ D-Bus client utilities for Pidgin.
 %prep
 %setup
 %patch0 -p1
-%patch1 -p1
 
 cp %SOURCE2 prefs.xml
 
@@ -449,6 +446,11 @@ fi
 %endif
 
 %changelog
+* Fri May 18 2012 Alexey Shabalin <shaba@altlinux.ru> 2.10.4-alt1
+- 2.10.4
+- fixed CVE-2012-2214, CVE-2012-2318, CVE-2012-1178, CVE-2011-4939
+- drop upstreamed farstream patch
+
 * Thu Mar 29 2012 Michael Shigorin <mike@altlinux.org> 2.10.1-alt3
 - rebuilt against current gnome
 
