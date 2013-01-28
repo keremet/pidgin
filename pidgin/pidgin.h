@@ -29,6 +29,10 @@
 
 #include <gtk/gtk.h>
 
+#ifdef GDK_WINDOWING_X11
+# include <gdk/gdkx.h>
+#endif
+
 #ifdef _WIN32
 # include "gtkwin32dep.h"
 #endif

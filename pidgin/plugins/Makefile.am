@@ -70,8 +70,8 @@ plugin_LTLIBRARIES = \
 	timestamp_format.la \
 	xmppconsole.la
 
-if ENABLE_UNITY
-plugin_LTLIBRARIES +=	unity.la
+if USE_VV
+plugin_LTLIBRARIES +=	vvconfig.la
 endif
 
 noinst_LTLIBRARIES = \

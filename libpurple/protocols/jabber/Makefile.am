@@ -115,7 +115,8 @@ pkg_LTLIBRARIES      = libjabber.la libxmpp.la
 libjabber_la_SOURCES = $(JABBERSOURCES)
 libjabber_la_LIBADD  = $(GLIB_LIBS) $(SASL_LIBS) $(LIBXML_LIBS) $(IDN_LIBS)\
 	$(FARSIGHT_LIBS) \
-	$(GSTREAMER_LIBS)
+	$(GSTREAMER_LIBS) \
+	$(GSTINTERFACES_LIBS)
 
 libxmpp_la_SOURCES = libxmpp.c
 libxmpp_la_LIBADD = libjabber.la
@@ -130,4 +131,5 @@ AM_CPPFLAGS = \
 	$(IDN_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(FARSIGHT_CFLAGS) \
-	$(GSTREAMER_CFLAGS)
+	$(GSTREAMER_CFLAGS) \
+	$(GSTINTERFACES_CFLAGS)

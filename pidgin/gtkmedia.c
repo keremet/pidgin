@@ -38,15 +38,11 @@
 #ifdef USE_VV
 #include "media-gst.h"
 
-#ifdef GDK_WINDOWING_WIN32
+#ifdef _WIN32
 #include <gdk/gdkwin32.h>
 #endif
-#ifdef GDK_WINDOWING_X11
-#include <gdk/gdkx.h>
-#endif
-#ifdef GDK_WINDOWING_QUARTZ
-#include <gdk/gdkquartz.h>
-#endif
+
+#include <gst/interfaces/xoverlay.h>
 
 #define PIDGIN_TYPE_MEDIA            (pidgin_media_get_type())
 #define PIDGIN_MEDIA(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), PIDGIN_TYPE_MEDIA, PidginMedia))
@@ -559,25 +555,13 @@ realize_cb_cb(PidginMediaRealizeData *data)
 	}
 
 	if (window) {
-		gulong window_id = 0;
-#ifdef GDK_WINDOWING_WIN32
-		if (GDK_IS_WIN32_WINDOW(window))
-			window_id = GDK_WINDOW_HWND(window);
-		else
-#endif
-#ifdef GDK_WINDOWING_X11
-        window_id = GDK_WINDOW_XWINDOW(window);
-#endif
-#ifdef GDK_WINDOWING_QUARTZ
-		if (GDK_IS_QUARTZ_WINDOW(window))
-			window_id = (gulong)gdk_quartz_window_get_nsview(window);
-		else
-#endif
-			g_warning("Unsupported GDK backend");
-#if !(defined(GDK_WINDOWING_WIN32) \
-   || defined(GDK_WINDOWING_X11) \
-   || defined(GDK_WINDOWING_QUARTZ))
-#		error "Unsupported GDK windowing system"
+		gulong window_id;
+#ifdef _WIN32
+		window_id = GDK_WINDOW_HWND(window);
+#elif defined(HAVE_X11)
+		window_id = GDK_WINDOW_XWINDOW(window);
+#else
+#		error "Unsupported windowing system"
 #endif
 
 		purple_media_set_output_window(priv->media, data->session_id,
@@ -1098,10 +1082,6 @@ create_default_video_src(PurpleMedia *media,
 		src = gst_element_factory_make("dshowvideosrc", NULL);
 	if (src == NULL)
 		src = gst_element_factory_make("autovideosrc", NULL);
-#elif defined(__APPLE__)
-	src = gst_element_factory_make("osxvideosrc", NULL);
-	if (src == NULL)
-		src = gst_element_factory_make("autovideosrc", NULL);
 #else
 	src = gst_element_factory_make("gconfvideosrc", NULL);
 	if (src == NULL)
@@ -1156,8 +1136,6 @@ create_default_audio_src(PurpleMedia *media,
 		src = gst_element_factory_make("osssrc", NULL);
 	if (src == NULL)
 		src = gst_element_factory_make("dshowaudiosrc", NULL);
-	if (src == NULL)
-		src = gst_element_factory_make("osxaudiosrc", NULL);
 	if (src == NULL) {
 		purple_debug_error("gtkmedia", "Unable to find a suitable "
 				"element for the default audio source.\n");
