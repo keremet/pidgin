@@ -69,10 +69,6 @@ plugin_LTLIBRARIES = \
 	timestamp_format.la \
 	xmppconsole.la
 
-if USE_VV
-plugin_LTLIBRARIES +=	vvconfig.la
-endif
-
 noinst_LTLIBRARIES = \
 	contact_priority.la \
 	gtk_signals_test.la
