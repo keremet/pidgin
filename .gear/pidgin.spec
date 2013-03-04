@@ -4,7 +4,7 @@
 %def_disable tcl
 %def_disable tk
 %def_enable nss
-%def_disable cyrus_sasl
+%def_enable cyrus_sasl
 %def_disable gnutls
 %def_disable gevolution
 %def_enable meanwhile
@@ -448,6 +448,7 @@ fi
 %changelog
 * Mon Mar 04 2013 Alexey Shabalin <shaba@altlinux.ru> 2.10.7-alt1
 - 2.10.7
+- build with sasl support
 
 * Mon Jan 28 2013 Alexey Shabalin <shaba@altlinux.ru> 2.10.6-alt3
 - port to GStreamer 1.0 and Farstream 0.2
