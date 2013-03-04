@@ -336,7 +336,7 @@ if [ $1 = 0 ]; then
 fi
 
 %files -f %name.lang
-%doc AUTHORS COPYRIGHT INSTALL NEWS README README.MTN doc/*.txt
+%doc AUTHORS COPYRIGHT INSTALL NEWS README doc/*.txt
 %config %_sysconfdir/gconf/schemas/*
 %_bindir/%name
 %_libdir/%name
