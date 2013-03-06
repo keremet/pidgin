@@ -317,7 +317,7 @@ cp %SOURCE2 prefs.xml
 # install ALTLinux pidgin default prefs.xml
 mkdir -p %buildroot%_sysconfdir/purple
 install -m 644 prefs.xml %buildroot%_sysconfdir/purple/prefs.xml
-
+sed -i 's|/usr/lib|%_libdir|' %buildroot%_sysconfdir/purple/prefs.xml
 
 find %buildroot%_libdir -name \*.la -delete
 # remove non-plugin unrequired library symlinks
