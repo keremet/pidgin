@@ -8,7 +8,7 @@
 %def_disable gnutls
 %def_disable gevolution
 %def_enable meanwhile
-%def_enable cap
+%def_disable cap
 %def_enable nm
 %def_disable mono
 %def_enable consoleui
@@ -33,7 +33,7 @@
 
 Name: pidgin
 Version: 2.10.7
-Release: alt1
+Release: alt2
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -446,6 +446,9 @@ fi
 %endif
 
 %changelog
+* Wed Mar 06 2013 Alexey Shabalin <shaba@altlinux.ru> 2.10.7-alt2
+- disable build cap plugin
+
 * Mon Mar 04 2013 Alexey Shabalin <shaba@altlinux.ru> 2.10.7-alt1
 - 2.10.7
 - build with sasl support
