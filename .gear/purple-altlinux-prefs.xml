@@ -46,7 +46,6 @@
 				<item value='/usr/lib/pidgin/extplacement.so'/>
 				<item value='/usr/lib/pidgin/history.so'/>
 				<item value='/usr/lib/pidgin/notify.so'/>
-				<item value='/usr/lib/pidgin/nautilus.so'/>
 			</pref>
 		</pref>
 		<pref name='blist'>
