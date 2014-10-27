@@ -161,10 +161,6 @@ pidgin_LDADD = \
 	$(GTK_LIBS) \
 	$(top_builddir)/libpurple/libpurple.la -lm
 
-if USE_INTERNAL_LIBGADU
-INTGG_CFLAGS = -DUSE_INTERNAL_LIBGADU
-endif
-
 AM_CPPFLAGS = \
 	-DDATADIR=\"$(datadir)\" \
 	-DLIBDIR=\"$(libdir)/pidgin/\" \
