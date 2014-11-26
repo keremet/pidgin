@@ -341,6 +341,7 @@ fi
 %_bindir/%name
 %_libdir/%name
 %_desktopdir/%name.desktop
+%_datadir/appdata/*.appdata.xml
 %_pixmapsdir/%name
 %_iconsdir/hicolor/*/apps/*
 %_man1dir/%name.*
