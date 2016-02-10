@@ -249,7 +249,7 @@ def msnim(uri):
 
 def myim(uri):
         protocol = "prpl-myspace"
-        print "TODO: send uri: ", uri
+        print("TODO: send uri: %s" % uri)
         assert False, "Not implemented"
 
 def sip(uri):
