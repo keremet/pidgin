@@ -86,7 +86,7 @@ BuildPreReq: libxml2-devel >= 2.6.0
 BuildPreReq: GConf libGConf-devel
 
 BuildRequires: gcc-c++ libgpg-error
-BuildRequires: python-modules-encodings
+BuildRequires: python-modules-encodings python-module-future
 # for shared gadu plugin
 BuildRequires: libgadu-devel >= 1.11.0
 BuildRequires: intltool
