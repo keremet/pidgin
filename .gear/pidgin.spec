@@ -32,8 +32,8 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.10.12
-Release: alt2
+Version: 2.11.0
+Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
 License: GPL
@@ -457,6 +457,9 @@ fi
 %endif
 
 %changelog
+* Thu Jul 07 2016 Alexey Shabalin <shaba@altlinux.ru> 2.11.0-alt1
+- 2.11.0
+
 * Tue Feb 16 2016 Yuri N. Sedunov <aris@altlinux.org> 2.10.12-alt2
 - new libpurple-client subpackage
 
