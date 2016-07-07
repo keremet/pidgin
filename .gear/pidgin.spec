@@ -331,7 +331,7 @@ find %buildroot%_libdir -name \*.la -delete
 # remove non-plugin unrequired library symlinks
 rm -f %buildroot%_libdir/purple-2/liboscar.so
 rm -f %buildroot%_libdir/purple-2/libjabber.so
-rm -f %buildroot%_libdir/purple-2/libymsg.so 
+rm -f %buildroot%_libdir/purple-2/libymsg.so
 
 %find_lang --with-gnome %name
 
@@ -377,7 +377,6 @@ fi
 %_libdir/libpurple.so.*
 %_libdir/purple-2
 %_datadir/sounds/purple
-%_datadir/purple
 %if_enabled tcl
 %exclude %_libdir/purple-2/tcl.so
 %endif
