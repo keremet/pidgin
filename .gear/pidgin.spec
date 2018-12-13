@@ -17,8 +17,7 @@
 %def_enable dot
 %def_enable doxygen
 %def_enable relnot
-# disable idn, because it's deprecated, waiting for idn2 support
-%def_disable idn
+%def_enable idn
 %def_enable farstream
 %def_enable gstreamer
 %def_enable screensaver
