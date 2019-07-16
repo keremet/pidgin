@@ -51,24 +51,20 @@ OSCARSOURCES = \
 
 AM_CFLAGS = $(st)
 
-libaim_la_LDFLAGS = -module -avoid-version
 libicq_la_LDFLAGS = -module -avoid-version
 if STATIC_OSCAR
 
 st = -DPURPLE_STATIC_PRPL
 noinst_LTLIBRARIES  = liboscar.la
-liboscar_la_SOURCES = $(OSCARSOURCES) libaim.c libicq.c
+liboscar_la_SOURCES = $(OSCARSOURCES) libicq.c
 liboscar_la_CFLAGS  = $(AM_CFLAGS)
 
 else
 
 st =
-pkg_LTLIBRARIES     = liboscar.la libaim.la libicq.la
+pkg_LTLIBRARIES     = liboscar.la libicq.la
 liboscar_la_SOURCES = $(OSCARSOURCES)
 liboscar_la_LIBADD  = $(GLIB_LIBS)
-
-libaim_la_SOURCES   = libaim.c
-libaim_la_LIBADD    = liboscar.la
 
 libicq_la_SOURCES   = libicq.c
 libicq_la_LIBADD    = liboscar.la
