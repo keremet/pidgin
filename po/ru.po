@@ -8593,11 +8593,8 @@ msgstr "Клиент обмена мгновенными сообщениями 
 msgid "Internet Messenger"
 msgstr "Клиент обмена мгновенными сообщениями"
 
-#, fuzzy
 msgid "Chat over IM.  Supports AIM, Google Talk, Jabber/XMPP, and more"
-msgstr ""
-"Переписка мгновенными сообщениями.  Поддерживает AIM, Google Talk, Jabber/"
-"XMPP, MSN, Yahoo и не только"
+msgstr "Переписка мгновенными сообщениями.  Поддерживает Jabber/XMPP, MSN, Yahoo и др."
 
 #. Build the login options frame.
 msgid "Login Options"
