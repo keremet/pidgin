@@ -466,6 +466,7 @@ fi
 - Build against with NM
 - Drop aim support
 - Build with python3
+- fix generate russian comment in desktop file (ALT bug 36824)
 
 * Wed Dec 19 2018 Grigory Ustinov <grenka@altlinux.org> 2.13.0-alt5
 - Rebuild without NM support.
