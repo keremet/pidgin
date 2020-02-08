@@ -1579,7 +1579,7 @@ if test "x$enable_consoleui" = "xyes" -a ! -z "$PYTHON" -a x"$PYTHON" != x"no" ;
 	AC_MSG_CHECKING(for Python compile flags)
 	if test -f ${PYTHON}-config; then
 		PY_CFLAGS=`${PYTHON}-config --includes`
-		PY_LIBS=`${PYTHON}-config --libs`
+		PY_LIBS=`${PYTHON}-config --libs --embed` || PY_LIBS=`${PYTHON}-config --libs`
 		AC_DEFINE(USE_PYTHON, [1], [Define if python headers are available.])
 		AC_MSG_RESULT(ok)
 	else
