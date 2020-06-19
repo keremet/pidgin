@@ -9,13 +9,13 @@
 #define beta 7
 
 %if 0%{?beta}
-%define pidginver %(echo "2.13.0"|sed -e 's/dev.*//; s/beta.*//')
+%define pidginver %(echo "2.14.0"|sed -e 's/dev.*//; s/beta.*//')
 %else
-%define pidginver 2.13.0
+%define pidginver 2.14.0
 %endif
 
 # define the minimum API version required, so we can use it for plugin deps
-%define apiver %(echo "2.13.0"|awk -F. '{print $1"."$2}')
+%define apiver %(echo "2.14.0"|awk -F. '{print $1"."$2}')
 
 Summary:    A GTK+ based multiprotocol instant messaging client
 Name:       pidgin
@@ -24,7 +24,7 @@ Release:    0%{?beta:.beta%{beta}}
 License:    GPL
 Group:      Applications/Internet
 URL:        http://pidgin.im/
-Source:     %{name}-2.13.0.tar.bz2
+Source:     %{name}-2.14.0.tar.bz2
 BuildRoot:  %{_tmppath}/%{name}-%{version}-root
 
 # Generic build requirements
@@ -221,7 +221,7 @@ and plugins.
 %endif
 
 %prep
-%setup -q -n %{name}-2.13.0
+%setup -q -n %{name}-2.14.0
 
 %build
 CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix} \
@@ -291,7 +291,6 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/purple-2/tcl.so
 %if 0%{?_without_text:1}
 rm -f $RPM_BUILD_ROOT%{_mandir}/man1/finch.*
 rm -rf $RPM_BUILD_ROOT%{_bindir}/finch
-rm -f $RPM_BUILD_ROOT%{_libdir}/libgnt.so.*
 %endif
 
 %find_lang %{name}
@@ -456,20 +455,12 @@ fi
 
 %doc %{_mandir}/man1/finch.*
 %{_bindir}/finch
-%{_libdir}/libgnt.so.*
-%{_libdir}/gnt/irssi.so
-%{_libdir}/gnt/s.so
 
 %files -n finch-devel
 %defattr(-, root, root)
 %dir %{_includedir}/finch
 %{_includedir}/finch/*.h
-# libgnt
-%dir %{_includedir}/gnt
-%{_includedir}/gnt/*.h
 %{_libdir}/pkgconfig/finch.pc
-%{_libdir}/pkgconfig/gnt.pc
-%{_libdir}/libgnt.so
 
 %endif
 

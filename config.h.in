@@ -114,6 +114,9 @@
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #undef HAVE_GETTEXT
 
+/* Have gio-unix */
+#undef HAVE_GIOUNIX
+
 /* Define if you have GnuTLS */
 #undef HAVE_GNUTLS
 
@@ -468,9 +471,6 @@
 
 /* Use GNU Libidn for stringprep and IDN */
 #undef USE_IDN
-
-/* Define if python headers are available. */
-#undef USE_PYTHON
 
 /* Define if we're using XScreenSaver. */
 #undef USE_SCREENSAVER
