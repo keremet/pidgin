@@ -28,6 +28,7 @@
 
 #include "account.h"
 #include "debug.h"
+#include "glibcompat.h"
 #include "media.h"
 #include "mediamanager.h"
 
@@ -1967,7 +1968,7 @@ purple_media_manager_send_application_data (
 		media, session_id, participant);
 
 	if (info && info->appsrc && info->connected) {
-		GstBuffer *gstbuffer = gst_buffer_new_wrapped (g_memdup (buffer, size),
+		GstBuffer *gstbuffer = gst_buffer_new_wrapped (g_memdup2 (buffer, size),
 			size);
 		GstAppSrc *appsrc = gst_object_ref (info->appsrc);
 
@@ -2231,6 +2232,7 @@ static void
 purple_media_manager_unregister_gst_device(PurpleMediaManager *manager,
 		GstDevice *device)
 {
+#ifdef USE_VV
 	GList *i;
 	gchar *name;
 	gchar *device_class;
@@ -2277,6 +2279,7 @@ purple_media_manager_unregister_gst_device(PurpleMediaManager *manager,
 
 	g_free(name);
 	g_free(device_class);
+#endif /* USE_VV */
 }
 
 static gboolean
@@ -2304,7 +2307,7 @@ device_monitor_bus_cb(GstBus *bus, GstMessage *message, gpointer user_data)
 static void
 purple_media_manager_init_device_monitor(PurpleMediaManager *manager)
 {
-#if GST_CHECK_VERSION(1, 4, 0)
+#if GST_CHECK_VERSION(1, 4, 0) && defined(USE_VV)
 	GstBus *bus;
 	GList *i;
 
@@ -2334,6 +2337,7 @@ purple_media_manager_enumerate_elements(PurpleMediaManager *manager,
 		PurpleMediaElementType type)
 {
 	GList *result = NULL;
+#ifdef USE_VV
 	GList *i;
 
 	for (i = manager->priv->elements; i; i = i->next) {
@@ -2347,6 +2351,7 @@ purple_media_manager_enumerate_elements(PurpleMediaManager *manager,
 			result = g_list_prepend(result, info);
 		}
 	}
+#endif /* USE_VV */
 
 	return result;
 }
@@ -2414,10 +2419,10 @@ purple_media_manager_register_static_elements(PurpleMediaManager *manager)
 {
 	static const gchar *VIDEO_SINK_PLUGINS[] = {
 		/* "aasink", "AALib", Didn't work for me */
-		"directdrawsink", "DirectDraw",
-		"glimagesink", "OpenGL",
-		"ximagesink", "X Window System",
-		"xvimagesink", "X Window System (Xv)",
+		"directdrawsink", N_("DirectDraw"),
+		"glimagesink", N_("OpenGL"),
+		"ximagesink", N_("X Window System"),
+		"xvimagesink", N_("X Window System (Xv)"),
 		NULL
 	};
 	const gchar **sinks = VIDEO_SINK_PLUGINS;
