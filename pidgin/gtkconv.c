@@ -42,6 +42,7 @@
 #include "cmds.h"
 #include "core.h"
 #include "debug.h"
+#include "glibcompat.h"
 #include "idle.h"
 #include "imgstore.h"
 #include "log.h"
@@ -218,8 +219,7 @@ close_this_sucker(gpointer data)
 {
 	PidginConversation *gtkconv = data;
 	GList *list = g_list_copy(gtkconv->convs);
-	g_list_foreach(list, (GFunc)purple_conversation_destroy, NULL);
-	g_list_free(list);
+	g_list_free_full(list, (GDestroyNotify)purple_conversation_destroy);
 	return FALSE;
 }
 
@@ -5544,8 +5544,7 @@ pidgin_conv_destroy(PurpleConversation *conv)
 	gtk_object_sink(GTK_OBJECT(gtkconv->tooltips));
 
 	gtkconv->send_history = g_list_first(gtkconv->send_history);
-	g_list_foreach(gtkconv->send_history, (GFunc)g_free, NULL);
-	g_list_free(gtkconv->send_history);
+	g_list_free_full(gtkconv->send_history, (GDestroyNotify)g_free);
 
 	if (gtkconv->attach.timer) {
 		g_source_remove(gtkconv->attach.timer);
@@ -5964,7 +5963,7 @@ pidgin_conv_write_conv(PurpleConversation *conv, const char *name, const char *a
 
 		gtk_imhtml_append_text(GTK_IMHTML(gtkconv->imhtml), buf2, gtk_font_options_all);
 	} else {
-		char *new_message = g_memdup(displaying, length);
+		char *new_message = g_memdup2(displaying, length);
 		char *alias_escaped = (alias ? g_markup_escape_text(alias, strlen(alias)) : g_strdup(""));
 		/* The initial offset is to deal with
 		 * escaped entities making the string longer */
@@ -6085,7 +6084,7 @@ pidgin_conv_write_conv(PurpleConversation *conv, const char *name, const char *a
 			length += pre_len + post_len;
 			g_free(pre);
 		} else
-			with_font_tag = g_memdup(new_message, length);
+			with_font_tag = g_memdup2(new_message, length);
 
 		gtk_imhtml_append_text(GTK_IMHTML(gtkconv->imhtml),
 							 with_font_tag, gtk_font_options | gtk_font_options_all);
@@ -6423,7 +6422,7 @@ pidgin_conv_custom_smiley_write(PurpleConversation *conv, const char *smile,
 		return;
 
 	smiley->data = g_realloc(smiley->data, smiley->datasize + size);
-	g_memmove((guchar *)smiley->data + smiley->datasize, data, size);
+	memmove((guchar *)smiley->data + smiley->datasize, data, size);
 	smiley->datasize += size;
 
 	if (!smiley->loader)
@@ -10238,16 +10237,17 @@ color_is_visible(GdkColor foreground, GdkColor background, guint color_contrast,
 	fgreen = foreground.green >> 8 ;
 	fblue = foreground.blue >> 8 ;
 
-
 	bred = background.red >> 8 ;
 	bgreen = background.green >> 8 ;
 	bblue = background.blue >> 8 ;
 
 	fg_brightness = (fred * 299 + fgreen * 587 + fblue * 114) / 1000;
 	bg_brightness = (bred * 299 + bgreen * 587 + bblue * 114) / 1000;
-	br_diff = abs(fg_brightness - bg_brightness);
+	br_diff = MAX(fg_brightness, bg_brightness) - MIN(fg_brightness, bg_brightness);
 
-	col_diff = abs(fred - bred) + abs(fgreen - bgreen) + abs(fblue - bblue);
+	col_diff = (MAX(fred, bred) - MIN(fred, bred)) +
+	           (MAX(fgreen, bgreen) - MIN(fgreen, bgreen)) +
+	           (MAX(fblue, bblue) - MIN(fblue, bblue));
 
 	return ((col_diff > color_contrast) && (br_diff > brightness_contrast));
 }
@@ -10312,7 +10312,7 @@ generate_nick_colors(guint *color_count, GdkColor background)
 	if (i < numcolors) {
 		GdkColor *c = colors;
 		purple_debug_warning("gtkconv", "Unable to generate enough random colors before timeout. %u colors found.\n", i);
-		colors = g_memdup(c, i * sizeof(GdkColor));
+		colors = g_memdup2(c, i * sizeof(GdkColor));
 		g_free(c);
 		*color_count = i;
 	}

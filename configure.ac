@@ -24,7 +24,7 @@ AC_PREREQ([2.50])
 m4_define([purple_lt_current], [14])
 m4_define([purple_major_version], [2])
 m4_define([purple_minor_version], [14])
-m4_define([purple_micro_version], [1])
+m4_define([purple_micro_version], [2])
 m4_define([purple_version_suffix], [])
 m4_define([purple_version],
           [purple_major_version.purple_minor_version.purple_micro_version])
@@ -257,7 +257,7 @@ dnl #######################################################################
 AC_ARG_ENABLE(nls, AC_HELP_STRING([--disable-nls], [disable installation of translation files]), enable_i18n="$enableval", enable_i18n=yes)
 
 if test x$enable_i18n = xyes; then
-	AC_PROG_INTLTOOL
+AC_PROG_INTLTOOL
 	GETTEXT_PACKAGE=pidgin
 	AC_SUBST(GETTEXT_PACKAGE)
 
@@ -1458,23 +1458,18 @@ dnl auto-generated stuff to the repository is inelegant.
 dnl Alternatively, these python scripts could be rewritten
 dnl in C (brrrr ...).
 
-AC_ARG_WITH([python],
-			AC_HELP_STRING([--with-python=PATH],
+AC_ARG_WITH([python3],
+			AC_HELP_STRING([--with-python3=PATH],
 						   [which python interpreter to use for dbus code generation]),
-			PYTHON=$withval)
+			PYTHON3=$withval)
 
 if test "x$enable_dbus" = "xyes" ; then
-	if test -z "$PYTHON" -o "x$PYTHON" = "xyes"; then
-		AC_PATH_PROG([PYTHON], [python], [no])
+	if test -z "$PYTHON3" -o "x$PYTHON3" = "xyes"; then
+		AC_PATH_PROG([PYTHON3], [python3], [no])
 	fi
 
-	if test x"$PYTHON" = x"no" ; then
-		AC_MSG_WARN([python interpreter not found in your path])
-		enable_dbus=no
-	fi
-
-	if $PYTHON -c "import sys; sys.exit(sys.version[[:3]] >= '2.4')" ; then
-		AC_MSG_WARN([python version >= 2.4 required])
+	if test x"$PYTHON3" = x"no" ; then
+		AC_MSG_WARN([python3 interpreter not found in your path])
 		enable_dbus=no
 	fi
 fi
@@ -2332,7 +2327,7 @@ dnl #######################################################################
 dnl AC_CHECK_SIZEOF(short)
 AC_CHECK_FUNCS(snprintf connect)
 AC_SUBST(SASL_LIBS)
-AC_ARG_ENABLE(cyrus-sasl, AC_HELP_STRING([--enable-cyrus-sasl], [enable Cyrus SASL support for xmpp/irc]), enable_cyrus_sasl=$enableval, enable_cyrus_sasl=no)
+AC_ARG_ENABLE(cyrus-sasl, AC_HELP_STRING([--enable-cyrus-sasl], [enable Cyrus SASL support for xmpp/irc]), enable_cyrus_sasl=$enableval, enable_cyrus_sasl=yes)
 if test "x$enable_cyrus_sasl" = "xyes" ; then
 	AC_CHECK_LIB(sasl2, sasl_client_init, [
 			AM_CONDITIONAL(USE_CYRUS_SASL, true)
