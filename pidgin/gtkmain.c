@@ -928,7 +928,7 @@ int main(int argc, char *argv[])
 
 	if ((active_accounts = purple_accounts_get_all_active()) == NULL)
 	{
-		pidgin_accounts_window_show();
+		pidgin_account_dialog_show(PIDGIN_ADD_ACCOUNT_DIALOG, NULL);
 	}
 	else
 	{

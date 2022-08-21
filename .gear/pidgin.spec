@@ -317,7 +317,8 @@ done
 %endif
 	--with-python3=%__python3 \
 	--with-system-ssl-certs=%_datadir/ca-certificates \
-	--with-extraversion=%release
+	--with-extraversion=%release \
+	--with-static-prpls="jabber" --with-dynamic-prpls=""
 
 
 %make_build

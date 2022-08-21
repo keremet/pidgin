@@ -7560,9 +7560,9 @@ void pidgin_blist_init(void)
 	/* Initialize prefs */
 	purple_prefs_add_none(PIDGIN_PREFS_ROOT "/blist");
 	purple_prefs_add_bool(PIDGIN_PREFS_ROOT "/blist/show_buddy_icons", TRUE);
-	purple_prefs_add_bool(PIDGIN_PREFS_ROOT "/blist/show_empty_groups", FALSE);
+	purple_prefs_add_bool(PIDGIN_PREFS_ROOT "/blist/show_empty_groups", TRUE);
 	purple_prefs_add_bool(PIDGIN_PREFS_ROOT "/blist/show_idle_time", TRUE);
-	purple_prefs_add_bool(PIDGIN_PREFS_ROOT "/blist/show_offline_buddies", FALSE);
+	purple_prefs_add_bool(PIDGIN_PREFS_ROOT "/blist/show_offline_buddies", TRUE);
 	purple_prefs_add_bool(PIDGIN_PREFS_ROOT "/blist/show_protocol_icons", FALSE);
 	purple_prefs_add_bool(PIDGIN_PREFS_ROOT "/blist/list_visible", FALSE);
 	purple_prefs_add_bool(PIDGIN_PREFS_ROOT "/blist/list_maximized", FALSE);

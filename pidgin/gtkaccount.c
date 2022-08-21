@@ -24,6 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02111-1301  USA
  */
 
+#define _XOPEN_SOURCE
+#include <stdio.h>
 #include "internal.h"
 #include "pidgin.h"
 
@@ -111,7 +113,6 @@ typedef struct
 	GtkWidget *notebook;
 	GtkWidget *top_vbox;
 	GtkWidget *ok_button;
-	GtkWidget *register_button;
 
 	/* Login Options */
 	GtkWidget *login_frame;
@@ -119,12 +120,10 @@ typedef struct
 	GtkWidget *password_box;
 	GtkWidget *username_entry;
 	GtkWidget *password_entry;
-	GtkWidget *alias_entry;
 	GtkWidget *remember_pass_check;
 
 	/* User Options */
 	GtkWidget *user_frame;
-	GtkWidget *new_mail_check;
 	GtkWidget *icon_hbox;
 	GtkWidget *icon_check;
 	GtkWidget *icon_entry;
@@ -135,20 +134,6 @@ typedef struct
 
 	/* Protocol Options */
 	GtkWidget *protocol_frame;
-
-	/* Proxy Options */
-	GtkWidget *proxy_frame;
-	GtkWidget *proxy_vbox;
-	GtkWidget *proxy_dropdown;
-	GtkWidget *proxy_host_entry;
-	GtkWidget *proxy_port_entry;
-	GtkWidget *proxy_user_entry;
-	GtkWidget *proxy_pass_entry;
-
-	/* Voice & Video Options*/
-	GtkWidget *voice_frame;
-	GtkWidget *suppression_check;
-
 } AccountPrefsDialog;
 
 static AccountsWindow *accounts_window = NULL;
@@ -163,9 +148,6 @@ static void set_account(GtkListStore *store, GtkTreeIter *iter,
  **************************************************************************/
 static void add_login_options(AccountPrefsDialog *dialog, GtkWidget *parent);
 static void add_user_options(AccountPrefsDialog *dialog, GtkWidget *parent);
-static void add_protocol_options(AccountPrefsDialog *dialog);
-static void add_proxy_options(AccountPrefsDialog *dialog, GtkWidget *parent);
-static void add_voice_options(AccountPrefsDialog *dialog);
 
 static GtkWidget *
 add_pref_box(AccountPrefsDialog *dialog, GtkWidget *parent,
@@ -250,23 +232,8 @@ set_account_protocol_cb(GtkWidget *item, const char *id,
 
 	add_login_options(dialog,    dialog->top_vbox);
 	add_user_options(dialog,     dialog->top_vbox);
-	add_protocol_options(dialog);
-	add_voice_options(dialog);
 
 	gtk_widget_grab_focus(dialog->protocol_menu);
-
-	if (!dialog->prpl_info || !dialog->prpl_info->register_user ||
-	    g_object_get_data(G_OBJECT(item), "fake")) {
-		gtk_widget_hide(dialog->register_button);
-	} else {
-		if (dialog->prpl_info != NULL &&
-		   (dialog->prpl_info->options & OPT_PROTO_REGISTER_NOSCREENNAME)) {
-			gtk_widget_set_sensitive(dialog->register_button, TRUE);
-		} else {
-			gtk_widget_set_sensitive(dialog->register_button, FALSE);
-		}
-		gtk_widget_show(dialog->register_button);
-	}
 }
 
 static gboolean
@@ -294,13 +261,6 @@ username_changed_cb(GtkEntry *entry, AccountPrefsDialog *dialog)
 	if (dialog->ok_button)
 		gtk_widget_set_sensitive(dialog->ok_button,
 				*gtk_entry_get_text(entry) != '\0');
-	if (dialog->register_button) {
-		if (dialog->prpl_info != NULL && (dialog->prpl_info->options & OPT_PROTO_REGISTER_NOSCREENNAME))
-			gtk_widget_set_sensitive(dialog->register_button, TRUE);
-		else
-			gtk_widget_set_sensitive(dialog->register_button,
-					*gtk_entry_get_text(entry) != '\0');
-	}
 }
 
 static gboolean
@@ -471,30 +431,22 @@ add_login_options(AccountPrefsDialog *dialog, GtkWidget *parent)
 	{
 		dialog->protocol_menu = pidgin_protocol_option_menu_new(
 				dialog->protocol_id, G_CALLBACK(set_account_protocol_cb), dialog);
-#if GTK_CHECK_VERSION(2,12,0)
-		g_object_ref(G_OBJECT(dialog->protocol_menu));
-#else
-		gtk_widget_ref(dialog->protocol_menu);
-#endif
 	}
 
-	hbox = add_pref_box(dialog, vbox, _("Pro_tocol:"), dialog->protocol_menu);
 	g_object_set_data(G_OBJECT(dialog->protocol_menu), "container", hbox);
-
-#if GTK_CHECK_VERSION(2,12,0)
-	g_object_unref(G_OBJECT(dialog->protocol_menu));
-#else
-	gtk_widget_unref(dialog->protocol_menu);
-#endif
 
 	/* Username */
 	dialog->username_entry = gtk_entry_new();
+	gtk_entry_set_text(GTK_ENTRY(dialog->username_entry), "123");
 	g_object_set(G_OBJECT(dialog->username_entry), "truncate-multiline", TRUE, NULL);
 
 	add_pref_box(dialog, vbox, _("_Username:"), dialog->username_entry);
 
 	if (dialog->account != NULL)
 		username = g_strdup(purple_account_get_username(dialog->account));
+	else {
+		gtk_entry_set_text(GTK_ENTRY(dialog->username_entry), cuserid(NULL));
+	}
 
 	if (!username && dialog->prpl_info
 			&& PURPLE_PROTOCOL_PLUGIN_HAS_FUNC(dialog->prpl_info, get_account_text_table)) {
@@ -517,10 +469,7 @@ add_login_options(AccountPrefsDialog *dialog, GtkWidget *parent)
 					 G_CALLBACK(username_changed_cb), dialog);
 
 	/* Do the user split thang */
-	if (dialog->prpl_info == NULL)
-		user_splits = NULL;
-	else
-		user_splits = dialog->prpl_info->user_splits;
+	user_splits = NULL;
 
 	if (dialog->user_split_entries != NULL) {
 		g_list_free(dialog->user_split_entries);
@@ -666,16 +615,6 @@ add_user_options(AccountPrefsDialog *dialog, GtkWidget *parent)
 	gtk_container_add(GTK_CONTAINER(frame), vbox);
 	gtk_widget_show(vbox);
 
-	/* Alias */
-	dialog->alias_entry = gtk_entry_new();
-	add_pref_box(dialog, vbox, _("_Local alias:"), dialog->alias_entry);
-
-	/* New mail notifications */
-	dialog->new_mail_check =
-		gtk_check_button_new_with_mnemonic(_("New _mail notifications"));
-	gtk_box_pack_start(GTK_BOX(vbox), dialog->new_mail_check, FALSE, FALSE, 0);
-	gtk_widget_show(dialog->new_mail_check);
-
 	/* Buddy icon */
 	dialog->icon_check = gtk_check_button_new_with_mnemonic(_("Use this buddy _icon for this account:"));
 	g_signal_connect(G_OBJECT(dialog->icon_check), "toggled", G_CALLBACK(icon_check_cb), dialog);
@@ -720,9 +659,6 @@ add_user_options(AccountPrefsDialog *dialog, GtkWidget *parent)
 	gtk_widget_show(button);
 
 	if (dialog->prpl_info != NULL) {
-		if (!(dialog->prpl_info->options & OPT_PROTO_MAIL_CHECK))
-			gtk_widget_hide(dialog->new_mail_check);
-
 		if (dialog->prpl_info->icon_spec.format == NULL) {
 			gtk_widget_hide(dialog->icon_check);
 			gtk_widget_hide(dialog->icon_hbox);
@@ -733,13 +669,6 @@ add_user_options(AccountPrefsDialog *dialog, GtkWidget *parent)
 		PurpleStoredImage *img;
 		gpointer data = NULL;
 		size_t len = 0;
-
-		if (purple_account_get_alias(dialog->account))
-			gtk_entry_set_text(GTK_ENTRY(dialog->alias_entry),
-							   purple_account_get_alias(dialog->account));
-
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dialog->new_mail_check),
-					     purple_account_get_check_mail(dialog->account));
 
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dialog->icon_check),
 					     !purple_account_get_bool(dialog->account, "use-global-buddyicon",
@@ -768,452 +697,6 @@ add_user_options(AccountPrefsDialog *dialog, GtkWidget *parent)
 #endif
 }
 
-static void
-add_protocol_options(AccountPrefsDialog *dialog)
-{
-	PurpleAccountOption *option;
-	PurpleAccount *account;
-	GtkWidget *vbox, *check, *entry, *combo;
-	GList *list, *node;
-	gint i, idx, int_value;
-	GtkListStore *model;
-	GtkTreeIter iter;
-	GtkCellRenderer *renderer;
-	PurpleKeyValuePair *kvp;
-	GList *l;
-	char buf[1024];
-	char *title, *tmp;
-	const char *str_value;
-	gboolean bool_value;
-	ProtocolOptEntry *opt_entry;
-
-	if (dialog->protocol_frame != NULL) {
-		gtk_notebook_remove_page (GTK_NOTEBOOK(dialog->notebook), 1);
-		dialog->protocol_frame = NULL;
-	}
-
-	while (dialog->protocol_opt_entries != NULL) {
-		ProtocolOptEntry *opt_entry = dialog->protocol_opt_entries->data;
-		g_free(opt_entry->setting);
-		g_free(opt_entry);
-		dialog->protocol_opt_entries = g_list_delete_link(dialog->protocol_opt_entries, dialog->protocol_opt_entries);
-	}
-
-	if (dialog->prpl_info == NULL ||
-			dialog->prpl_info->protocol_options == NULL)
-		return;
-
-	account = dialog->account;
-
-	/* Main vbox */
-	dialog->protocol_frame = vbox = gtk_vbox_new(FALSE, PIDGIN_HIG_BOX_SPACE);
-	gtk_container_set_border_width(GTK_CONTAINER(vbox), PIDGIN_HIG_BORDER);
-	gtk_notebook_insert_page(GTK_NOTEBOOK(dialog->notebook), vbox,
-			gtk_label_new_with_mnemonic(_("Ad_vanced")), 1);
-	gtk_widget_show(vbox);
-
-	for (l = dialog->prpl_info->protocol_options; l != NULL; l = l->next)
-	{
-		option = (PurpleAccountOption *)l->data;
-
-		opt_entry = g_new0(ProtocolOptEntry, 1);
-		opt_entry->type = purple_account_option_get_type(option);
-		opt_entry->setting = g_strdup(purple_account_option_get_setting(option));
-
-		switch (opt_entry->type)
-		{
-			case PURPLE_PREF_BOOLEAN:
-				if (account == NULL ||
-					!purple_strequal(purple_account_get_protocol_id(account),
-						   dialog->protocol_id))
-				{
-					bool_value = purple_account_option_get_default_bool(option);
-				}
-				else
-				{
-					bool_value = purple_account_get_bool(account,
-						purple_account_option_get_setting(option),
-						purple_account_option_get_default_bool(option));
-				}
-
-				tmp = g_strconcat("_", purple_account_option_get_text(option), NULL);
-				opt_entry->widget = check = gtk_check_button_new_with_mnemonic(tmp);
-				g_free(tmp);
-
-				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check),
-											 bool_value);
-
-				gtk_box_pack_start(GTK_BOX(vbox), check, FALSE, FALSE, 0);
-				gtk_widget_show(check);
-				break;
-
-			case PURPLE_PREF_INT:
-				if (account == NULL ||
-					!purple_strequal(purple_account_get_protocol_id(account),
-						   dialog->protocol_id))
-				{
-					int_value = purple_account_option_get_default_int(option);
-				}
-				else
-				{
-					int_value = purple_account_get_int(account,
-						purple_account_option_get_setting(option),
-						purple_account_option_get_default_int(option));
-				}
-
-				g_snprintf(buf, sizeof(buf), "%d", int_value);
-
-				opt_entry->widget = entry = gtk_entry_new();
-				gtk_entry_set_text(GTK_ENTRY(entry), buf);
-
-				title = g_strdup_printf("_%s:",
-						purple_account_option_get_text(option));
-				add_pref_box(dialog, vbox, title, entry);
-				g_free(title);
-				break;
-
-			case PURPLE_PREF_STRING:
-				if (account == NULL ||
-					!purple_strequal(purple_account_get_protocol_id(account),
-						   dialog->protocol_id))
-				{
-					str_value = purple_account_option_get_default_string(option);
-				}
-				else
-				{
-					str_value = purple_account_get_string(account,
-						purple_account_option_get_setting(option),
-						purple_account_option_get_default_string(option));
-				}
-
-				opt_entry->widget = entry = gtk_entry_new();
-				if (purple_account_option_get_masked(option))
-				{
-					gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
-#if !GTK_CHECK_VERSION(2,16,0)
-					if (gtk_entry_get_invisible_char(GTK_ENTRY(entry)) == '*')
-						gtk_entry_set_invisible_char(GTK_ENTRY(entry), PIDGIN_INVISIBLE_CHAR);
-#endif /* Less than GTK+ 2.16 */
-				}
-
-				if (str_value != NULL)
-					gtk_entry_set_text(GTK_ENTRY(entry), str_value);
-
-				title = g_strdup_printf("_%s:",
-						purple_account_option_get_text(option));
-				add_pref_box(dialog, vbox, title, entry);
-				g_free(title);
-				break;
-
-			case PURPLE_PREF_STRING_LIST:
-				i = 0;
-				idx = 0;
-
-				if (account == NULL ||
-					!purple_strequal(purple_account_get_protocol_id(account),
-						   dialog->protocol_id))
-				{
-					str_value = purple_account_option_get_default_list_value(option);
-				}
-				else
-				{
-					str_value = purple_account_get_string(account,
-						purple_account_option_get_setting(option),
-						purple_account_option_get_default_list_value(option));
-				}
-
-				list = purple_account_option_get_list(option);
-				model = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_POINTER);
-				opt_entry->widget = combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(model));
-
-				/* Loop through list of PurpleKeyValuePair items */
-				for (node = list; node != NULL; node = node->next) {
-					if (node->data != NULL) {
-						kvp = (PurpleKeyValuePair *) node->data;
-						if ((kvp->value != NULL) && (str_value != NULL) &&
-						    !g_utf8_collate(kvp->value, str_value))
-							idx = i;
-
-						gtk_list_store_append(model, &iter);
-						gtk_list_store_set(model, &iter,
-								0, kvp->key,
-								1, kvp->value,
-								-1);
-					}
-
-					i++;
-				}
-
-				/* Set default */
-				gtk_combo_box_set_active(GTK_COMBO_BOX(combo), idx);
-
-				/* Define renderer */
-				renderer = gtk_cell_renderer_text_new();
-				gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(combo), renderer,
-						TRUE);
-				gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combo),
-						renderer, "text", 0, NULL);
-
-				title = g_strdup_printf("_%s:",
-						purple_account_option_get_text(option));
-				add_pref_box(dialog, vbox, title, combo);
-				g_free(title);
-				break;
-
-			default:
-				purple_debug_error("gtkaccount", "Invalid Account Option pref type (%d)\n",
-						   opt_entry->type);
-				g_free(opt_entry->setting);
-				g_free(opt_entry);
-				continue;
-		}
-
-		dialog->protocol_opt_entries =
-			g_list_append(dialog->protocol_opt_entries, opt_entry);
-
-	}
-}
-
-static GtkWidget *
-make_proxy_dropdown(void)
-{
-	GtkWidget *dropdown;
-	GtkListStore *model;
-	GtkTreeIter iter;
-	GtkCellRenderer *renderer;
-
-	model = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_INT);
-	dropdown = gtk_combo_box_new_with_model(GTK_TREE_MODEL(model));
-
-	gtk_list_store_append(model, &iter);
-	gtk_list_store_set(model, &iter,
-			0, purple_running_gnome() ? _("Use GNOME Proxy Settings")
-			:_("Use Global Proxy Settings"),
-			1, PURPLE_PROXY_USE_GLOBAL,
-			-1);
-
-	gtk_list_store_append(model, &iter);
-	gtk_list_store_set(model, &iter,
-			0, _("No Proxy"),
-			1, PURPLE_PROXY_NONE,
-			-1);
-
-	gtk_list_store_append(model, &iter);
-	gtk_list_store_set(model, &iter,
-			0, _("SOCKS 4"),
-			1, PURPLE_PROXY_SOCKS4,
-			-1);
-
-	gtk_list_store_append(model, &iter);
-	gtk_list_store_set(model, &iter,
-			0, _("SOCKS 5"),
-			1, PURPLE_PROXY_SOCKS5,
-			-1);
-
-	gtk_list_store_append(model, &iter);
-	gtk_list_store_set(model, &iter,
-			0, _("Tor/Privacy (SOCKS5)"),
-			1, PURPLE_PROXY_TOR,
-			-1);
-
-	gtk_list_store_append(model, &iter);
-	gtk_list_store_set(model, &iter,
-			0, _("HTTP"),
-			1, PURPLE_PROXY_HTTP,
-			-1);
-
-	gtk_list_store_append(model, &iter);
-	gtk_list_store_set(model, &iter,
-			0, _("Use Environmental Settings"),
-			1, PURPLE_PROXY_USE_ENVVAR,
-			-1);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(dropdown), renderer, TRUE);
-	gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(dropdown), renderer,
-			"text", 0, NULL);
-
-	return dropdown;
-}
-
-static void
-proxy_type_changed_cb(GtkWidget *menu, AccountPrefsDialog *dialog)
-{
-	GtkTreeIter iter;
-
-	if (gtk_combo_box_get_active_iter(GTK_COMBO_BOX(menu), &iter)) {
-		int int_value;
-		gtk_tree_model_get(gtk_combo_box_get_model(GTK_COMBO_BOX(menu)), &iter,
-			1, &int_value, -1);
-		dialog->new_proxy_type = int_value;
-	}
-
-	if (dialog->new_proxy_type == PURPLE_PROXY_USE_GLOBAL ||
-		dialog->new_proxy_type == PURPLE_PROXY_NONE ||
-		dialog->new_proxy_type == PURPLE_PROXY_USE_ENVVAR) {
-
-		gtk_widget_hide_all(dialog->proxy_vbox);
-	}
-	else
-		gtk_widget_show_all(dialog->proxy_vbox);
-}
-
-static void
-port_popup_cb(GtkWidget *w, GtkMenu *menu, gpointer data)
-{
-	GtkWidget *item1;
-	GtkWidget *item2;
-
-	/* This is an easter egg.
-	   It means one of two things, both intended as humourus:
-	   A) your network is really slow and you have nothing better to do than
-	      look at butterflies.
-	   B)You are looking really closely at something that shouldn't matter. */
-	item1 = gtk_menu_item_new_with_label(_("If you look real closely"));
-
-	/* This is an easter egg. See the comment on the previous line in the source. */
-	item2 = gtk_menu_item_new_with_label(_("you can see the butterflies mating"));
-
-	gtk_widget_show(item1);
-	gtk_widget_show(item2);
-
-	/* Prepend these in reverse order so they appear correctly. */
-	gtk_menu_shell_prepend(GTK_MENU_SHELL(menu), item2);
-	gtk_menu_shell_prepend(GTK_MENU_SHELL(menu), item1);
-}
-
-static void
-add_proxy_options(AccountPrefsDialog *dialog, GtkWidget *parent)
-{
-	PurpleProxyInfo *proxy_info;
-	GtkWidget *vbox;
-	GtkWidget *vbox2;
-	GtkTreeIter iter;
-	GtkTreeModel *proxy_model;
-
-	if (dialog->proxy_frame != NULL)
-		gtk_widget_destroy(dialog->proxy_frame);
-
-	/* Main vbox */
-	dialog->proxy_frame = vbox = gtk_vbox_new(FALSE, PIDGIN_HIG_BOX_SPACE);
-	gtk_container_add(GTK_CONTAINER(parent), vbox);
-	gtk_widget_show(vbox);
-
-	/* Proxy Type drop-down. */
-	dialog->proxy_dropdown = make_proxy_dropdown();
-
-	add_pref_box(dialog, vbox, _("Proxy _type:"), dialog->proxy_dropdown);
-
-	/* Setup the second vbox, which may be hidden at times. */
-	dialog->proxy_vbox = vbox2 = gtk_vbox_new(FALSE, PIDGIN_HIG_BOX_SPACE);
-	gtk_box_pack_start(GTK_BOX(vbox), vbox2, FALSE, FALSE, PIDGIN_HIG_BORDER);
-	gtk_widget_show(vbox2);
-
-	/* Host */
-	dialog->proxy_host_entry = gtk_entry_new();
-	add_pref_box(dialog, vbox2, _("_Host:"), dialog->proxy_host_entry);
-
-	/* Port */
-	dialog->proxy_port_entry = gtk_entry_new();
-	add_pref_box(dialog, vbox2, _("_Port:"), dialog->proxy_port_entry);
-
-	g_signal_connect(G_OBJECT(dialog->proxy_port_entry), "populate-popup",
-					 G_CALLBACK(port_popup_cb), NULL);
-
-	/* User */
-	dialog->proxy_user_entry = gtk_entry_new();
-
-	add_pref_box(dialog, vbox2, _("_Username:"), dialog->proxy_user_entry);
-
-	/* Password */
-	dialog->proxy_pass_entry = gtk_entry_new();
-	gtk_entry_set_visibility(GTK_ENTRY(dialog->proxy_pass_entry), FALSE);
-#if !GTK_CHECK_VERSION(2,16,0)
-	if (gtk_entry_get_invisible_char(GTK_ENTRY(dialog->proxy_pass_entry)) == '*')
-		gtk_entry_set_invisible_char(GTK_ENTRY(dialog->proxy_pass_entry), PIDGIN_INVISIBLE_CHAR);
-#endif /* Less than GTK+ 2.16 */
-	add_pref_box(dialog, vbox2, _("Pa_ssword:"), dialog->proxy_pass_entry);
-
-	if (dialog->account != NULL &&
-		(proxy_info = purple_account_get_proxy_info(dialog->account)) != NULL) {
-		const char *value;
-		int int_val;
-
-		dialog->new_proxy_type = purple_proxy_info_get_type(proxy_info);
-
-		if ((value = purple_proxy_info_get_host(proxy_info)) != NULL)
-			gtk_entry_set_text(GTK_ENTRY(dialog->proxy_host_entry), value);
-
-		if ((int_val = purple_proxy_info_get_port(proxy_info)) != 0) {
-			char buf[11];
-
-			g_snprintf(buf, sizeof(buf), "%d", int_val);
-
-			gtk_entry_set_text(GTK_ENTRY(dialog->proxy_port_entry), buf);
-		}
-
-		if ((value = purple_proxy_info_get_username(proxy_info)) != NULL)
-			gtk_entry_set_text(GTK_ENTRY(dialog->proxy_user_entry), value);
-
-		if ((value = purple_proxy_info_get_password(proxy_info)) != NULL)
-			gtk_entry_set_text(GTK_ENTRY(dialog->proxy_pass_entry), value);
-
-	} else
-		dialog->new_proxy_type = PURPLE_PROXY_USE_GLOBAL;
-
-	proxy_model = gtk_combo_box_get_model(
-		GTK_COMBO_BOX(dialog->proxy_dropdown));
-	if (gtk_tree_model_get_iter_first(proxy_model, &iter)) {
-		int int_val;
-		do {
-			gtk_tree_model_get(proxy_model, &iter, 1, &int_val, -1);
-			if (int_val == dialog->new_proxy_type) {
-				gtk_combo_box_set_active_iter(
-					GTK_COMBO_BOX(dialog->proxy_dropdown), &iter);
-				break;
-			}
-		} while(gtk_tree_model_iter_next(proxy_model, &iter));
-	}
-
-	proxy_type_changed_cb(dialog->proxy_dropdown, dialog);
-
-	/* Connect signals. */
-	g_signal_connect(G_OBJECT(dialog->proxy_dropdown), "changed",
-					 G_CALLBACK(proxy_type_changed_cb), dialog);
-}
-
-static void
-add_voice_options(AccountPrefsDialog *dialog)
-{
-#ifdef USE_VV
-	if (!dialog->prpl_info || !PURPLE_PROTOCOL_PLUGIN_HAS_FUNC(dialog->prpl_info, initiate_media)) {
-		if (dialog->voice_frame) {
-			gtk_widget_destroy(dialog->voice_frame);
-			dialog->voice_frame = NULL;
-			dialog->suppression_check = NULL;
-		}
-		return;
-	}
-
-	if (!dialog->voice_frame) {
-		dialog->voice_frame = gtk_vbox_new(FALSE, PIDGIN_HIG_BORDER);
-		gtk_container_set_border_width(GTK_CONTAINER(dialog->voice_frame),
-										PIDGIN_HIG_BORDER);
-
-		dialog->suppression_check =
-				gtk_check_button_new_with_mnemonic(_("Use _silence suppression"));
-		gtk_box_pack_start(GTK_BOX(dialog->voice_frame), dialog->suppression_check,
-				FALSE, FALSE, 0);
-
-		gtk_notebook_append_page(GTK_NOTEBOOK(dialog->notebook),
-				dialog->voice_frame, gtk_label_new_with_mnemonic(_("_Voice and Video")));
-		gtk_widget_show_all(dialog->voice_frame);
-	}
-
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dialog->suppression_check),
-								purple_account_get_silence_suppression(dialog->account));
-#endif
-}
 
 static gboolean
 account_win_destroy_cb(GtkWidget *w, GdkEvent *event,
@@ -1263,6 +746,12 @@ ok_account_prefs_cb(GtkWidget *w, AccountPrefsDialog *dialog)
 
 	/* Build the username string. */
 	username = g_strdup(gtk_entry_get_text(GTK_ENTRY(dialog->username_entry)));
+	if (strchr(username, '@') == NULL)
+	{
+		tmp = g_strconcat(username, "@chat", NULL);
+		g_free(username);
+		username = tmp;
+	}
 
 	if (dialog->prpl_info != NULL)
 	{
@@ -1319,12 +808,7 @@ ok_account_prefs_cb(GtkWidget *w, AccountPrefsDialog *dialog)
 	}
 
 	/* Alias */
-	value = gtk_entry_get_text(GTK_ENTRY(dialog->alias_entry));
-
-	if (*value != '\0')
-		purple_account_set_alias(account, value);
-	else
-		purple_account_set_alias(account, NULL);
+	purple_account_set_alias(account, NULL);
 
 	/* Buddy Icon */
 	if (dialog->prpl_info != NULL && dialog->prpl_info->icon_spec.format != NULL)
@@ -1371,9 +855,7 @@ ok_account_prefs_cb(GtkWidget *w, AccountPrefsDialog *dialog)
 
 	/* Check Mail */
 	if (dialog->prpl_info && dialog->prpl_info->options & OPT_PROTO_MAIL_CHECK)
-		purple_account_set_check_mail(account,
-			gtk_toggle_button_get_active(
-					GTK_TOGGLE_BUTTON(dialog->new_mail_check)));
+		purple_account_set_check_mail(account, FALSE);
 
 	/* Password */
 	value = gtk_entry_get_text(GTK_ENTRY(dialog->password_entry));
@@ -1447,36 +929,16 @@ ok_account_prefs_cb(GtkWidget *w, AccountPrefsDialog *dialog)
 	purple_proxy_info_set_type(proxy_info, dialog->new_proxy_type);
 
 	/* Host */
-	value = gtk_entry_get_text(GTK_ENTRY(dialog->proxy_host_entry));
-
-	if (*value != '\0')
-		purple_proxy_info_set_host(proxy_info, value);
-	else
-		purple_proxy_info_set_host(proxy_info, NULL);
+	purple_proxy_info_set_host(proxy_info, NULL);
 
 	/* Port */
-	value = gtk_entry_get_text(GTK_ENTRY(dialog->proxy_port_entry));
-
-	if (*value != '\0')
-		purple_proxy_info_set_port(proxy_info, atoi(value));
-	else
-		purple_proxy_info_set_port(proxy_info, 0);
+	purple_proxy_info_set_port(proxy_info, 0);
 
 	/* Username */
-	value = gtk_entry_get_text(GTK_ENTRY(dialog->proxy_user_entry));
-
-	if (*value != '\0')
-		purple_proxy_info_set_username(proxy_info, value);
-	else
-		purple_proxy_info_set_username(proxy_info, NULL);
+	purple_proxy_info_set_username(proxy_info, NULL);
 
 	/* Password */
-	value = gtk_entry_get_text(GTK_ENTRY(dialog->proxy_pass_entry));
-
-	if (*value != '\0')
-		purple_proxy_info_set_password(proxy_info, value);
-	else
-		purple_proxy_info_set_password(proxy_info, NULL);
+	purple_proxy_info_set_password(proxy_info, NULL);
 
 	/* If there are no values set then proxy_info NULL */
 	if ((purple_proxy_info_get_type(proxy_info) == PURPLE_PROXY_USE_GLOBAL) &&
@@ -1489,12 +951,6 @@ ok_account_prefs_cb(GtkWidget *w, AccountPrefsDialog *dialog)
 		proxy_info = NULL;
 	}
 
-	/* Voice and Video settings */
-	if (dialog->voice_frame) {
-		purple_account_set_silence_suppression(account,
-				gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dialog->suppression_check)));
-	}
-
 	/* If this is a new account, add it to our list */
 	if (new_acct)
 		purple_accounts_add(account);
@@ -1502,9 +958,7 @@ ok_account_prefs_cb(GtkWidget *w, AccountPrefsDialog *dialog)
 		purple_signal_emit(pidgin_account_get_handle(), "account-modified", account);
 
 	/* If this is a new account, then sign on! */
-	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dialog->register_button))) {
-		purple_account_register(account);
-	} else if (new_acct) {
+	if (new_acct) {
 		const PurpleSavedStatus *saved_status;
 
 		saved_status = purple_savedstatus_get_current();
@@ -1533,7 +987,6 @@ pidgin_account_dialog_show(PidginAccountDialogType type,
 	GtkWidget *win;
 	GtkWidget *main_vbox;
 	GtkWidget *vbox;
-	GtkWidget *dbox;
 	GtkWidget *notebook;
 	GtkWidget *button;
 
@@ -1594,30 +1047,6 @@ pidgin_account_dialog_show(PidginAccountDialogType type,
 	add_login_options(dialog, vbox);
 	add_user_options(dialog, vbox);
 
-	button = gtk_check_button_new_with_mnemonic(
-		_("Create _this new account on the server"));
-	gtk_box_pack_start(GTK_BOX(main_vbox), button, FALSE, FALSE, 0);
-	gtk_widget_show(button);
-	dialog->register_button = button;
-	if (dialog->account == NULL)
-		gtk_widget_set_sensitive(button, FALSE);
-
-	if (!dialog->prpl_info || !dialog->prpl_info->register_user)
-		gtk_widget_hide(button);
-
-	/* Setup the page with 'Advanced' (protocol options). */
-	add_protocol_options(dialog);
-
-	/* Setup the page with 'Proxy'. */
-	dbox = gtk_vbox_new(FALSE, PIDGIN_HIG_BORDER);
-	gtk_container_set_border_width(GTK_CONTAINER(dbox), PIDGIN_HIG_BORDER);
-	gtk_notebook_append_page(GTK_NOTEBOOK(notebook), dbox,
-			gtk_label_new_with_mnemonic(_("P_roxy")));
-	gtk_widget_show(dbox);
-	add_proxy_options(dialog, dbox);
-
-	add_voice_options(dialog);
-
 	/* Cancel button */
 	pidgin_dialog_add_button(GTK_DIALOG(win), GTK_STOCK_CANCEL, G_CALLBACK(cancel_account_prefs_cb), dialog);
 
@@ -1627,7 +1056,7 @@ pidgin_account_dialog_show(PidginAccountDialogType type,
 	                                  G_CALLBACK(ok_account_prefs_cb),
 	                                  dialog);
 	if (dialog->account == NULL)
-		gtk_widget_set_sensitive(button, FALSE);
+		gtk_widget_set_sensitive(button, *gtk_entry_get_text(GTK_ENTRY(dialog->username_entry)) != '\0');
 	dialog->ok_button = button;
 
 	/* Set up DND */

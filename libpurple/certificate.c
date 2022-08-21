@@ -1418,30 +1418,7 @@ static void
 x509_tls_cached_user_auth(PurpleCertificateVerificationRequest *vrq,
 			  const gchar *reason)
 {
-	gchar *primary;
-
-	/* Make messages */
-	primary = g_strdup_printf(_("Accept certificate for %s?"),
-				  vrq->subject_name);
-
-	/* Make a semi-pretty display */
-	purple_request_action(
-		vrq->cb_data, /* TODO: Find what the handle ought to be */
-		_("SSL Certificate Verification"),
-		primary,
-		reason,
-		0,            /* Accept by default */
-		NULL,         /* No account */
-		NULL,         /* No other user */
-		NULL,         /* No associated conversation */
-		x509_tls_cached_ua_ctx_new(vrq, reason),
-		3,            /* Number of actions */
-		_("Accept"), x509_tls_cached_user_auth_accept_cb,
-		_("Reject"),  x509_tls_cached_user_auth_reject_cb,
-		_("_View Certificate..."), x509_tls_cached_show_cert);
-
-	/* Cleanup */
-	g_free(primary);
+	x509_tls_cached_user_auth_cb(x509_tls_cached_ua_ctx_new(vrq, reason), 2);
 }
 
 static void
