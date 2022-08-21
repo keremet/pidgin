@@ -32,7 +32,7 @@
 %def_enable vv
 
 Name: pidgin
-Version: 2.14.3
+Version: 20.14.3
 Release: alt1
 
 Summary: A GTK+ based multiprotocol instant messaging client
@@ -454,6 +454,9 @@ fi
 %endif
 
 %changelog
+* Sun Aug 21 2022 Andrey Sokolov <keremet@solaris.kirov.ru> 20.14.3-alt1
+- Special edition for schools.
+
 * Tue Apr 20 2021 Alexey Shabalin <shaba@altlinux.org> 2.14.3-alt1
 - 2.14.3
 - Removed the AIM protocol plugin. AIM has been shut down since December
